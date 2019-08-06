@@ -1,0 +1,40 @@
+.mndot_body { font-family:Arial, Helvetica, sans-serif, Geneva, Swiss, SunsSans-Regular;
+	font-size:12;
+        padding-left:1em;
+        padding-right:1em;
+        padding-bottom:50px;}
+
+.test {
+	bgcolor:"#ffffff";
+	leftmargin:"0";
+	topmargin:"0";
+	style:"MARGIN-TOP: 0px; MARGIN-LEFT: 0px;";
+	marginwidth:"0";
+	marginheight:"0";
+}
+
+.old_body {
+	width:"600";
+	text="#000000";
+	bgcolor:"#FFFFFF";
+	link:"#0000EF";
+	vlink:"#51188E";
+	alink:"#FF0000";
+}
+
+.map { font-family:Arial, Helvetica, sans-serif;
+	font-size:12;
+	position:absolute;
+	left:152px;
+	top:110px;}
+
+.mndot_table { font-family:Arial, Helvetica, sans-serif;
+	font-size:12;}
+
+header { border-bottom: 1px solid #000; }
+header > h1 { display: inline-block; }
+header span {}
+header spanleft { margin-left: 100px; }
+header spanright { margin-right: 100px; }
+header spanboth { margin-left: 100px;
+                  margin-right: 100px; }

@@ -1,0 +1,16 @@
+/source_code/Java/TICAS4-Plugin-TeTRES-User/build/
+/source_code/Java/TICAS4-Plugin-TeTRES-User/dist/
+__pycache__/
+server/data/metro/
+server/data/cache/
+server/data/map/
+ve/
+dist/
+server/datafiles
+*/logs/
+*.log
+*.pyc
+*.prefs
+*.swp
+*.old
+*.bak

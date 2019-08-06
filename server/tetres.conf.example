@@ -1,0 +1,12 @@
+#FilePreferences
+#Edit accordingly, copy to /etc/tetres/tetres.conf
+ticas.python_server_host_ip=127.0.0.1
+ticas.db_host=http://example.com/
+ticas.db_user=user
+ticas.db_pass=pass
+ticas.tetres_db_name=tetres_db_name
+ticas.iris_db_name=iris_db_name
+ticas.cad_db_name=cad_db_name
+ticas.rwis_db_name=rwis_db_name
+# Comma-separated list:
+ticas.admin_ip_addresses=127.0.0.1,

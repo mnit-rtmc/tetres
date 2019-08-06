@@ -1,0 +1,11 @@
+#FilePreferences
+#Wed Aug 01 13:34:41 CDT 2018
+ticas.python_terminate_server_on_exit=false
+ticas.map_provider=OSM
+ticas.log_level=INFO
+ticas.python_server_url=http\://localhost
+ticas.python_server_path=N\:\\TICAS-NG\\Java\\TICAS4-Plugin-TeTRES-User\\server.py
+ticas.python_server_port=5000
+ticas.python_exe_path=python.exe
+ticas.custom_osm_server=
+ticas.data_path=C\:\\Portable_PYTicas\\data

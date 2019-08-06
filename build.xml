@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="TeTRES" basedir=".">
+	<!-- File '~/.ant.properties' must contain the keys:
+		TeTRES-related (omit http://):
+			tetres.webstart.host 
+			tetres.server.host
+		Jarsign-related:
+			sign.store
+			sign.store.pass
+			sign.alias
+			sign.alias.pass
+		-->
+	<property file="${user.home}/.ant.properties"/>
+
+	<property name="src.dir" value="source_code/Java"/>
+	<property name="dist.dir" value="dist"/>
+	<property name="server.dir" value="server"/>
+	<property name="admin.data" value="admin/data"/>
+	<property name="dist.admin.bin" value="${dist.dir}/admin/bin"/>
+	<property name="dist.admin.data" value="${dist.dir}/admin/data"/>
+	<property name="user.data" value="user/data"/>
+	<property name="dist.user.bin" value="${dist.dir}/user/bin"/>
+	<property name="dist.user.data" value="${dist.dir}/user/data"/>
+
+	<taskdef resource="net/sf/antcontrib/antlib.xml">
+		<classpath>
+			<pathelement location="/usr/share/ant/lib/ant-contrib.jar"/>
+		</classpath>
+	</taskdef>
+
+	<target name="clean-all">
+   		<subant target="clean">
+			<fileset dir="${src.dir}" includes="*/build.xml"/>
+		</subant>
+	</target>
+
+	<target name="clean" depends="clean-all">
+		<delete dir="${dist.dir}"/>
+	</target>
+
+	<target name="build-all">
+   		<subant target="jar">
+			<fileset dir="${src.dir}" includes="*/build.xml"/>
+		</subant>
+	</target>
+
+	<target name="dist" depends="build-all">
+		<mkdir dir="${dist.admin.bin}" />
+		<mkdir dir="${dist.admin.data}" />
+		<mkdir dir="${dist.admin.bin}/lib" />
+		<mkdir dir="${dist.user.bin}" />
+		<mkdir dir="${dist.user.data}" />
+		<mkdir dir="${dist.user.bin}/lib" />
+
+		<copy file="${src.dir}/TICAS4-Plugin-TeTRES-Admin/dist/TeTRES-Admin.jar" todir="${dist.admin.bin}" flatten="true"/>
+		<copy todir="${dist.admin.data}">
+			<fileset dir="${admin.data}"/>
+		</copy>
+		<copy todir="${dist.admin.bin}/lib" flatten="true">
+			<fileset dir="${src.dir}">
+				<include name="*/dist/lib/*.jar"/>
+				<include name="libs/*.jar"/>
+				<include name="libs/**/httpclient-4.5.6.jar"/>
+				<include name="libs/**/httpcore-4.4.10.jar"/>
+				<include name="libs/**/httpmime-4.5.6.jar"/>
+				<include name="libs/**/commons-logging-1.2.jar"/>
+				<exclude name="TICAS4-Plugin-TeTRES-User/**"/>
+				<exclude name="**/cache/**"/>
+			</fileset>
+		</copy>
+		<copy file="${src.dir}/TICAS4-Plugin-TeTRES-User/dist/TICAS4-Plugin-TeTRES-User.jar" tofile="${dist.user.bin}/TeTRES-User.jar" flatten="true"/>
+		<copy todir="${dist.user.data}">
+			<fileset dir="${user.data}"/>
+		</copy>
+		<copy todir="${dist.user.bin}/lib" flatten="true">
+			<fileset dir="${src.dir}">
+				<include name="*/dist/*.jar"/>
+				<include name="*/dist/lib/*.jar"/>
+				<include name="libs/*.jar"/>
+				<include name="libs/**/httpclient-4.5.6.jar"/>
+				<include name="libs/**/httpcore-4.4.10.jar"/>
+				<include name="libs/**/httpmime-4.5.6.jar"/>
+				<include name="libs/**/commons-logging-1.2.jar"/>
+				<exclude name="**/cache/**"/>
+			</fileset>
+		</copy>
+		<copy todir="${dist.dir}" filtering="true">
+			<fileset dir="." includes="*.jnlp,Readme.md,index.html,standard.css"/>
+			<filterset begintoken="@@" endtoken="@@">
+				<filter token="VERSION" value="${version}"/>
+				<filter token="TETRES.WEBSTART.HOST" value="${tetres.webstart.host}"/>
+				<filter token="TETRES.SERVER.HOST" value="${tetres.server.host}"/>
+			</filterset>
+		</copy>
+		<copy todir="${dist.dir}">
+			<fileset dir="." includes="config.png"/>
+		</copy>
+		<for param="jar.file" parallel="true">
+			<path>
+				<fileset dir="${dist.dir}">
+					<include name="**/*.jar"/>
+				</fileset>
+			</path>
+			<sequential>
+				<signjar 
+						jar="@{jar.file}"
+						keystore="${sign.store}"
+						storepass="${sign.store.pass}"
+						alias="${sign.alias}"
+						keypass="${sign.alias.pass}"
+						lazy="true"/>
+			</sequential>
+		</for>
+		<zip basedir="${dist.dir}/user"
+			 destfile="${dist.dir}/user/data.zip"
+			 includes="data/**/*"
+			 excludes="**/cache/**"/>
+		<zip basedir="${dist.dir}/admin"
+			 destfile="${dist.dir}/admin/data.zip"
+			 includes="data/**/*"
+			 excludes="**/cache/**"/>
+		<zip basedir="."
+			 destfile="${dist.dir}/server.zip"
+			 includes="${server.dir}/**/*, start_server.sh, package_installer.sh, requirements.txt"
+			 excludes="**/cache/**"/>
+	</target>
+</project>

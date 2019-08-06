@@ -1,0 +1,16 @@
+#FilePreferences
+#Tue Feb 20 17:26:00 CST 2018
+ttrms.server_port=5000
+ncrtes.regions_stations.region=Central,Northeast,Northwest,South
+ncrtes.server_port=5000
+ticas.python_terminate_server_on_exit=false
+ticas.map_provider=OSM
+ttrms.server_url=http\://localhost
+ticas.log_level=INFO
+ticas.python_server_url=http\://localhost
+ticas.python_server_path=D\:\\TICAS-NG\\Java\\TICAS4-NCRTES\\server.py
+ticas.python_server_port=5000
+ticas.python_exe_path=python.exe
+ncrtes.regions_stations.truck_station=ARDEN HILLS,CAMDEN,CEDAR AVENUE,MARYLAND,FOREST LAKE,NORTH BRANCH,OAKDALE,SPRING LAKE PARK,ANOKA,EDEN PRAIRIE,GOLDEN VALLEY,MAPLE GROVE,PLYMOUTH,HASTINGS,JORDAN,LAKEVILLE,MENDOTA HEIGHTS,SHAKOPEE,CHASKA
+ncrtes.server_url=http\://localhost
+ticas.data_path=N\:\\data

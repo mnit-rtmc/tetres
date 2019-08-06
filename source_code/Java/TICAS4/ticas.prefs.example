@@ -1,0 +1,17 @@
+#FilePreferences
+#Mon Feb 12 15:17:36 CST 2018
+ticas.map_provider=OSM
+ticas.moe.end_min_index=55
+ticas.moe.checked_options=[]
+ticas.moe.output_path=N\:\\data
+ticas.moe.checked_moes=[Travel Time]
+ticas.moe.duration_index=0
+ticas.log_level=INFO
+ticas.python_server_url=http\://localhost
+ticas.moe.time_interval_index=5
+ticas.python_server_port=5000
+ticas.moe.start_hour_index=0
+ticas.custom_osm_server=
+ticas.data_path=N\:\\data
+ticas.moe.start_min_index=0
+ticas.moe.end_hour_index=23

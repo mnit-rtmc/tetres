@@ -1,0 +1,1 @@
+{"name":"DryDay","desc":"only dryday's","weather_conditions":[{"type":"No","intensity":"No"}],"incident_conditions":[],"workzone_conditions":[],"specialevent_conditions":[],"snowmanagement_conditions":[],"__module__":"pyticas_tetres.ttypes","__class__":"OperatingConditionsInfo"}

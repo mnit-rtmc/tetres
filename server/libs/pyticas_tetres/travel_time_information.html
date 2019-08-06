@@ -1,0 +1,499 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<title>Travel Time Information Service Example</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="Chongmyung Park (chongmyung.park@gmail.com)">    	
+</head>
+
+<body>
+
+<div class="container">
+
+	<div class="page-header">
+		<h1>Travel Time Information</h1>
+	</div>
+
+	<div class="row">	
+		<div class="col-md-3">
+
+			<h4>Route</h4>
+
+			<div class="dropdown inline">
+			  <button class="btn btn-default btn-sm dropdown-toggle" type="button" id="routeDropdownMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+			    Select Route
+			  </button>		  
+			  <ul id="routes" class="dropdown-menu" aria-labelledby="routeDropdownMenu"></ul>
+			</div>
+		</div>
+
+		<div class="col-md-9">			
+			<h4>Depart Time</h4>
+			<div class="inline form-inline">
+				<input id="datetimepicker" class="form-control form-control-sm" type="text" >
+			</div>
+			<input type="button" id="btn_run" name="btn_run" class="btn btn-sm btn-primary" value="Show Travel Time Data">
+		</div>
+	</div>
+
+	<div class="row">
+		<div id="result" class="col-md-12"></div>
+	</div>
+
+	<div class="row">	
+
+		<div class="col-md-6">
+			<div id="map"></div>				
+		</div>
+
+		<div class="col-md-6">
+			<div id="ttr_chart_wrapper" style="position: relative; height:400px; width:100%">
+				<canvas id="ttr_chart" width="600" height="400"></canvas>
+			</div>
+		</div>
+	</div>
+	
+
+	<div id="footer" class="row">
+		<div class="col-md-12">
+			© 2017, Transportation Research Lab @ University of Minnesota Duluth, All rights reserved
+		</div>
+	</div>
+
+</div>
+
+<div class="loading" style="display:none">Loading&#8230;</div>
+
+<!-- chart.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-zoom/0.5.0/chartjs-plugin-zoom.min.js"></script>
+
+<!-- jquery -->
+<script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+
+<!-- bootstrap3 -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+<!-- datetime picker -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.14/jquery.datetimepicker.min.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-datetimepicker/2.5.14/jquery.datetimepicker.full.min.js"></script>
+
+<!-- custom style -->
+<style>
+	body{width:100%;height:100%;}
+	#routeDropdownMenu {width:100%;}
+	#map { margin-top:10px; width:100%; height: 350px; }
+	#footer { margin-top:100px; padding-top:10px; text-align:center;color:#AAAAAA; border-top:1px solid #EAEAEA;}
+	#footer a { color:#AAAAAA; }
+	#result { margin-top:10px; }
+	.inline { display: inline }
+	.indent { margin-left:30px; }
+	.loading { position: fixed; z-index: 999; height: 2em; width: 2em; overflow: show; margin: auto; top: 0; left: 0; bottom: 0; right: 0; }
+	.loading:before {content: ''; display: block; position:fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.3); }
+	.loading:not(:required) { font: 0/0 a; color: transparent; text-shadow: none; background-color: transparent; border: 0;	}
+	.loading:not(:required):after { content: ''; display: block; font-size: 10px; width: 1em; height: 1em; margin-top: -0.5em; -webkit-animation: spinner 1500ms infinite linear; -moz-animation: spinner 1500ms infinite linear; -ms-animation: spinner 1500ms infinite linear; -o-animation: spinner 1500ms infinite linear; animation: spinner 1500ms infinite linear; border-radius: 0.5em; -webkit-box-shadow: rgba(0, 0, 0, 0.75) 1.5em 0 0 0, rgba(0, 0, 0, 0.75) 1.1em 1.1em 0 0, rgba(0, 0, 0, 0.75) 0 1.5em 0 0, rgba(0, 0, 0, 0.75) -1.1em 1.1em 0 0, rgba(0, 0, 0, 0.5) -1.5em 0 0 0, rgba(0, 0, 0, 0.5) -1.1em -1.1em 0 0, rgba(0, 0, 0, 0.75) 0 -1.5em 0 0, rgba(0, 0, 0, 0.75) 1.1em -1.1em 0 0; box-shadow: rgba(0, 0, 0, 0.75) 1.5em 0 0 0, rgba(0, 0, 0, 0.75) 1.1em 1.1em 0 0, rgba(0, 0, 0, 0.75) 0 1.5em 0 0, rgba(0, 0, 0, 0.75) -1.1em 1.1em 0 0, rgba(0, 0, 0, 0.75) -1.5em 0 0 0, rgba(0, 0, 0, 0.75) -1.1em -1.1em 0 0, rgba(0, 0, 0, 0.75) 0 -1.5em 0 0, rgba(0, 0, 0, 0.75) 1.1em -1.1em 0 0; }
+	@-webkit-keyframes spinner {
+	  0% { -webkit-transform: rotate(0deg); -moz-transform: rotate(0deg); -ms-transform: rotate(0deg); -o-transform: rotate(0deg); transform: rotate(0deg); }
+	  100% { -webkit-transform: rotate(360deg); -moz-transform: rotate(360deg); -ms-transform: rotate(360deg); -o-transform: rotate(360deg); transform: rotate(360deg); 
+	  }
+	}
+	@-moz-keyframes spinner {
+	  0% { -webkit-transform: rotate(0deg); -moz-transform: rotate(0deg); -ms-transform: rotate(0deg); -o-transform: rotate(0deg); transform: rotate(0deg); }
+	  100% { -webkit-transform: rotate(360deg); -moz-transform: rotate(360deg); -ms-transform: rotate(360deg); -o-transform: rotate(360deg); transform: rotate(360deg); }
+	}
+	@-o-keyframes spinner {
+	  0% { -webkit-transform: rotate(0deg); -moz-transform: rotate(0deg); -ms-transform: rotate(0deg); -o-transform: rotate(0deg); transform: rotate(0deg); }
+	  100% { -webkit-transform: rotate(360deg); -moz-transform: rotate(360deg); -ms-transform: rotate(360deg); -o-transform: rotate(360deg); transform: rotate(360deg); }
+	}
+	@keyframes spinner {
+	  0% { -webkit-transform: rotate(0deg); -moz-transform: rotate(0deg); -ms-transform: rotate(0deg); -o-transform: rotate(0deg); transform: rotate(0deg); }
+	  100% { -webkit-transform: rotate(360deg); -moz-transform: rotate(360deg); -ms-transform: rotate(360deg); -o-transform: rotate(360deg); transform: rotate(360deg);
+	  }
+	}
+</style>
+
+<!-- main script -->
+<script>
+	
+	function Point(name, lat, lon)
+	{
+		this.name = name;
+		this.lat = lat;
+		this.lon = lon;
+	}
+
+	function TTRIS(opts={}) {
+
+		// default options
+		this.opts = {
+			'api_url' : 'http://localhost:5000/tetres/public',
+			'uri_route_list' : '/route_list',
+			'uri_get' : '/traveltime',
+			'map_wrapper' : '#map',
+			'map_zoom' : 9,
+			'cbx_routes' : '#routes',
+			'chart' : '#ttr_chart',
+			'btn_run' : '#btn_run',
+			'result_panel' : '#result',
+			'datetime_picker' : '#datetimepicker',
+		};
+
+		// extend default options
+		$.extend( this.opts, opts );	
+
+		// self
+		_this = this;
+
+		this._pad = function(d) {
+		    return (d < 10) ? '0' + d.toString() : d.toString();
+		}
+		
+		// member variables
+		this.selected_route_id = null;
+		this.map_wrapper = $(this.opts.map_wrapper);	
+		this.cbx_routes = $(this.opts.cbx_routes);
+		this.chart_wrapper = $(this.opts.chart);
+		this.chart = null;
+		this.btn_run = $(this.opts.btn_run);
+		this.datetimepicker = $(this.opts.datetime_picker);
+		this.panel = $(this.opts.result_panel);
+		
+		// allow times during 05:00 - 23:55 in datetimepicker
+		var allow_times = [];
+		for(var h=5; h<=23; h++) {
+			for(var m=0; m<=55; m+=5) {
+				allow_times.push(this._pad(h) + ':' + this._pad(m))
+			}
+		}
+
+		// set datetimepicker
+		this.datetimepicker.datetimepicker({
+			format:'Y-m-d H:i',
+			maxDate: new Date(),
+			allowTimes: allow_times
+		});
+
+		// initialize map
+		this.init_map = function() {
+		    var minneapolis = {lat: 44.9706756, lng: -93.3315183};
+		    _this.map = new google.maps.Map(_this.map_wrapper.get(0), {
+		      zoom: _this.opts.map_zoom,
+		      center: minneapolis
+		    });	
+		};
+
+		// display two points of start and end station to the map
+		this.show_map = function(p1, p2) {
+			
+			// remove markers
+			$.each(_this.markers, function(idx, marker) {
+				marker.setMap(null);
+			});
+			_this.markers = [];
+
+			// add markers
+		    var marker1 = new google.maps.Marker({
+		      position: {'lat' : p1.lat, 'lng' : p1.lon},
+		      map: _this.map,
+		      color: 'blue',
+		      label: 'S'
+		    });			
+		    var marker2 = new google.maps.Marker({
+		      position: {'lat' : p2.lat, 'lng' : p2.lon},
+		      map: _this.map,
+		      color: 'red',
+		      label: 'E'
+		    });			    
+		    _this.markers.push(marker1);
+		    _this.markers.push(marker2);
+		};
+
+		// ajax request method
+		this.request = function(uri, data, callback) {
+			console.log('ajax request to :' + _this.opts.api_url + uri);
+			if(!$.isEmptyObject(data)) {
+				console.log('  - data : ');
+				console.log(data);
+			}
+			$.ajax({
+			  type: 'POST',
+			  dataType: 'json',
+			  url: _this.opts.api_url + uri,
+			  data: data,
+			  success: callback,
+			  fail: function() {
+			  	alert('Fail to use API (' + uri + ')');
+			  }
+			});
+		};
+
+		// get route list and set dropdown menu
+		this.get_route_list = function() {
+			_this.selected_route_id = null;
+			_this.request(_this.opts.uri_route_list, {}, function(json) {
+				if(json.code != 1) {
+					alert(json.message);
+					return;
+				}
+				_this.cbx_routes.html('');
+				$.each(json.obj, function(idx, route) {
+					console.log(route.id + ' : ' + route.name 
+						+ ' from ' + route.start_station.station_id + '('+route.start_station.lat+', '+route.start_station.lon +')' 
+						+ ' to ' + route.end_station.station_id + '('+route.end_station.lat+', '+route.end_station.lon +')'); 				
+					
+					// add routes to dropdown menu
+					_this.cbx_routes.append(
+						$('<li></li>').append(
+
+							// create route item in dropdown menu
+							$('<a></a>').attr('href', '#route-'+route.id).data('route_id', route.id).text(route.name).click(function(evt) {
+								// when route is selected
+								var $this = $(this);
+
+								// display map
+								_this.show_map(
+									new Point(route.start_station.name, route.start_station.lat, route.start_station.lon),
+									new Point(route.end_station.name, route.end_station.lat, route.end_station.lon),
+									);
+								
+								// display selected route to dropdown menu
+								$this.parents('.dropdown-menu').find('li').removeClass('active');
+								$this.parent('li').addClass('active');
+								$this.parents('.dropdown').find('.dropdown-toggle').html($this.text());
+								_this.selected_route_id = $this.data('route_id');
+							})
+						)
+					);
+				});
+			});
+		};
+
+		this.selected_time = function() {
+			return _this.datetimepicker.val();
+		};
+
+		// button click event handler
+		this.btn_run.click(function(evt) {
+
+			if(!_this.selected_route_id) {
+				alert('Select Route');
+				return;				
+			}
+
+			var depart_time = _this.selected_time();
+			if(!depart_time) {
+				alert('Select Depart Time');
+				return;
+			}
+			
+			_this.panel.html('');
+			if(_this.chart) {
+				_this.chart.destroy();
+			}
+
+			_this.request(_this.opts.uri_get,  { 
+				'route_id' : _this.selected_route_id, 
+				'weather_type' : null, // dry = 1, rain = 2, snow = 3 .. if it is not given, weather is identified automatically
+				'depart_time' : depart_time,
+				}, function(json) { 
+					if(json.code != 1) {
+						alert(json.message);
+						return;
+					}
+					_this.show_result(json.obj);
+					_this.render_chart(json.obj.reliabilities, json.obj.traveltimes);
+			});
+		});
+
+		// add minutes to Date object
+		this.add_minutes = function(date, minutes) {
+		    return new Date(date.getTime() + minutes*60000);
+		};
+
+		// display result as text in the panel
+		this.show_result = function(obj) {
+			var n_tts = obj.traveltimes.length;			
+			if(!n_tts) {
+				return;
+			}
+			var avg_tt = obj.reliabilities[n_tts-1].avg_tt
+			var p95_tt = obj.reliabilities[n_tts-1].p95_tt
+			var p85_tt = obj.reliabilities[n_tts-1].p85_tt
+			var ttr = obj.reliabilities[n_tts-1];
+			var current_tt = obj.traveltimes[n_tts-1]
+			var current_time = _this._pad(ttr.hour) + ':' + _this._pad(ttr.minute);
+			var panel = $('<div></div>').attr('class', 'panel panel-default');
+			var panel_body = $('<div></div>').attr('class', 'panel-body');
+
+			var now = _this.selected_time();
+			if(!now) {
+				alert('Departure time is not selected');
+				return;
+			}
+			var depart_time = new Date(now);
+			
+			var arrival_time_avg = this.add_minutes(depart_time, avg_tt)
+			var arrival_time_95p = this.add_minutes(depart_time, p95_tt)
+			var arrival_time_85p = this.add_minutes(depart_time, p85_tt)
+
+			var arrival_time_avg_margin = (arrival_time_avg.getSeconds() >= 30 ? 1 : 0)
+			var arrival_time_95p_margin = (arrival_time_95p.getSeconds() >= 30 ? 1 : 0)
+			var arrival_time_85p_margin = (arrival_time_85p.getSeconds() >= 30 ? 1 : 0)
+
+			var buffer_time_95p = Math.round((p95_tt -avg_tt) * 100) / 100;
+			var buffer_time_85p = Math.round((p85_tt -avg_tt) * 100) / 100;
+
+			console.log('avg_tt : ' + avg_tt);
+			console.log('p95_tt : ' + p95_tt);
+			console.log('depart_time : ' + depart_time);
+			console.log('arrival_time_avg : ' + arrival_time_avg);
+			console.log('arrival_time_85p : ' + arrival_time_95p);
+			console.log('arrival_time_95p : ' + arrival_time_95p);
+			console.log('current_time : ' + current_time);
+			console.log('current_tt : ' + current_tt);
+
+			panel_body.html(
+				'<div class="row">'
+
+				+ '<div class="col-md-4">'
+				+ '<strong>Travel Time Information</strong> : <br>'
+				+ '<span class="indent">- Current Day TT at ' + current_time +' :</span> <span class="text-primary"><strong>' + current_tt + '</strong></span> minutes<br>'
+				+ '<span class="indent">- Average TT :</span> <span class="text-primary"><strong>' + avg_tt + '</strong></span> minutes <br>'				
+				+ '<span class="indent">- 85<sup>th</sup> percentile TT :</span> <span class="text-primary"><strong>' + p85_tt + '</strong></span> minutes <br>'				
+				+ '<span class="indent">- 95<sup>th</sup> percentile TT :</span> <span class="text-primary"><strong>' + p95_tt + '</strong></span> minutes <br>'				
+				+ '</div>' 
+
+				+ '<div class="col-md-3">'
+				+ '<strong>Expected Arrival Time</strong> : <br>'
+				+ '<span class="indent">- Average :</span> <span class="text-primary"><strong>' + _this._pad(arrival_time_avg.getHours()) + ':' + _this._pad(arrival_time_avg.getMinutes()+arrival_time_avg_margin) + '</strong></span> <br>'
+				+ '<span class="indent">- 85<sup>th</sup> percentile :</span> <span class="text-primary"><strong>' + _this._pad(arrival_time_85p.getHours()) + ':' + _this._pad(arrival_time_85p.getMinutes()+arrival_time_85p_margin) + '</strong></span> <br>'				
+				+ '<span class="indent">- 95<sup>th</sup> percentile :</span> <span class="text-primary"><strong>' + _this._pad(arrival_time_95p.getHours()) + ':' + _this._pad(arrival_time_95p.getMinutes()+arrival_time_95p_margin) + '</strong></span> <br>'				
+				+ '</div>' 
+
+				+ '<div class="col-md-5">'
+				+ '<p class="text-danger">'
+				+ ' * Average and n<sup>th</sup> percentile TT is based on previous 1 year.<br>'
+				+ ' * This result is based on normal traffic data.<br>'
+				+ '   &nbsp;&nbsp;(without incident)'
+				+ '</p>'
+				+ '</div>'
+
+				+ '</div>'
+			);
+			panel.append(panel_body);			
+			_this.panel.html('').append(panel);
+
+		};
+
+		// display chart
+		this.render_chart = function(reliabilities, traveltimes) {
+			
+			console.log(reliabilities);
+			console.log(traveltimes);
+
+			var data_avg_tt = [];		
+			var data_p95_tt = [];		
+			var data_p85_tt = [];		
+			var labels = [];		
+
+			$.each(reliabilities, function(idx, ttr) {
+				data_avg_tt.push(ttr.avg_tt);
+				data_p95_tt.push(ttr.p95_tt);
+				data_p85_tt.push(ttr.p85_tt);
+				labels.push(_this._pad(ttr.hour) + ':' + _this._pad(ttr.minute));
+			});
+
+
+			dataset = [ { 'label' : 'avg. TT', 'data' : data_avg_tt, 'fill' : false, 'borderColor' : 'rgb(0, 153, 255)', 'lineTension': 0.1}, // blue
+					    { 'label' : '85% percentile TT', 'data' : data_p85_tt, 'fill' : false, 'borderColor' : 'rgb(179, 143, 0)', 'lineTension': 0.1}, // light brown
+						{ 'label' : '95% percentile TT', 'data' : data_p95_tt, 'fill' : false, 'borderColor' : 'rgb(255, 80, 80)', 'lineTension': 0.1}, // red
+						{ 'label' : 'current TT', 'data' : traveltimes, 'fill' : false, 'borderColor' : 'rgb(0, 204, 102)' , 'lineTension': 0.1}, // green}
+			];
+
+			var maxu = Math.max.apply(Math, data_p95_tt);
+			maxu = Math.ceil(maxu/5)*5;
+			
+
+			if(_this.chart) {
+				_this.chart.destroy();
+			}
+
+			_this.chart = new Chart(_this.chart_wrapper, {
+				'type': 'line',
+				'data': {
+					'labels' : labels,
+					'datasets' : dataset
+				},
+				'options': {
+				  'scales': {
+				    'yAxes': [{
+				      'scaleLabel': {
+				        'display': true,
+				        'labelString': 'travel time (minute)',
+				      },
+			         'ticks': {
+	                    'steps': 10,
+	                    'stepValue': 5,
+	                    'min': 0,
+	                    //'max': maxu,
+	        		 }			      
+				    }],
+				    'xAxes': [{
+				      'scaleLabel': {
+				        'display': true,
+				        'labelString': 'time of day'
+				      }
+				    }],			    
+				  }, // scales
+
+		          'pan': {
+		            'enabled': true,
+		            // 'drag': true,
+		            'mode': 'xy'
+		          },
+
+				  'zoom': {
+					'enabled': true,
+					// 'drag': true,
+					'mode': 'xy',					
+				  }				  
+			    }
+			});		
+		};
+
+	}
+
+	function initialize() {
+		var ttris = new TTRIS();
+		ttris.init_map();
+		ttris.get_route_list();
+		setTimeout(function() {
+			jQuery.ajaxSetup({
+			  beforeSend: function() {
+			     $('.loading').show();
+			  },
+			  complete: function(){
+			     $('.loading').hide();
+			  },
+			  success: function() {}
+			});						
+		}, 1000);
+
+	}
+
+
+
+</script>
+
+<!--
+ get google map api key here : https://developers.google.com/maps/documentation/javascript/
+-->
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=<YOUR API KEY>&callback=initialize"></script>
+
+</body>
+</html>

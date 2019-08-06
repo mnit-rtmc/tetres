@@ -1,0 +1,27 @@
+# -*- coding: utf-8 -*-
+__author__ = 'Chongmyung Park (chongmyung.park@gmail.com)'
+
+INFO_INFRA = '/ticas/infra'
+CHECK_CFG_DATE = '/ticas/infra/exists'
+
+MOE_TT = '/ticas/moe/tt'
+MOE_SPEED = '/ticas/moe/speed'
+MOE_DENSITY = '/ticas/moe/density'
+MOE_TOTAL_FLOW = '/ticas/moe/total_flow'
+MOE_AVG_FLOW = '/ticas/moe/avg_flow'
+MOE_OCCUPANCY = '/ticas/moe/occupancy'
+MOE_ACCELERATION = '/ticas/moe/acceleration'
+MOE_VMT = '/ticas/moe/vmt'
+MOE_LVMT = '/ticas/moe/lvmt'
+MOE_VHT = '/ticas/moe/vht'
+MOE_DVH = '/ticas/moe/dvh'
+MOE_MRF = '/ticas/moe/mrf'
+MOE_STT = '/ticas/moe/stt'
+MOE_SV = '/ticas/moe/sv'
+MOE_CM = '/ticas/moe/cm'
+MOE_CMH = '/ticas/moe/cmh'
+MOE_RWIS = '/ticas/moe/rwis'
+
+ROUTE_FROM_XLSX = '/ticas/route/fromcfg'
+ROUTE_FROM_JSON = '/ticas/route/fromjson'
+ROUTE_TO_XLSX = '/ticas/route/toxlsx'

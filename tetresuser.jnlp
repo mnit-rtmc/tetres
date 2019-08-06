@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- JNLP File for TeTRES User -->
+<jnlp
+	codebase="http://@@TETRES.WEBSTART.HOST@@/tetres"
+	href="tetresuser.jnlp">
+	<information>
+		<title>TeTRES User</title>
+		<vendor>MN/DOT</vendor>
+		<description>Travel Time Reliability Management System</description>
+	</information>
+	<resources arch="x86">
+		<j2se version="1.8+" max-heap-size="1G" />
+	</resources>
+	<resources arch="amd64">
+		<j2se version="1.8+" max-heap-size="3G" />
+	</resources>
+	<resources>
+		<j2se version="1.8+" max-heap-size="1G" />
+		<jar href="user/bin/TeTRES-User.jar"/>
+		<jar href="user/bin/lib/TICAS4-Common.jar"/>
+		<jar href="user/bin/lib/LGoodDatePicker-4.3.1.jar"/>
+		<jar href="user/bin/lib/gson-2.5.jar"/>
+		<jar href="user/bin/lib/jspf.core-1.0.2.jar"/>
+		<jar href="user/bin/lib/log4j-1.2-api-2.5.jar"/>
+		<jar href="user/bin/lib/log4j-api-2.5.jar"/>
+		<jar href="user/bin/lib/log4j-core-2.5.jar"/>
+		<jar href="user/bin/lib/swingx-ws-2007_10_14.jar"/>
+		<jar href="user/bin/lib/swingx.jar"/>
+		<jar href="user/bin/lib/zip4j_1.3.2.jar"/>
+		<jar href="user/bin/lib/TeTRES-Admin.jar"/>
+		<jar href="user/bin/lib/jarchivelib-0.7.1-jar-with-dependencies.jar"/>
+		<jar href="user/bin/lib/httpclient-4.5.6.jar"/>
+		<jar href="user/bin/lib/httpcore-4.4.10.jar"/>
+		<jar href="user/bin/lib/httpmime-4.5.6.jar"/>
+		<jar href="user/bin/lib/commons-logging-1.2.jar"/>
+	</resources>
+	<security>
+		<all-permissions/>
+	</security>
+	<application-desc main-class="ticas.tetres.user.TeTRESMain">
+		<argument>http://@@TETRES.SERVER.HOST@@:5000/tetres/downloaddata</argument>
+		<argument>http://@@TETRES.SERVER.HOST@@</argument>
+	</application-desc>
+</jnlp>
