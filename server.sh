@@ -12,8 +12,8 @@ _cyanText=\\e[36m
 _whiteText=\\e[37m
 _resetText=\\e[0m
 
-_serverPath="/home/faverolles/Desktop/ssd/TeTRES/Server/src/server.py"
+_serverPath="./Server/src/server.py"
 
 echo -e "$_cyanText""Starting Server...""$_resetText"
-sudo python3 $_serverPath
+ve/bin/python3 $_serverPath
 echo -e "$_cyanText""Done""$_resetText"
