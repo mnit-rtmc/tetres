@@ -1,0 +1,25 @@
+name: tetres
+description: The TeTRES Flutter Client
+version: 1.0.0+1
+
+environment:
+  sdk: ">=2.3.0 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^0.1.2
+  http: any
+  intl: ^0.16.0
+#  flutter_map:  ^0.8.2
+#  google_maps_flutter: ^0.5.21+15
+#  tpp:
+#    path: ../plugins/tpp
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  uses-material-design: true
