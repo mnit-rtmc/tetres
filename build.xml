@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="TeTRES" basedir=".">
+	<!-- File '~/.ant.properties' must contain the keys:
+		TeTRES-related (omit http://):
+			tetres.webstart.host
+			tetres.server.host
+		Jarsign-related:
+			sign.store
+			sign.store.pass
+			sign.alias
+			sign.alias.pass
+	-->
+	<property file="${user.home}/.ant.properties"/>
+
+	<property name="src.dir" value="Original_Clients/src"/>
+	<property name="dist.dir" value="dist"/>
+	<property name="server.dir" value="Server"/>
+	<property name="data.dir" valeu="$Original_Clients/run/userclient/data"/>
+	<property name="dist.admin.bin" value="${dist.dir}/admin/bin"/>
+	<property name="dist.admin.data" value="${dist.dir}/admin/data"/>
+	<property name="dist.user.bin" value="${dist.dir}/user/bin"/>
+	<property name="dist.user.data" value="${dist.dir}/user/data"/>
+</project>
