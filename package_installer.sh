@@ -7,3 +7,4 @@ source ve/bin/activate
 pip3 install -r requirements.txt
 deactivate
 
+chmod +x server.sh
