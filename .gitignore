@@ -21,6 +21,8 @@ Platforms/*
 .history
 .svn/
 ve/
+dist/
+build/
 
 # IntelliJ related
 *.iml

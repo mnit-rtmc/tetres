@@ -1,0 +1,43 @@
+<project name="TeTRESUser" basedir=".">
+	<path id="cpath">
+		<fileset dir="../../lib">
+			<include name="**/*.jar"/>
+		</fileset>
+		<fileset dir="../common/dist">
+			<include name="**/*.jar"/>
+		</fileset>
+		<fileset dir="../admin/dist">
+			<include name="**/*.jar"/>
+		</fileset>
+	</path>
+
+	<target name="init">
+		<mkdir dir="build"/>
+	</target>
+
+	<target name="compile-admin">
+		<subant>
+			<target name="clean"/>
+			<target name="jar"/>
+			<fileset dir="../admin" includes="build.xml"/>
+		</subant>
+	</target>
+
+	<target name="compile" depends="init,compile-admin">
+		<javac srcdir="." destdir="build">
+			<classpath refid="cpath"/>
+		</javac>
+	</target>
+
+	<target name="jar" depends="compile">
+		<mkdir dir="dist"/>
+		<mkdir dir="dist/lib"/>
+
+		<jar destfile="dist/TeTRES-User.jar" basedir="build"/>
+	</target>
+
+	<target name="clean">
+		<delete dir="build"/>
+		<delete dir="dist"/>
+	</target>
+</project>

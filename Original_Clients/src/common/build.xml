@@ -1,0 +1,29 @@
+<project name="TeTRESCommon" basedir=".">
+	<path id="cpath">
+		<fileset dir="../../lib">
+			<include name="**/*.jar"/>
+		</fileset>
+	</path>
+
+	<target name="init">
+		<mkdir dir="build"/>
+	</target>
+
+	<target name="compile" depends="init">
+		<javac srcdir="." destdir="build">
+			<classpath refid="cpath"/>
+		</javac>
+	</target>
+
+	<target name="jar" depends="compile">
+		<mkdir dir="dist"/>
+		<mkdir dir="dist/lib"/>
+
+		<jar destfile="dist/TeTRES-Common.jar" basedir="build"/>
+	</target>
+
+	<target name="clean">
+		<delete dir="build"/>
+		<delete dir="dist"/>
+	</target>
+</project>
