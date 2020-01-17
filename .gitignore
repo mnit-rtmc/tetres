@@ -23,6 +23,7 @@ Platforms/*
 ve/
 dist/
 build/
+deploy.sh
 
 # IntelliJ related
 *.iml
