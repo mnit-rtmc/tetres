@@ -60,14 +60,14 @@
 			<fileset dir="${data.dir}"/>
 		</copy>
 		<copy todir="${dist.admin.bin}/lib" flatten="true">
-			<fileset dir="${src.dir}">
-				<include name="*/dist/lib/*.jar"/>
-				<include name="libs/*.jar"/>
-				<include name="libs/**/httpclient-4.5.6.jar"/>
-				<include name="libs/**/httpcore-4.4.10.jar"/>
-				<include name="libs/**/httpmime-4.5.6.jar"/>
-				<include name="libs/**/commons-logging-1.2.jar"/>
-				<exclude name="user/**"/>
+			<fileset dir="${src.dir}/..">
+				<include name="src/*/dist/**/*.jar"/>
+				<include name="lib/*.jar"/>
+				<include name="lib/**/httpclient-4.5.6.jar"/>
+				<include name="lib/**/httpcore-4.4.10.jar"/>
+				<include name="lib/**/httpmime-4.5.6.jar"/>
+				<include name="lib/**/commons-logging-1.2.jar"/>
+				<exclude name="src/user/**"/>
 				<exclude name="**/cache/**"/>
 			</fileset>
 		</copy>
@@ -77,13 +77,13 @@
 			<fileset dir="${data.dir}"/>
 		</copy>
 		<copy todir="${dist.user.bin}/lib" flatten="true">
-			<fileset dir="${src.dir}">
-				<include name="*/dist/lib/*.jar"/>
-				<include name="libs/*.jar"/>
-				<include name="libs/**/httpclient-4.5.6.jar"/>
-				<include name="libs/**/httpcore-4.4.10.jar"/>
-				<include name="libs/**/httpmime-4.5.6.jar"/>
-				<include name="libs/**/commons-logging-1.2.jar"/>
+			<fileset dir="${src.dir}/..">
+				<include name="src/*/dist/**/*.jar"/>
+				<include name="lib/*.jar"/>
+				<include name="lib/**/httpclient-4.5.6.jar"/>
+				<include name="lib/**/httpcore-4.4.10.jar"/>
+				<include name="lib/**/httpmime-4.5.6.jar"/>
+				<include name="lib/**/commons-logging-1.2.jar"/>
 				<exclude name="**/cache/**"/>
 			</fileset>
 		</copy>

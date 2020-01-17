@@ -1,0 +1,70 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+	<title>TeTRES</title>
+	<link rel="stylesheet" type="text/css" href="./standard.css" />
+</head>
+<body>
+<div class='mndot_body'>
+<table width='100%'>
+<tr>
+ <td rowspan='2'>
+  <img src='http://www.dot.state.mn.us/images/templates/logo.gif'>
+ </td>
+ <td valign='bottom'>
+  <font face="Arial, Helvetica, sans-serif" size="6">Travel Time Reliability Estimation System (TeTRES)</font>
+ </td>
+</tr>
+<tr>
+ <td align="center" valign='top' bgcolor="#003366">
+  <img src="/images/seconds/transp.gif" HEIGHT="3" WIDTH="1">
+ </td>
+</tr>
+</table>
+
+<h3><u>Requirements</u></h3>
+The following software is required to run the Tetres server:
+<ul>
+	<li>python3</li>
+	<li>pip3</li>
+	<li>default-jre (not default-jre-headless)</li>
+	<li>python3-tkinter (can be installed by using sudo yum install python3-tkinter)</li>
+	<li>postgresql server</li>
+</ul>
+The client only needs Java to run the admin or user applications. 
+
+<hr WIDTH="100%">
+<h3><u>Installation and Running</u></h3>
+Server instructions:
+<ul>
+	<li>Download <a href="server.zip">server.zip</a> and extract to a directory.</li>
+	<li>Move <b>server/tetres.conf.example</b> to <b>/etc/tetres/tetres.conf</b>. Update the TICAS and PostgreSQL server details in this new file.</li>
+	<li>Run <b>package_installer.sh</b> to install the required libraries for python3. It will create a virtual environment, download and installs the required packages. You need to run only once.</li>
+	<li>To run the server, execute <b>start_server.sh</b></li>
+</ul>
+Client instructions:
+<ul>
+	<li>To run the user client, run <a href="tetresuser.jnlp">tetresuser.jnlp</a> with Java Web Start</li>
+	<li>To run the admin client, run <a href="tetresadmin.jnlp">tetresadmin.jnlp</a> with Java Web Start</li>
+</ul>
+<hr WIDTH="100%">
+<h3><u>Client Configuration</u></h3>
+When the user or admin is executed for the first time, it will automatically download the data and configurations. To access the following configurations, once TeTRES loads select <b>Tools > Options</b>.
+<ul>
+	<li><b>PyTICAS Server URL</b> - The system URL or IP on which PyTICAS server is running.</li>
+	<li><b>PyTICAS Server Port</b> - The port on which PyTICAS server is running. (default 5000)</li>
+	<li><b>Data directory path</b> - The directory containing the containing the configuration files (like filters, maps, ...) and temp data.</li>
+	<li><b>Log Level</b> - Determines what the application logs to the console. This has no visible effect if the Java console is not enabled.
+	<li><b>Map Provider</b> - The source of the map. Choose TMC to use MnDOT's internal map tile server. 
+</ul>
+<img src="./config.png"/> 
+<hr WIDTH="100%">
+<h3><u>Data Files Download</u></h3>
+If the user or admin client could not download the data directory, you can download the compressed files <a href="http://@@TETRES.SERVER.HOST@@:5000/tetres/downloaddata">here</a>.
+Extract the data folder anywhere, and in the <b>Configurations</b> window (Tools > Options) click <b>browse</b> and select the data directory.
+<br/><br/>
+<hr WIDTH="100%">
+Tested on Ubuntu 16.04, Fedora 28, and Windows 7.
+</body>
+</html>
