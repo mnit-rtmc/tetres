@@ -10,6 +10,10 @@
 			sign.alias
 			sign.alias.pass
 	-->
+	<!-- Build requires ant-contrib.jar to be in /usr/share/ant/lib -->
+	<!-- Clean build directory with `ant clean` and build the jars
+			with `ant dist`. (`ant clean dist` to do both) -->
+
 	<property file="${user.home}/.ant.properties"/>
 
 	<property name="src.dir" value="Original_Clients/src"/>
