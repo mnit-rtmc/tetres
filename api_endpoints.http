@@ -46,20 +46,22 @@ Accept: application/json
 #########################################################################
 
 
+#/tetres/deletedata?path=tetres/filters/adrgfngnj.json
+
 ### Add a new route
 #US 169 SB start station S1805 end S1772
 POST http://192.168.1.19:5000/tetres/adm/route/add
 Content-Type: application/x-www-form-urlencoded
 
 data={
-	"name": "devroute",
-	"description": "development+route",
+	"name": "faverollesroute",
+	"description": "faverolles+route",
 	"corridor": "U.S.169+(SB)",
 	"route": {
 		"__module__": "pyticas.ttypes",
 		"__class__": "Route",
-		"name": "devroute",
-		"desc": "development+route",
+		"name": "faverollesroute",
+		"desc": "faverolles+route",
 		"rnodes": [
 			"rnd_138",
 			"rnd_147",
@@ -249,9 +251,9 @@ cfg={
 "specialevent_arrival_window":150,
 "specialevent_departure_window1":120,
 "specialevent_departure_window2":150,
-"moe_critical_density":4556,
-"moe_lane_capacity":5467,
-"moe_congestion_threshold_speed":6782,
+"moe_critical_density":45,
+"moe_lane_capacity":2300,
+"moe_congestion_threshold_speed":40,
 "__module__":"pyticas_tetres.ttypes",
 "__class__":"SystemConfigInfo"
 }

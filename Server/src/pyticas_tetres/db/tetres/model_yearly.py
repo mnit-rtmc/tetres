@@ -40,7 +40,7 @@ def create_year_table(year):
     # from pyticas_tetres.db.model import Base
     Base = declarative_base(bind=conn.engine)
 
-    # faverolles 10/8/2019 NOTE: HERE
+    # faverolles 10/8/2019 NOTE: MOE
     tt_table = type('TravelTime%d' % year, (Base,), {
         '__tablename__': 'tt_%d' % year,
         'id': Column(Integer, primary_key=True, autoincrement=True),
@@ -53,7 +53,8 @@ def create_year_table(year):
         'vht': Column(Float, nullable=True),
         'dvh': Column(Float, nullable=True),
         'lvmt': Column(Float, nullable=True),
-        'sv': Column(Float, nullable=True),
+        'uvmt': Column(Float, nullable=True),
+        # 'sv': Column(Float, nullable=True),
         '_tt_weathers': relationship('TTWeather%d' % year, lazy='joined'),
         '_tt_incidents': relationship('TTIncident%d' % year, lazy='joined'),
         '_tt_workzones': relationship('TTWorkzone%d' % year, lazy='joined'),

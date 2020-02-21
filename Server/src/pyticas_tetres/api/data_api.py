@@ -1,20 +1,16 @@
 import os
-import tarfile
-import zipfile
 import time
+import zipfile
 
-from flask import request, send_file, flash
+from flask import request, send_file
 
-from pyticas.tool import json
+import global_settings
 from pyticas_server import protocol as prot
 from pyticas_tetres import api_urls_client
-from pyticas_tetres.est import workers
-from pyticas_tetres.est.helper import util
-import common
 
 
 def compress_data():
-    outdir = common.DATA_PATH + "/tetres/clientdatafiles"
+    outdir = global_settings.DATA_PATH + "/tetres/clientdatafiles"
 
     os.makedirs(outdir, exist_ok=True)
     filename = 'data-' + str(time.strftime('%Y%m%d-%H%M%S')) + '.zip'
@@ -40,7 +36,7 @@ def compress_data():
             archive.write(path, relname)
         archive.close()
 
-    create_zip(common.DATA_PATH + '/tetres', 'tetres', filename)
+    create_zip(global_settings.DATA_PATH + '/tetres', 'tetres', filename)
 
     return outdir, filename
 
@@ -81,7 +77,7 @@ def register_api(app):
             return prot.response_fail('No selected file')
         if file and allowed_file(file.filename):
             filename = 'data.zip'
-            filedir = common.DATA_PATH + "/tetres/clientdatafiles"
+            filedir = global_settings.DATA_PATH + "/tetres/clientdatafiles"
 
             file.save(os.path.join(filedir, filename))
             success = extract_data(filedir, filename)
@@ -101,7 +97,7 @@ def register_api(app):
             return prot.response_fail('No selected file')
         if file and allowed_file(file.filename):
 
-            filedir = common.DATA_PATH
+            filedir = global_settings.DATA_PATH
 
             path = os.path.join(filedir, file.filename)
             success = file.save(path)
@@ -116,7 +112,7 @@ def register_api(app):
         """ Called when the client tries to delete data """
         delete_path = request.args.get("path")
 
-        outdir = common.DATA_PATH
+        outdir = global_settings.DATA_PATH
 
         os.remove(os.path.join(outdir, delete_path))
         return prot.response_success()

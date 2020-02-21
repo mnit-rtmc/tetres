@@ -1130,7 +1130,7 @@ class Route(Serializable):
     def length(self):
         miles = 0.0
         for ridx in range(1, len(self.rnodes)):
-            m = distutil.distance_in_mile(self.rnodes[ridx-1], self.rnodes[ridx])
+            m = distutil.distance_in_mile(self.rnodes[ridx - 1], self.rnodes[ridx])
             miles += m
         return miles
 
@@ -1160,12 +1160,11 @@ class Route(Serializable):
         cfg_json2 = json.dumps(other.cfg)
         return cfg_json1 == cfg_json2
 
-
     def __str__(self):
         return '<Route name="%s" description="%s" corridor="%s" rnodes="%s ~ %s>' % (
             self.name,
             self.desc,
-            ', '.join([ corr.name for corr in self.corridors() ]),
+            ', '.join([corr.name for corr in self.corridors()]),
             self.rnodes[0].name,
             self.rnodes[-1].name
         )
@@ -1199,6 +1198,7 @@ class RouteConfig(Serializable):
         :rtype: RouteConfig
         """
         return super().clone()
+
 
 class RouteConfigNodeSet(Serializable):
     def __init__(self, rn, orn, mp=0, ad=0, ln1=0, ln2=0):
@@ -1352,8 +1352,11 @@ class RNodeData(Serializable):
         self.dup_detector_names = []
         """:type: list[str] """
         self.detector_data = {}
+
+        # faverolles 1/22/2020 NOTE: I think this should be type int
         self.lanes = None
         """:type: list[int] """
+
         self.missing_lanes = []
         """:type: list[int] """
 
@@ -1397,7 +1400,6 @@ class RNodeData(Serializable):
                                                               self.rnode.station_id if self.rnode.station_id else self.rnode.name,
                                                               self.lanes, self.rnode.lanes)
 
-
     def set_data(self, dets, data, **kwargs):
         """ set detector list and data (called by pyticas.dr.rnode_reader)
 
@@ -1423,10 +1425,11 @@ class RNodeData(Serializable):
         n_dets = len(dets) - len(dup_dets)
         rnode_data = []
 
-        lengths = [ len(data[i]) for i in range(len(data)) ]
+        lengths = [len(data[i]) for i in range(len(data))]
         max_length = max(lengths)
         for i in range(max_length):
-            row = [data[j][i] for j, det in enumerate(dets) if det not in dup_dets and lengths[j] > i and data[j][i] >= 0]
+            row = [data[j][i] for j, det in enumerate(dets) if
+                   det not in dup_dets and lengths[j] > i and data[j][i] >= 0]
             n_valid = len(row)
             n_total_valid += n_valid
             v = self.traffic_type.gathering_method(sum(row), n_valid) if n_valid > 0 else missing_value
@@ -1912,7 +1915,7 @@ class ScanWebData(Serializable):
         :rtype: bool
         """
         surface_status = self.get_surface_statuses()
-        rain_status = [sf for sf in surface_status if self._contains(['wet', 'rain'], sf.lower(), ['freezing']) ]
+        rain_status = [sf for sf in surface_status if self._contains(['wet', 'rain'], sf.lower(), ['freezing'])]
         if not rain_status or not surface_status or len(rain_status) / len(surface_status) < rate_threshold:
             return False
         else:
@@ -1930,12 +1933,12 @@ class ScanWebData(Serializable):
         :rtype: bool
         """
         surface_status = self.get_surface_statuses()
-        snow_status = [sf for sf in surface_status if self._contains(['snow', 'slush', 'ice', 'chemical wet', 'freezing'], sf.lower()) ]
+        snow_status = [sf for sf in surface_status if
+                       self._contains(['snow', 'slush', 'ice', 'chemical wet', 'freezing'], sf.lower())]
         if not snow_status or not surface_status or len(snow_status) / len(surface_status) < rate_threshold:
             return False
         else:
             return True
-
 
     def set_period(self, prd):
         """ make list of json from csv list
@@ -2498,7 +2501,7 @@ class AttrDict(dict):
 
     def extract(self, names):
         if isinstance(names, list):
-            return ( self.__dict__.get(k, None) for k in names )
+            return (self.__dict__.get(k, None) for k in names)
         else:
             return self.__dict__.get(names, None)
 
@@ -2520,4 +2523,3 @@ class AttrDict(dict):
     def __delitem__(self, key):
         super(AttrDict, self).__delitem__(key)
         del self.__dict__[key]
-

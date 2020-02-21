@@ -85,7 +85,7 @@ class TICASServer(object):
             sock.bind(('0.0.0.0', 0))
             port = sock.getsockname()[1]
             sock.close()
-
+        print(f"{port}")
         self.server.run(debug=debug, port=port, ssl_context=context, **kwargs)
 
         logger.info('program terminated')

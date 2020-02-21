@@ -2,7 +2,7 @@
 This file contains functions related to parsing tetres.conf
 """
 
-import common
+import global_settings
 
 
 def get_property(prop):
@@ -12,7 +12,7 @@ def get_property(prop):
     """
 
     try:
-        with open(common.CONFIG_FILE_PATH, 'r') as f:
+        with open(global_settings.CONFIG_FILE_PATH, 'r') as f:
             for line in f.readlines():
                 if not line or line.startswith('#'):
                     continue

@@ -2,16 +2,17 @@
 
 __author__ = 'Chongmyung Park (chongmyung.park@gmail.com)'
 
-import os, datetime
+import datetime
+import os
 import uuid
 
 from pyticas import ticas
 from pyticas.infra import Infra
-from pyticas.rn.geo import between_rnodes, iter_to_downstream, get_mile_points
 from pyticas.logger import getDefaultLogger
 from pyticas.rc import route_config
-from pyticas.ttypes import Route
+from pyticas.rn.geo import between_rnodes, iter_to_downstream, get_mile_points
 from pyticas.tool import util, json
+from pyticas.ttypes import Route
 
 logger = getDefaultLogger(__name__)
 

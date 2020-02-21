@@ -285,7 +285,7 @@ class ActionLog(Base):
 
 # this class is for type reference in IDE (TravelTime model is declared in model_yearly.py)
 class TravelTime(object):
-    # faverolles 10/8/2019 NOTE: HERE
+    # faverolles 10/8/2019 NOTE: MOE
 
     id = Column(Integer, primary_key=True, unique=True, autoincrement=True)
     route_id = Column(Integer, ForeignKey('route.id'), nullable=False)
@@ -296,7 +296,8 @@ class TravelTime(object):
     vht = Column(Float, nullable=True)
     dvh = Column(Float, nullable=True)
     lvmt = Column(Float, nullable=True)
-    sv = Column(Float, nullable=True)
+    uvmt = Column(Float, nullable=True)
+    # sv = Column(Float, nullable=True)
 
     inc_severity = Column(Integer, nullable=True)
     inc_impact = Column(Integer, nullable=True)

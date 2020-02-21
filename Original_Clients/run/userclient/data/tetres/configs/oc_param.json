@@ -1,1 +1,27 @@
-{"incident_downstream_distance_limit":10.0,"incident_upstream_distance_limit":2.0,"incident_keep_in_minute":60,"workzone_downstream_distance_limit":10.0,"workzone_upstream_distance_limit":2.0,"workzone_length_short_from":0.0,"workzone_length_short_to":5.0,"workzone_length_medium_from":5.0,"workzone_length_medium_to":10.0,"workzone_length_long_from":10.0,"workzone_length_long_to":9999.0,"specialevent_size_small_from":0,"specialevent_size_small_to":20000,"specialevent_size_medium_from":20000,"specialevent_size_medium_to":40000,"specialevent_size_large_from":40000,"specialevent_size_large_to":999999999,"specialevent_distance_near_from":0.0,"specialevent_distance_near_to":3.0,"specialevent_distance_middle_from":3.0,"specialevent_distance_middle_to":5.0,"specialevent_distance_far_from":5.0,"specialevent_distance_far_to":9999.0,"__module__":"pyticas_tetres.ttypes","__class__":"OperatingConditionParamInfo"}
+{
+  "incident_downstream_distance_limit": 10.0,
+  "incident_upstream_distance_limit": 2.0,
+  "incident_keep_in_minute": 60,
+  "workzone_downstream_distance_limit": 10.0,
+  "workzone_upstream_distance_limit": 2.0,
+  "workzone_length_short_from": 0.0,
+  "workzone_length_short_to": 5.0,
+  "workzone_length_medium_from": 5.0,
+  "workzone_length_medium_to": 10.0,
+  "workzone_length_long_from": 10.0,
+  "workzone_length_long_to": 9999.0,
+  "specialevent_size_small_from": 0,
+  "specialevent_size_small_to": 20000,
+  "specialevent_size_medium_from": 20000,
+  "specialevent_size_medium_to": 40000,
+  "specialevent_size_large_from": 40000,
+  "specialevent_size_large_to": 999999999,
+  "specialevent_distance_near_from": 0.0,
+  "specialevent_distance_near_to": 3.0,
+  "specialevent_distance_middle_from": 3.0,
+  "specialevent_distance_middle_to": 5.0,
+  "specialevent_distance_far_from": 5.0,
+  "specialevent_distance_far_to": 9999.0,
+  "__module__": "pyticas_tetres.ttypes",
+  "__class__": "OperatingConditionParamInfo"
+}

@@ -58,7 +58,7 @@ public class Config {
     private static final String DEFAULT_LOG_LEVEL = "INFO";
     private static final String DEFAULT_PYTHON_EXE_PATH = "python.exe";
     private static final String DEFAULT_PYTHON_SERER_PATH = FileHelper.currentPath() + File.separator + "server.py";
-    private static final String DEFAULT_PYTHON_SERVER_URL = "http://192.168.1.19";
+    private static final String DEFAULT_PYTHON_SERVER_URL = "http://127.0.0.1";
     private static final String DEFAULT_PYTHON_SERVER_PORT = "5000";
     private static final String DEFAULT_DATA_PATH = FileHelper.currentPath() + File.separator + "data";
     private static final Boolean DEFAULT_TERMINATE_SERVER_ON_EXIT = false;

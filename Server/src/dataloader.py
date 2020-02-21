@@ -4,8 +4,8 @@ __author__ = 'Chongmyung Park (chongmyung.park@gmail.com)'
 import datetime
 import time
 
-import common
 import dbinfo
+import global_settings
 
 if __name__ == '__main__':
     from pyticas import ticas
@@ -14,7 +14,7 @@ if __name__ == '__main__':
     from pyticas_tetres.db.iris import conn as conn_iris
     from pyticas_tetres.db.tetres import conn
 
-    ticas.initialize(common.DATA_PATH)
+    ticas.initialize(global_settings.DATA_PATH)
     infra = Infra.get_infra()
 
     conn.connect(dbinfo.tetres_db_info())
@@ -34,8 +34,8 @@ if __name__ == '__main__':
     print('# Then the operating condition data will be linked to each travel time data')
     print('')
 
-    sdate = datetime.datetime.strptime('2018-07-01', '%Y-%m-%d').date()
-    edate = datetime.datetime.strptime('2018-08-31', '%Y-%m-%d').date()
+    sdate = datetime.datetime.strptime('2011-01-01', '%Y-%m-%d').date()
+    edate = datetime.datetime.strptime('2019-12-31', '%Y-%m-%d').date()
 
     print('')
     print('!! Data during the given time period will be deleted.')
