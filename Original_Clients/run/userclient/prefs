@@ -1,0 +1,8 @@
+#FilePreferences
+#Wed Jan 22 15:38:58 CST 2020
+ticas.log_level=INFO
+ticas.python_server_url=http\://127.0.0.1
+ticas.map_provider=CUSTOM
+ticas.custom_osm_server=http\://www.dot.state.mn.us/osm/tiles/
+ticas.data_path=Z\:\\TeTRES\\Original_Clients\\run\\userclient\\data
+ticas.python_server_port=5001
