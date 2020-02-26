@@ -7,15 +7,14 @@
     - server URL is specified ``pyticas.config.mn.TRAFFIC_DATA_URL``
     - traffic data is downloaded and cached into local disk (``DATA_PATH/cache``)
 """
+import global_settings
 from pyticas.tool import http
 
 __author__ = 'Chongmyung Park (chongmyung.park@gmail.com)'
 
 import datetime
-import time
 import os
 
-from urllib import error as url_error
 from pyticas import cfg, logger
 from pyticas.ticas import get_path
 
@@ -24,72 +23,6 @@ CACHE_TYPE_DET = 'det'
 CACHE_TYPE_FAIL = 'fail'
 
 logging = logger.getDefaultLogger(__name__)
-
-
-def _load_testing(det_name, year, month, day, traffic_type, only_download=False, n_try=1):
-    def _cached_data_local(detector_name, date_val, traffic_type_val):
-        """
-        :rtype: None or String
-        """
-        cache_path = _cache_path(CACHE_TYPE_DET, detector_name, date_val, traffic_type_val)
-        if not os.path.exists(cache_path):
-            return None
-        with open(cache_path, 'rb') as cache_file:
-            return cache_file.read()
-
-    if det_name is None:
-        raise Exception("Detector number must be passed")
-
-    missing_data = [cfg.MISSING_VALUE] * cfg.SAMPLES_PER_DAY
-    date = datetime.date(year, month, day)
-    cached_data = _cached_data_local(det_name, date, traffic_type)
-
-    if cached_data is not None:
-        ret_val = _convert_to_list(cached_data, traffic_type) if only_download is False else None
-        return ret_val
-
-    # not cached, check if failed detector
-    if _is_failed(det_name, date, traffic_type):
-        # logging.debug("Detector " + det_name + " is failed detector")
-        return missing_data if only_download is False else None
-
-    dir_name = str(year) + str(month).zfill(2) + str(day).zfill(2)
-    remote_file = cfg.TRAFFIC_DATA_URL + '/' + str(year) + '/' + dir_name + '/' + det_name + traffic_type.extension
-
-    try:
-        if n_try > 1:
-            logging.critical('Retrying... (n_try=%d)' % n_try)
-
-        with http.get_url_opener(remote_file, timeout=30) as res:
-            binData = res.read()
-            data = _convert_to_list(binData, traffic_type)
-            if not data:
-                return missing_data
-            _cache(det_name, date, binData, traffic_type)
-            return data
-
-    except url_error.HTTPError as e:
-        logging.debug(
-            'Could not get the remote file (file={}, reason={}, http_code={})'.format(remote_file, str(e.reason),
-                                                                                      e.code))
-        if e.code == 404:
-            open(_cache_path(CACHE_TYPE_FAIL, det_name, date, traffic_type), 'w').close()
-        return missing_data if only_download is False else None
-    except url_error.URLError as e:
-        logging.critical('Could not connect to the server (file={}, reason={})'.format(remote_file, str(e.reason)))
-        return missing_data if only_download is False else None
-    except ConnectionResetError as e:
-        logging.critical('HTTP Connection has been reset. (file={}, reason={})'.format(remote_file, e.errno))
-        if n_try <= MAX_TRY_NUM:
-            time.sleep(1)
-            return _load_testing(det_name, year, month, day, traffic_type, only_download=False, n_try=n_try + 1)
-        else:
-            logging.critical('  - fail to get data')
-        return missing_data if only_download is False else None
-    except Exception as e:
-        logging.critical(
-            'Exception occured while downloading traffic data(file={}, reason={})'.format(remote_file, str(e)))
-        return missing_data if only_download is False else None
 
 
 def _path():
@@ -107,56 +40,6 @@ def _path():
     return PATHS
 
 
-def read(det_name, prd, traffic_type):
-    """ read detector data according to period and traffictype """
-    return _read([det_name, prd, traffic_type])
-
-
-def _read(args):
-    # faverolles 1/16/2020 NOTE: _read() is the entry point to _loadByDate()
-    #  which nis the only entry point to _load() which downloads traffic data files.
-    #  A Period is passed which contains the dates to download data for.
-    #  Correct fix is to find everywhere that a period is called for a time after the stop date.
-    #  Hack fix is to just not download the detector file in _load()
-    """ protected real data read function """
-    det_name, period, trafficType = args
-
-    start_date = period.start_date
-    end_date = period.end_date
-
-    day_count = ((datetime.date(end_date.year, end_date.month, end_date.day)
-                  - datetime.date(start_date.year, start_date.month, start_date.day)).days + 1)
-    allData = []
-    interval = cfg.SAMPLES_PER_DAY // trafficType.samples_per_day * cfg.DETECTOR_DATA_INTERVAL
-
-    start_index = (int)(start_date.hour * 3600 // interval
-                        + start_date.minute * 60 // interval)
-
-    end_index = (int)(end_date.hour * 3600 // interval
-                      + end_date.minute * 60 // interval
-                      + ((day_count - 1) * trafficType.samples_per_day))
-
-    for date in (start_date + datetime.timedelta(n) for n in range(day_count)):
-        allData += _loadByDate(det_name, date, trafficType)
-
-    clip = allData[start_index:end_index]
-
-    del allData
-    return clip
-
-
-def _loadByDate(det_name, date, traffic_type):
-    """
-    load_data data from web or cached db
-    traffic_type
-        TrafficType.scan
-        TrafficType.speed_wavetronics
-        TrafficType.volume
-    """
-
-    return _load(det_name, date.year, date.month, date.day, traffic_type)
-
-
 def _cache_path(cache_type, det_name, date, traffic_type):
     PATHS = _path()
     """ return cache path according to cache_type ('fail', 'det'), but if not exists, create directory """
@@ -169,75 +52,6 @@ def _cache_path(cache_type, det_name, date, traffic_type):
     except:
         pass
     return os.path.join(cache_path, '{0}{1}'.format(det_name, traffic_type.extension))
-
-
-def _is_failed(det, date, traffic_type):
-    return os.path.exists(_cache_path(CACHE_TYPE_FAIL, det, date, traffic_type))
-
-
-def _load(det_name, year, month, day, traffic_type, only_download=False, n_try=1):
-    """ Return raw data of the detector as list """
-    if det_name == None:
-        raise Exception("Detector number must be passed")
-
-    missing_data = [cfg.MISSING_VALUE] * cfg.SAMPLES_PER_DAY
-    date = datetime.date(year, month, day)
-    data = _cached_data(det_name, date, traffic_type)
-
-    if data != None:
-        return _convert_to_list(data, traffic_type) if only_download == False else None
-
-    # not cached, check if failed detector
-    if _is_failed(det_name, date, traffic_type):
-        # logging.debug("Detector " + det_name + " is failed detector")
-        return missing_data if only_download == False else None
-
-    dirname = str(year) + str(month).zfill(2) + str(day).zfill(2)
-    remote_file = cfg.TRAFFIC_DATA_URL + '/' + str(year) + '/' + dirname + '/' + det_name + traffic_type.extension
-
-    # faverolles 1/13/2020 NOTE: DATA DOWNLOAD TEMPORARY FIX
-    #   Temporary fix to stop the server from trying to download
-    #   the traffic data files past the year specified by dataloader.py
-    #   The server config while developing is Aug 1~31 2018 but the server
-    #   continually tries to download 2019 traffic data (hundred+ GB) so
-    #   the travel time calculation never finishes
-    if str(year) > "2018":
-        return missing_data
-
-    try:
-        if n_try > 1:
-            logging.critical('Retrying... (n_try=%d)' % n_try)
-
-        with http.get_url_opener(remote_file, timeout=30) as res:
-            binData = res.read()
-            data = _convert_to_list(binData, traffic_type)
-            if not data:
-                return missing_data
-            _cache(det_name, date, binData, traffic_type)
-            return data
-
-    except url_error.HTTPError as e:
-        logging.debug(
-            'Could not get the remote file (file={}, reason={}, http_code={})'.format(remote_file, str(e.reason),
-                                                                                      e.code))
-        if e.code == 404:
-            open(_cache_path(CACHE_TYPE_FAIL, det_name, date, traffic_type), 'w').close()
-        return missing_data if only_download == False else None
-    except url_error.URLError as e:
-        logging.critical('Could not connect to the server (file={}, reason={})'.format(remote_file, str(e.reason)))
-        return missing_data if only_download == False else None
-    except ConnectionResetError as e:
-        logging.critical('HTTP Connection has been reset. (file={}, reason={})'.format(remote_file, e.errno))
-        if n_try <= MAX_TRY_NUM:
-            time.sleep(1)
-            return _load(det_name, year, month, day, traffic_type, only_download=False, n_try=n_try + 1)
-        else:
-            logging.critical('  - fail to get data')
-        return missing_data if only_download == False else None
-    except Exception as e:
-        logging.critical(
-            'Exception occured while downloading traffic data(file={}, reason={})'.format(remote_file, str(e)))
-        return missing_data if only_download == False else None
 
 
 def _convert_to_list(binData, traffic_type):
@@ -270,16 +84,86 @@ def _convert_to_list(binData, traffic_type):
     return data
 
 
-def _cache(det_name, date, binData, trafficType):
-    cache_path = _cache_path(CACHE_TYPE_DET, det_name, date, trafficType)
+def _save_file_to_cache(det_name, date, bin_data, traffic_type):
+    cache_path = _cache_path(CACHE_TYPE_DET, det_name, date, traffic_type)
     with open(cache_path, 'wb') as cfile:
-        cfile.write(binData)
+        cfile.write(bin_data)
 
 
-def _cached_data(det_name, date, trafficType):
+def _read_cached_data_file(det_name, date, trafficType):
     """ fetch cached data from db """
     cache_path = _cache_path(CACHE_TYPE_DET, det_name, date, trafficType)
     if not os.path.exists(cache_path):
         return None
     with open(cache_path, 'rb') as cfile:
         return cfile.read()
+
+
+def _load(det_name, year, month, day, traffic_type, missing_data):
+    # faverolles 1/18/2020: Reworked the downloading operation
+    #   No longer saves all of the "fail" files
+    #   Checks if global option to download data files is "TRUE"
+    """ Return raw data of the detector as list """
+    if det_name is None:
+        raise Exception("Detector number must be passed")
+
+    dirname = str(year) + str(month).zfill(2) + str(day).zfill(2)
+    remote_file = cfg.TRAFFIC_DATA_URL + '/' + str(year) + '/' + dirname + '/' + det_name + traffic_type.extension
+    date = datetime.date(year, month, day)
+    data = _read_cached_data_file(det_name, date, traffic_type)
+
+    if data is not None:
+        return _convert_to_list(data, traffic_type)
+
+    if global_settings.DOWNLOAD_TRAFFIC_DATA_FILES:
+        print(f"Downloading traffic data file [{remote_file}]")
+        try:
+            with http.get_url_opener(remote_file, timeout=30) as res:
+                bin_data = res.read()
+                data = _convert_to_list(bin_data, traffic_type)
+                if not data:
+                    return missing_data
+                _save_file_to_cache(det_name, date, bin_data, traffic_type)
+                return data
+        except Exception as e:
+            print(f"Exception downloading traffic data(file=[{remote_file}], reason=[{str(e)}]")
+            return missing_data
+
+    return missing_data
+
+
+def read(det_name, prd, traffic_type):
+    """ read detector data according to period and traffic_type """
+
+    # faverolles 1/16/2020 NOTE: _read() is the entry point to _loadByDate()
+    #  which is the only entry point to _load() which downloads traffic data files.
+    #  A Period is passed which contains the dates to download data for.
+    #  Correct fix is to find everywhere that a period is called for a time after the stop date.
+    #  Hack fix is to just not download the detector file in _load()
+
+    start_date = prd.start_date
+    end_date = prd.end_date
+
+    day_count = ((datetime.date(end_date.year, end_date.month, end_date.day)
+                  - datetime.date(start_date.year, start_date.month, start_date.day)).days + 1)
+    all_data = []
+    interval = cfg.SAMPLES_PER_DAY // traffic_type.samples_per_day * cfg.DETECTOR_DATA_INTERVAL
+
+    start_index = (int)(start_date.hour * 3600 // interval
+                        + start_date.minute * 60 // interval)
+
+    end_index = (int)(end_date.hour * 3600 // interval
+                      + end_date.minute * 60 // interval
+                      + ((day_count - 1) * traffic_type.samples_per_day))
+
+    # faverolles 1/16/2020 NOTE: missing_data is a list of [-1's]
+    #   Moved out of _load() to fix recursive initialization of 'missing_data'
+    missing_data = [cfg.MISSING_VALUE] * cfg.SAMPLES_PER_DAY
+
+    for date in (start_date + datetime.timedelta(n) for n in range(day_count)):
+        all_data += _load(det_name, date.year, date.month, date.day, traffic_type, missing_data)
+
+    clip = all_data[start_index:end_index]
+
+    del all_data
+    return clip

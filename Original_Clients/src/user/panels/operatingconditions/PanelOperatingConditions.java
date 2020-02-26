@@ -55,7 +55,7 @@ public class PanelOperatingConditions extends javax.swing.JPanel implements IIni
 
         tabOperationConditions = new javax.swing.JTabbedPane();
         panelOperatingConditionConfig = new user.panels.operatingconditions.PanelOperatingConditionConfig();
-        panelOCParameters = new user.panels.operatingconditions.PanelOCParameters();
+        panelOCParameters = new PanelOCParameters();
 
         tabOperationConditions.addTab("Operating Conditions", panelOperatingConditionConfig);
         tabOperationConditions.addTab("Parameters", panelOCParameters);
@@ -71,7 +71,7 @@ public class PanelOperatingConditions extends javax.swing.JPanel implements IIni
             .addComponent(tabOperationConditions)
         );
     }// Variables declaration - do not modify
-    private user.panels.operatingconditions.PanelOCParameters panelOCParameters;
+    private PanelOCParameters panelOCParameters;
     private user.panels.operatingconditions.PanelOperatingConditionConfig panelOperatingConditionConfig;
     private javax.swing.JTabbedPane tabOperationConditions;
     // End of variables declaration

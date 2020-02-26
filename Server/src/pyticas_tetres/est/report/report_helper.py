@@ -1,8 +1,13 @@
 # -*- coding: utf-8 -*-
 import math
+import traceback
+from typing import List
+
+import xlsxwriter
 
 from pyticas_noaa.isd import isdtypes
 from pyticas_tetres import ttypes
+from pyticas_tetres.rengine.filter.ftypes import ExtFilterGroup
 
 __author__ = 'Chongmyung Park (chongmyung.park@gmail.com)'
 
@@ -12,6 +17,7 @@ def write_operating_condition_info_sheet(eparam, wb):
     :type eparam: pyticas_tetres.ttypes.EstimationRequestInfo
     :type wb: xlsxwriter.Workbook
     """
+
     ws = wb.add_worksheet('Operating Coditions (OC)')
 
     ws.write_row(0, 0, ['Index', 'Name', 'Description'])
@@ -19,8 +25,73 @@ def write_operating_condition_info_sheet(eparam, wb):
         ws.write_row(idx + 1, 0, [idx, ef.name, ef.desc])
 
 
+def write_moe_per_route_sheets(est_req_info: ttypes.EstimationRequestInfo,
+                               ext_filter_groups: List[ExtFilterGroup],
+                               cm_work_book: xlsxwriter.Workbook,
+                               cmh_work_book: xlsxwriter.Workbook,
+                               sv_work_book: xlsxwriter.Workbook) -> None:
+    # faverolles 1/22/2020 TODO: Confirm Working
+
+    from pyticas import period
+    from pyticas.moe import writer
+    from colorama import Fore
+    from pyticas.moe.mods import cm, cmh, sv
+
+    print(f"{Fore.LIGHTGREEN_EX}Calculating and Writing Spreadsheets for CM, CMH, and SV...")
+
+    route_name = est_req_info.travel_time_route.name
+    start_date_time = f"{est_req_info.get_start_date().strftime('%Y-%m-%d')} " \
+                      f"{est_req_info.get_start_time().strftime('%H:%M:%S')}"
+    end_date_time = f"{est_req_info.get_end_date().strftime('%Y-%m-%d')} " \
+                    f"{est_req_info.get_end_time().strftime('%H:%M:%S')}"
+
+    print(f"{Fore.CYAN}[{Fore.LIGHTMAGENTA_EX}{route_name}{Fore.CYAN}] "
+          f"[{Fore.LIGHTMAGENTA_EX}{start_date_time}{Fore.CYAN}] "
+          f"[{Fore.LIGHTMAGENTA_EX}{end_date_time}{Fore.CYAN}]")
+
+    try:
+        route = est_req_info.travel_time_route.route
+        prd = period.create_period_from_string(start_date_time, end_date_time, 300)
+
+        try:
+            print(f"{Fore.LIGHTGREEN_EX}Calculating CM...")
+            res_cm = cm.run(route, prd)
+            writer.write_cm(None, _route=route, results=res_cm, work_book=cm_work_book)
+        except Exception as e:
+            print(f"{Fore.RED} Fail calculate or write cm {e}")
+            traceback.print_exc()
+            print(f"{Fore.RED} End Traceback")
+
+        print(f"{Fore.LIGHTBLUE_EX}Done Calculating CM")
+
+        try:
+            print(f"{Fore.LIGHTGREEN_EX}Calculating CMH...")
+            res_cmh = cmh.run(route, prd)
+            writer.write_cmh(None, _route=route, results=res_cmh, work_book=cmh_work_book)
+        except Exception as e:
+            print(f"{Fore.RED} Fail calculate or write cmh {e}")
+            traceback.print_exc()
+            print(f"{Fore.RED} End Traceback")
+
+        print(f"{Fore.LIGHTBLUE_EX}Done Calculating CMH")
+
+        try:
+            print(f"{Fore.LIGHTGREEN_EX}Calculating SV...")
+            res_sv = sv.run(route, prd)
+            writer.write_sv(None, _route=route, results=res_sv, work_book=sv_work_book)
+        except Exception as e:
+            print(f"{Fore.RED} Fail calculate or write sv {e}")
+            traceback.print_exc()
+            print(f"{Fore.RED} End Traceback")
+
+        print(f"{Fore.LIGHTBLUE_EX}Done Calculating SV")
+
+    except Exception as e:
+        print(f"{Fore.RED} Fail to load route name or create period {e}")
+
+
 def write_moe_data_sheet(eparam, ext_filter_groups, wb):
-    # faverolles 10/12/2019 [A]:
+    # faverolles 10/12/2019:
     #   Created function to write moe data to spreadsheet
     """
     :type eparam: pyticas_tetres.ttypes.EstimationRequestInfo
@@ -44,7 +115,7 @@ def write_moe_data_sheet(eparam, ext_filter_groups, wb):
 
         ws.write_row(2, 0, [
             'time', 'tt', 'speed', 'vmt',
-            'vht', 'dvh', 'lvmt', 'sv',
+            'vht', 'dvh', 'lvmt', 'uvmt',
         ])
 
         for idx, extdata in enumerate(ef.whole_data):
@@ -52,7 +123,7 @@ def write_moe_data_sheet(eparam, ext_filter_groups, wb):
             dts = x.time.strftime('%Y-%m-%d %H:%M')
             ws.write_row(idx + 3, 0, [
                 dts, clean(x.tt), clean(x.speed), clean(x.vmt),
-                cleanMOE(x.vht), cleanMOE(x.dvh), cleanMOE(x.lvmt), cleanMOE(x.sv)]
+                cleanMOE(x.vht), cleanMOE(x.dvh), cleanMOE(x.lvmt), cleanMOE(x.uvmt)]
                          + get_weather_values(extdata)
                          + get_incident_values(extdata)
                          + get_workzone_values(extdata)
@@ -61,7 +132,7 @@ def write_moe_data_sheet(eparam, ext_filter_groups, wb):
 
 
 def write_moe_data_sheet_daily(eparam, ext_filter_groups, wb, daily):
-    # faverolles 10/12/2019 [A]:
+    # faverolles 10/12/2019 TODO:
     #   Created function to write moe data to spreadsheet
     """
     :type eparam: pyticas_tetres.ttypes.EstimationRequestInfo

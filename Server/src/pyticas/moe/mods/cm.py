@@ -18,6 +18,7 @@ def run(route, prd, **kwargs):
     :type prd: pyticas.ttypes.Period
     :return:
     """
+
     # load_data speed data
     us = moe_helper.get_speed(route.get_stations(), prd, **kwargs)
     us_results = moe_helper.add_virtual_rnodes(us, route)
@@ -179,31 +180,31 @@ def post_book_writer(wb, results, r, **kwargs):
     sheet.write_column(row=0, col=col, data=['Average'] + avg_data + [sum(avg_data)])
 
 
-if __name__ == '__main__':
-    import os
-    from pyticas.infra import Infra
-    from pyticas import route
-    from pyticas import period
-    from pyticas.moe import writer
-
-    data_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../../../../data'))
-    Infra.initialize(data_path)
-    infra = Infra.load_infra()
-    r = route.load_route_by_name('Route I-494 WB')
-    prd1 = period.create_period_from_string('2016-05-17 06:00:00', '2016-05-17 09:00:00', 300)
-    prd2 = period.create_period_from_string('2016-05-18 06:00:00', '2016-05-18 09:00:00', 300)
-
-    res1 = run(r, prd1)
-    res2 = run(r, prd2)
-    res = [res1, res2]
-
-    writer.write_cm(os.path.join(infra.get_path('moe', create=True), 'cm.xlsx'), r, res)
-
-    from pyticas.moe.mods import speed
-
-    ures1 = speed.run(r, prd1)
-    ures2 = speed.run(r, prd2)
-    ures1 = moe_helper.add_virtual_rnodes(ures1, r)
-    ures2 = moe_helper.add_virtual_rnodes(ures2, r)
-    ures = [ures1, ures2]
-    writer.write(os.path.join(infra.get_path('moe', create=True), 'u.xlsx'), r, ures)
+# if __name__ == '__main__':
+#     import os
+#     from pyticas.infra import Infra
+#     from pyticas import route
+#     from pyticas import period
+#     from pyticas.moe import writer
+#
+#     data_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../../../../data'))
+#     Infra.initialize(data_path)
+#     infra = Infra.load_infra()
+#     r = route.load_route_by_name('Route I-494 WB')
+#     prd1 = period.create_period_from_string('2016-05-17 06:00:00', '2016-05-17 09:00:00', 300)
+#     prd2 = period.create_period_from_string('2016-05-18 06:00:00', '2016-05-18 09:00:00', 300)
+#
+#     res1 = run(r, prd1)
+#     res2 = run(r, prd2)
+#     res = [res1, res2]
+#
+#     writer.write_cm(os.path.join(infra.get_path('moe', create=True), 'cm.xlsx'), r, res)
+#
+#     from pyticas.moe.mods import speed
+#
+#     ures1 = speed.run(r, prd1)
+#     ures2 = speed.run(r, prd2)
+#     ures1 = moe_helper.add_virtual_rnodes(ures1, r)
+#     ures2 = moe_helper.add_virtual_rnodes(ures2, r)
+#     ures = [ures1, ures2]
+#     writer.write(os.path.join(infra.get_path('moe', create=True), 'u.xlsx'), r, ures)

@@ -36,11 +36,11 @@ public class SnowRouteClient extends APIClient<SnowRouteInfo> {
         this.RESPONSE_TYPE = new TypeToken<ObjectResponse<SnowRouteInfo>>(){}.getType();
         this.DATA_TYPE = SnowRouteInfo.class;        
         
-        this.URL_DELETE = Config.getAPIUrl(admin.api.ApiURIs.URI.SNR_DELETE);
-        this.URL_YEARS = Config.getAPIUrl(admin.api.ApiURIs.URI.SNR_YEARS);
-        this.URL_LIST = Config.getAPIUrl(admin.api.ApiURIs.URI.SNR_LIST);
-        this.URL_INSERT = Config.getAPIUrl(admin.api.ApiURIs.URI.SNR_INSERT);
-        this.URL_UPDATE = Config.getAPIUrl(admin.api.ApiURIs.URI.SNR_UPDATE);
+        this.URL_DELETE = Config.getAPIUrl(ApiURIs.URI.SNR_DELETE);
+        this.URL_YEARS = Config.getAPIUrl(ApiURIs.URI.SNR_YEARS);
+        this.URL_LIST = Config.getAPIUrl(ApiURIs.URI.SNR_LIST);
+        this.URL_INSERT = Config.getAPIUrl(ApiURIs.URI.SNR_INSERT);
+        this.URL_UPDATE = Config.getAPIUrl(ApiURIs.URI.SNR_UPDATE);
         this.URL_GET = Config.getAPIUrl(ApiURIs.URI.SNR_GET);
     }   
 

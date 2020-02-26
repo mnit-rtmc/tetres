@@ -46,12 +46,12 @@ public class SnowManagementClient extends APIClient<SnowManagementInfo> {
         }.getType();
         this.DATA_TYPE = SnowManagementInfo.class;
 
-        this.URL_DELETE = Config.getAPIUrl(admin.api.ApiURIs.URI.SNM_DELETE);
-        this.URL_YEARS = Config.getAPIUrl(admin.api.ApiURIs.URI.SNM_YEARS);
-        this.URL_LIST = Config.getAPIUrl(admin.api.ApiURIs.URI.SNM_LIST);
-        this.URL_INSERT = Config.getAPIUrl(admin.api.ApiURIs.URI.SNM_INSERT);
-        this.URL_INSERT_ALL = Config.getAPIUrl(admin.api.ApiURIs.URI.SNM_INSERT_ALL);
-        this.URL_UPDATE = Config.getAPIUrl(admin.api.ApiURIs.URI.SNM_UPDATE);
+        this.URL_DELETE = Config.getAPIUrl(ApiURIs.URI.SNM_DELETE);
+        this.URL_YEARS = Config.getAPIUrl(ApiURIs.URI.SNM_YEARS);
+        this.URL_LIST = Config.getAPIUrl(ApiURIs.URI.SNM_LIST);
+        this.URL_INSERT = Config.getAPIUrl(ApiURIs.URI.SNM_INSERT);
+        this.URL_INSERT_ALL = Config.getAPIUrl(ApiURIs.URI.SNM_INSERT_ALL);
+        this.URL_UPDATE = Config.getAPIUrl(ApiURIs.URI.SNM_UPDATE);
         this.URL_GET = Config.getAPIUrl(ApiURIs.URI.SNM_GET);
     }
 

@@ -1119,6 +1119,7 @@ class EstimationRequestInfo(InfoBase):
         self.write_graph_images = None
         """:type: bool """
 
+        # faverolles 1/22/2020: Added for selectable parameter in Admin Client
         self.write_moe_spreadsheet = None
         """:type: bool """
 

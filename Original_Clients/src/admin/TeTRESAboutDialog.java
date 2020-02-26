@@ -32,7 +32,7 @@ public class TeTRESAboutDialog extends javax.swing.JDialog {
     public TeTRESAboutDialog(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();        
-        this.appVersion.setText(admin.TeTRESVersion.version);
+        this.appVersion.setText(TeTRESVersion.version);
         this.setTitle("About : TTRMS " + TeTRESVersion.version);
         this.setLocationRelativeTo(parent);
     }

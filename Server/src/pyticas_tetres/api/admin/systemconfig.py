@@ -21,9 +21,9 @@ from pyticas_tetres.da.config import ConfigDataAccess
 from pyticas_tetres.db.tetres.model import Config
 from pyticas_tetres.logger import getLogger
 from pyticas_tetres.sched import scheduler, worker
+from pyticas_tetres.systasks import actionlog_processor as actionlog_proc
 from pyticas_tetres.ttypes import SystemConfigInfo
 from pyticas_tetres.util import actionlog, systemconfig
-from pyticas_tetres.systasks import actionlog_processor as actionlog_proc
 
 
 def register_api(app):
@@ -166,7 +166,7 @@ def put_task_to_actionlog(prev_syscfg):
                           Config.__tablename__,
                           syscfg.id,
                           'DAILY_JOB_START_TIME is updated : %s -> %s' % (
-                          prev_syscfg.daily_job_start_time, cfg.DAILY_JOB_START_TIME),
+                              prev_syscfg.daily_job_start_time, cfg.DAILY_JOB_START_TIME),
                           handled=True)
 
         if cfg.DAILY_JOB_OFFSET_DAYS != prev_syscfg.daily_job_offset_days:
@@ -175,7 +175,7 @@ def put_task_to_actionlog(prev_syscfg):
                           Config.__tablename__,
                           syscfg.id,
                           'DAILY_JOB_OFFSET_DAYS is updated: %s -> %s' % (
-                          prev_syscfg.daily_job_offset_days, cfg.DAILY_JOB_OFFSET_DAYS),
+                              prev_syscfg.daily_job_offset_days, cfg.DAILY_JOB_OFFSET_DAYS),
                           handled=True)
 
         if cfg.WEEKLY_JOB_START_WEEKDAY != prev_syscfg.weekly_job_start_day:
@@ -184,7 +184,7 @@ def put_task_to_actionlog(prev_syscfg):
                           Config.__tablename__,
                           syscfg.id,
                           'WEEKLY_JOB_START_WEEKDAY is updated: %s -> %s' % (
-                          prev_syscfg.weekly_job_start_day, cfg.WEEKLY_JOB_START_WEEKDAY),
+                              prev_syscfg.weekly_job_start_day, cfg.WEEKLY_JOB_START_WEEKDAY),
                           handled=True)
 
         if cfg.WEEKLY_JOB_START_TIME != prev_syscfg.weekly_job_start_time:
@@ -193,7 +193,7 @@ def put_task_to_actionlog(prev_syscfg):
                           Config.__tablename__,
                           syscfg.id,
                           'WEEKLY_JOB_START_TIME is updated: %s -> %s' % (
-                          prev_syscfg.weekly_job_start_time, cfg.WEEKLY_JOB_START_TIME),
+                              prev_syscfg.weekly_job_start_time, cfg.WEEKLY_JOB_START_TIME),
                           handled=True)
 
         if cfg.MONTHLY_JOB_START_DAY != prev_syscfg.monthly_job_start_date:
@@ -202,7 +202,7 @@ def put_task_to_actionlog(prev_syscfg):
                           Config.__tablename__,
                           syscfg.id,
                           'MONTHLY_JOB_START_DAY is updated: %s -> %s' % (
-                          prev_syscfg.monthly_job_start_date, cfg.MONTHLY_JOB_START_DAY),
+                              prev_syscfg.monthly_job_start_date, cfg.MONTHLY_JOB_START_DAY),
                           handled=True)
 
         if cfg.MONTHLY_JOB_START_TIME != prev_syscfg.monthly_job_start_time:
@@ -211,9 +211,9 @@ def put_task_to_actionlog(prev_syscfg):
                           Config.__tablename__,
                           syscfg.id,
                           'MONTHLY_JOB_START_TIME is updated: %s -> %s' % (
-                          prev_syscfg.monthly_job_start_time, cfg.MONTHLY_JOB_START_TIME),
+                              prev_syscfg.monthly_job_start_time, cfg.MONTHLY_JOB_START_TIME),
                           handled=True)
-
+        # faverolles 1/22/2020 TODO: Add moe threshold parameters
     if not should_run_actionlog_handler:
         unhandled = da_actionlog.list(target_datatypes=[ActionLogDataAccess.DT_SYSTEMCONFIG], handled=False)
         if unhandled:

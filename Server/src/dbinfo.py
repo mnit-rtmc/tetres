@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 __author__ = 'Chongmyung Park (chongmyung.park@gmail.com)'
 
-from common import *
+from global_settings import *
 from pyticas import tetresconf
 
 SERVER_ADDR = tetresconf.get_property('ticas.db_host')

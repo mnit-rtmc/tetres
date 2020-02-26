@@ -14,6 +14,7 @@ from pyticas_tetres.da.tt import TravelTimeDataAccess
 from pyticas_tetres.logger import getLogger
 from pyticas_tetres.rengine.helper.wz import apply_workzone
 from pyticas_tetres.util.noop_context import nonop_with
+from pyticas_tetres.util.systemconfig import get_system_config_info
 
 """
 Travel Time Calculation
@@ -65,10 +66,17 @@ def calculate_a_route(prd, ttri, **kwargs):
     logger = getLogger(__name__)
     dbsession = kwargs.get('dbsession', None)
 
+    cur_config = get_system_config_info()
+
     if dbsession:
         da_tt = TravelTimeDataAccess(prd.start_date.year, session=dbsession)
     else:
         da_tt = TravelTimeDataAccess(prd.start_date.year)
+
+    print(f"{Fore.LIGHTBLUE_EX}"
+          f" moe_crit_dens[{cur_config.moe_critical_density}]"
+          f" moe_lane_cap[{cur_config.moe_lane_capacity}]"
+          f" moe_cong_thresh_speed[{cur_config.moe_congestion_threshold_speed}]")
 
     lock = kwargs.get('lock', nonop_with())
 
@@ -85,14 +93,14 @@ def calculate_a_route(prd, ttri, **kwargs):
 
     print(f"{Fore.GREEN}CALCULATING TRAVEL-TIME FOR ROUTE[{ttri.name}]")
 
-    res_list = _calculate_tt(ttri.route, prd)
+    res_list = _calculate_tt(ttri.route, prd, cur_config.moe_critical_density, cur_config.moe_lane_capacity)
 
-    names = ["tt", "speed", "vmt", "vht",
-             "dvh", "lvmt", "sv", "acceleration", "cm", "cmh"]
+    names = ["tt", "speed", "vmt", "vht", "dvh", "lvmt", "uvmt"]
+
     ctr = 0
     for i in res_list:
-        print(f"{Fore.YELLOW}MOE[{names[ctr]}] RNodeDataCount[{len(i)}]")
-        print_rnode_data(i)
+        print(f"{Fore.YELLOW}MOE[{names[ctr]}] RNodeDataCount[{len(i)}] RNodeDataLen[{len(i[0].data)}]")
+        # print_rnode_data(i)
         ctr += 1
 
     if res_list[0] is None:
@@ -101,15 +109,11 @@ def calculate_a_route(prd, ttri, **kwargs):
 
     travel_time = res_list[0][-1].data
     avg_speeds = _route_avgs(res_list[1])
-    total_vmts = _route_total(res_list[2])  # flow
+    total_vmt = _route_total(res_list[2])  # flow
     res_vht = _route_total(res_list[3])  # speed
     res_dvh = _route_total(res_list[4])  # flow
     res_lvmt = _route_total(res_list[5])  # density
-    res_sv = _route_avgs(res_list[6])  # speed
-
-    avg_accel = _route_avgs(res_list[7])
-    total_cm = _route_total(res_list[8])
-    total_cmh = _route_total(res_list[9])
+    res_uvmt = _route_total(res_list[6])
 
     timeline = prd.get_timeline(as_datetime=False, with_date=True)
     print(f"{Fore.CYAN}Start[{timeline[0]}] End[{timeline[-1]}] TimelineLength[{len(timeline)}]")
@@ -120,11 +124,11 @@ def calculate_a_route(prd, ttri, **kwargs):
             'time': dateTimeStamp,
             'tt': travel_time[index],
             'speed': avg_speeds[index],
-            'vmt': total_vmts[index],
+            'vmt': total_vmt[index],
             'vht': res_vht[index],
             'dvh': res_dvh[index],
             'lvmt': res_lvmt[index],
-            'sv': res_sv[index],
+            'uvmt': res_uvmt[index]
         })
 
     with lock:
@@ -141,7 +145,7 @@ def calculate_a_route(prd, ttri, **kwargs):
     return inserted_ids
 
 
-def _calculate_tt(r, prd, **kwargs) -> List[List[RNodeData]]:
+def _calculate_tt(r, prd, moe_critical_density, moe_lane_capacity, **kwargs) -> List[List[RNodeData]]:
     """
 
     :type r: pyticas.ttypes.Route
@@ -164,10 +168,12 @@ def _calculate_tt(r, prd, **kwargs) -> List[List[RNodeData]]:
                 moe.vht(updated_route, prd),
                 moe.dvh(updated_route, prd),
                 moe.lvmt(updated_route, prd),
-                moe.sv(updated_route, prd),
-                moe.acceleration(updated_route, prd),
-                moe.cm(updated_route, prd),
-                moe.cmh(updated_route, prd)]
+                moe.uvmt(updated_route, prd, moe_critical_density, moe_lane_capacity),
+                # moe.cm(updated_route, prd),
+                # moe.cmh(updated_route, prd),
+                # moe.sv(updated_route, prd),
+                # moe.acceleration(updated_route, prd)
+                ]
 
     except Exception as ex:
         getLogger(__name__).warning(tb.traceback(ex))

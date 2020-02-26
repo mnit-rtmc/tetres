@@ -53,7 +53,7 @@ def write(uid, eparam, operating_conditions, results):
         logger.debug('UID = %s' % uid)
 
     if eparam.write_moe_spreadsheet:
-        # faverolles 10/10/2019 [A]:
+        # faverolles 10/10/2019:
         #   Added condition to write MOE spreadsheet if requested in eparam
         proc_start_time = time.time()
         logger.debug('>> Writing MOE spread sheet')

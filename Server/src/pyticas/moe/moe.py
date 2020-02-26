@@ -254,6 +254,40 @@ def lvmt_md(route, prds, **kwargs):
     return _do_moe_md(route, prds, 'lvmt', **kwargs)
 
 
+# faverolles 1/22/2020: Added For TICAS MOE Integration
+def uvmt(route, prd, default_critical_density=40, default_lane_capacity=2200, **kwargs):
+    """
+
+    :param default_lane_capacity:
+    :param default_critical_density:
+    :type route: pyticas.ttypes.Route
+    :type prd: Period
+    :rtype: list[list[RNodeData]]
+    """
+
+    kwargs["critical_k"] = default_critical_density
+    kwargs["lan_capacity"] = default_lane_capacity
+
+    return _do_moe(route, prd, 'uvmt', **kwargs)
+
+
+# faverolles 1/22/2020: Added For TICAS MOE Integration
+def uvmt_md(route, prds, default_critical_density=40, default_lane_capacity=2200, **kwargs):
+    """
+
+    :param default_lane_capacity:
+    :param default_critical_density:
+    :type route: pyticas.ttypes.Route
+    :type prds: list[Period]
+    :rtype: list[list[RNodeData]]
+    """
+
+    kwargs["critical_k"] = default_critical_density
+    kwargs["lan_capacity"] = default_lane_capacity
+
+    return _do_moe_md(route, prds, 'uvmt', **kwargs)
+
+
 def cm(route, prd, **kwargs):
     """
 
@@ -353,6 +387,7 @@ def acceleration_md(route, prds, **kwargs):
     """
     return _do_moe_md(route, prds, 'accel', **kwargs)
 
+
 def mrf(route, prd, **kwargs):
     """ Mainline and Ramp Flow Rates
 
@@ -430,6 +465,7 @@ def accumulated_distances(results, route, **kwargs):
     """
     return moe_helper.accumulated_distances(results, route, **kwargs)
 
+
 def imputation(res, imp_module=None, **kwargs):
     """
 
@@ -445,6 +481,7 @@ def imputation(res, imp_module=None, **kwargs):
     for ridx, r in enumerate(res):
         r.data = _data[ridx]
     return res
+
 
 def imputation_md(ress, imp_module=None):
     """

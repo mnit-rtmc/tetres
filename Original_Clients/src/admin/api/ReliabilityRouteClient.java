@@ -37,13 +37,13 @@ public class ReliabilityRouteClient extends APIClient<ReliabilityRouteInfo> {
 
     public ReliabilityRouteClient() {
         this.RESPONSE_LIST_TYPE = new TypeToken<ListResponse<ReliabilityRouteInfo>>() {}.getType();
-        this.RESPONSE_TYPE = new TypeToken<admin.api.ObjectResponse<ReliabilityRouteInfo>>() {}.getType();
+        this.RESPONSE_TYPE = new TypeToken<ObjectResponse<ReliabilityRouteInfo>>() {}.getType();
         this.DATA_TYPE = ReliabilityRouteInfo.class;
-        this.URL_DELETE = Config.getAPIUrl(admin.api.ApiURIs.URI.TTROUTE_DELETE);
-        this.URL_LIST = Config.getAPIUrl(admin.api.ApiURIs.URI.TTROUTE_LIST);
-        this.URL_INSERT = Config.getAPIUrl(admin.api.ApiURIs.URI.TTROUTE_INSERT);
-        this.URL_UPDATE = Config.getAPIUrl(admin.api.ApiURIs.URI.TTROUTE_UPDATE);
-        this.URL_GET = Config.getAPIUrl(admin.api.ApiURIs.URI.TTROUTE_GET);
+        this.URL_DELETE = Config.getAPIUrl(ApiURIs.URI.TTROUTE_DELETE);
+        this.URL_LIST = Config.getAPIUrl(ApiURIs.URI.TTROUTE_LIST);
+        this.URL_INSERT = Config.getAPIUrl(ApiURIs.URI.TTROUTE_INSERT);
+        this.URL_UPDATE = Config.getAPIUrl(ApiURIs.URI.TTROUTE_UPDATE);
+        this.URL_GET = Config.getAPIUrl(ApiURIs.URI.TTROUTE_GET);
     }
 
     @Override
@@ -59,7 +59,7 @@ public class ReliabilityRouteClient extends APIClient<ReliabilityRouteInfo> {
     public Route opposingRoute(int id) {
         PostData pd = new PostData();
         pd.addData("id", id);
-        Type rtype = new TypeToken<admin.api.ObjectResponse<Route>>() {
+        Type rtype = new TypeToken<ObjectResponse<Route>>() {
         }.getType();
         ObjectResponse<Route> res = HttpClient.post_synced(Config.getAPIUrl(ApiURIs.URI.TTROUTE_OPPOSITE_ROUTE), pd, rtype);
         if (res != null) {

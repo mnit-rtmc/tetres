@@ -38,12 +38,12 @@ public class WorkzoneGroupClient extends APIClient<WorkZoneGroupInfo> {
         }.getType();
         this.DATA_TYPE = WorkZoneGroupInfo.class;
 
-        this.URL_DELETE = Config.getAPIUrl(admin.api.ApiURIs.URI.WZ_GROUP_DELETE);
-        this.URL_YEARS = Config.getAPIUrl(admin.api.ApiURIs.URI.WZ_GROUP_YEARS);
-        this.URL_LIST = Config.getAPIUrl(admin.api.ApiURIs.URI.WZ_GROUP_LIST);
-        this.URL_LIST_BY_YEAR = Config.getAPIUrl(admin.api.ApiURIs.URI.WZ_GROUP_LIST_BY_YEAR);
-        this.URL_INSERT = Config.getAPIUrl(admin.api.ApiURIs.URI.WZ_GROUP_INSERT);
-        this.URL_UPDATE = Config.getAPIUrl(admin.api.ApiURIs.URI.WZ_GROUP_UPDATE);
+        this.URL_DELETE = Config.getAPIUrl(ApiURIs.URI.WZ_GROUP_DELETE);
+        this.URL_YEARS = Config.getAPIUrl(ApiURIs.URI.WZ_GROUP_YEARS);
+        this.URL_LIST = Config.getAPIUrl(ApiURIs.URI.WZ_GROUP_LIST);
+        this.URL_LIST_BY_YEAR = Config.getAPIUrl(ApiURIs.URI.WZ_GROUP_LIST_BY_YEAR);
+        this.URL_INSERT = Config.getAPIUrl(ApiURIs.URI.WZ_GROUP_INSERT);
+        this.URL_UPDATE = Config.getAPIUrl(ApiURIs.URI.WZ_GROUP_UPDATE);
         this.URL_GET = Config.getAPIUrl(ApiURIs.URI.WZ_GROUP_GET);
     }
         

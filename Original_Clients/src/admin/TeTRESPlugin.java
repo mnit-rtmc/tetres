@@ -34,7 +34,7 @@ public class TeTRESPlugin implements TICASPlugin {
     @Override
     public void run(TICASPluginOption ticasPluginOption) {
         TeTRESConfig.init();
-        admin.TeTRESPanel panMain = new TeTRESPanel(ticasPluginOption.getMainWindow());
+        TeTRESPanel panMain = new TeTRESPanel(ticasPluginOption.getMainWindow());
         panMain.init();
         ticasPluginOption.addTabPanel("TeTRES Administrator", panMain);
     }

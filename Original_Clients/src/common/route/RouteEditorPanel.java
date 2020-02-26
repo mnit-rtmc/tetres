@@ -50,7 +50,7 @@ public class RouteEditorPanel extends javax.swing.JPanel {
 
         asyncRequestAdapter1 = new org.jdesktop.http.async.event.AsyncRequestAdapter();
         tabMainTab = new javax.swing.JTabbedPane();
-        panRouteList = new common.route.RouteListPanel();
+        panRouteList = new RouteListPanel();
         panRouteCreation = new common.route.RouteCreationPanel();
 
         tabMainTab.addChangeListener(new javax.swing.event.ChangeListener() {
@@ -87,7 +87,7 @@ public class RouteEditorPanel extends javax.swing.JPanel {
     // Variables declaration - do not modify
     private org.jdesktop.http.async.event.AsyncRequestAdapter asyncRequestAdapter1;
     private common.route.RouteCreationPanel panRouteCreation;
-    private common.route.RouteListPanel panRouteList;
+    private RouteListPanel panRouteList;
     private javax.swing.JTabbedPane tabMainTab;
     // End of variables declaration
 

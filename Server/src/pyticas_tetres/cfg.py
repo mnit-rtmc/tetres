@@ -46,7 +46,7 @@ OPT_NAME_ACTIONLOG_ID_IN_PROCESSING = 'actionlog_id_in_processing'
 # default system configuration  ############################################################################
 #   - these values are updated in administrator user and stored in to db ('config' table)
 
-DATA_ARCHIVE_START_YEAR = 2019
+DATA_ARCHIVE_START_YEAR = 2018
 DAILY_JOB_OFFSET_DAYS = 3  # daily tasks run the task for the day of `today` - `DAILY_JOB_OFFSET_DAYS`
 
 DAILY_JOB_START_TIME = '23:00'
@@ -66,8 +66,8 @@ SE_DEPARTURE_WINDOW1 = 120  # in minutes (beginning at 2 hours after the game st
 SE_DEPARTURE_WINDOW2 = 150  # in minutes (2.5 hour period from DEPARTURE_WINDOW_IN_MINUTE1)
 
 # faverolles 1/12/2020: Adding AdminClient MOE Config Parameters
-MOE_CRITICAL_DENSITY = 999  # vehs/mile/lane
-MOE_LANE_CAPACITY = 999  # vehs/hr/lane
-MOE_CONGESTION_THRESHOLD_SPEED = 999  # miles/hr
+MOE_CRITICAL_DENSITY = 40  # vehs/mile/lane
+MOE_LANE_CAPACITY = 2200  # vehs/hr/lane
+MOE_CONGESTION_THRESHOLD_SPEED = 45  # miles/hr
 
 ###########################################################################################################

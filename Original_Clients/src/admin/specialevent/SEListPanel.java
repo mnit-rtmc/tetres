@@ -75,9 +75,9 @@ public class SEListPanel extends JPanel {
         this.model = new SpecialEventClient();
 
         // when year is selected
-        this.cbxYear.addActionListener(new java.awt.event.ActionListener() {
+        this.cbxYear.addActionListener(new ActionListener() {
             @Override
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            public void actionPerformed(ActionEvent evt) {
                 selectedYear = getSelectedYear();
                 loadListByYear();
             }
@@ -313,15 +313,15 @@ public class SEListPanel extends JPanel {
     private void initComponents() {
 
         asyncRequestAdapter1 = new org.jdesktop.http.async.event.AsyncRequestAdapter();
-        jLabel2 = new javax.swing.JLabel();
-        jScrollPane3 = new javax.swing.JScrollPane();
-        tbSEList = new javax.swing.JTable();
-        btnDeleteSelection = new javax.swing.JButton();
-        btnEditRoute = new javax.swing.JButton();
+        jLabel2 = new JLabel();
+        jScrollPane3 = new JScrollPane();
+        tbSEList = new JTable();
+        btnDeleteSelection = new JButton();
+        btnEditRoute = new JButton();
         jxMap = new org.jdesktop.swingx.JXMapKit();
-        jLabel1 = new javax.swing.JLabel();
-        btnAddRoute = new javax.swing.JButton();
-        cbxYear = new javax.swing.JComboBox();
+        jLabel1 = new JLabel();
+        btnAddRoute = new JButton();
+        cbxYear = new JComboBox();
 
         jLabel2.setText("Special Event List");
 
@@ -348,19 +348,19 @@ public class SEListPanel extends JPanel {
                 return canEdit[columnIndex];
             }
         });
-        tbSEList.setSelectionMode(javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+        tbSEList.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         jScrollPane3.setViewportView(tbSEList);
 
         btnDeleteSelection.setText("Delete");
-        btnDeleteSelection.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        btnDeleteSelection.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
                 btnDeleteSelectionActionPerformed(evt);
             }
         });
 
         btnEditRoute.setText("Edit Special Event Info");
-        btnEditRoute.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        btnEditRoute.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
                 btnEditRouteActionPerformed(evt);
             }
         });
@@ -372,134 +372,134 @@ public class SEListPanel extends JPanel {
 
 
         // faverolles 1/14/2020: Special Event Bulk Add From .csv File User Interface
-        btnBulkAddSpecialEvents = new javax.swing.JButton();
+        btnBulkAddSpecialEvents = new JButton();
         btnBulkAddSpecialEvents.setText("Add Special Events From CSV File");
         btnBulkAddSpecialEvents.addActionListener(this::onBulkAddSpecialEventsButtonPress);
 
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
+        GroupLayout layout = new GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
-                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
                       .addGroup(layout.createSequentialGroup()
                                       .addContainerGap()
-                                      .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                                      .addComponent(btnAddRoute, javax.swing.GroupLayout.PREFERRED_SIZE,
-                                                                    332, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                      .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                                                      .addComponent(btnAddRoute, GroupLayout.PREFERRED_SIZE,
+                                                                    332, GroupLayout.PREFERRED_SIZE)
                                                       .addComponent(btnBulkAddSpecialEvents,
-                                                                    javax.swing.GroupLayout.PREFERRED_SIZE, 332,
-                                                                    javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                    GroupLayout.PREFERRED_SIZE, 332,
+                                                                    GroupLayout.PREFERRED_SIZE)
                                                       .addComponent(jLabel1)
                                                       .addComponent(jLabel2)
                                                       .addGroup(layout.createParallelGroup(
-                                                              javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                                              GroupLayout.Alignment.TRAILING, false)
                                                                       .addComponent(cbxYear,
-                                                                                    javax.swing.GroupLayout.Alignment.LEADING,
+                                                                                    GroupLayout.Alignment.LEADING,
                                                                                     0,
-                                                                                    javax.swing.GroupLayout.DEFAULT_SIZE,
+                                                                                    GroupLayout.DEFAULT_SIZE,
                                                                                     Short.MAX_VALUE)
                                                                       .addGroup(
-                                                                              javax.swing.GroupLayout.Alignment.LEADING,
+                                                                              GroupLayout.Alignment.LEADING,
                                                                               layout.createSequentialGroup()
                                                                                     .addComponent(btnDeleteSelection,
-                                                                                                  javax.swing.GroupLayout.PREFERRED_SIZE,
+                                                                                                  GroupLayout.PREFERRED_SIZE,
                                                                                                   141,
-                                                                                                  javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                                                  GroupLayout.PREFERRED_SIZE)
                                                                                     .addGap(18, 18, 18)
                                                                                     .addComponent(btnEditRoute,
-                                                                                                  javax.swing.GroupLayout.DEFAULT_SIZE,
-                                                                                                  javax.swing.GroupLayout.DEFAULT_SIZE,
+                                                                                                  GroupLayout.DEFAULT_SIZE,
+                                                                                                  GroupLayout.DEFAULT_SIZE,
                                                                                                   Short.MAX_VALUE))
                                                                       .addComponent(jScrollPane3,
-                                                                                    javax.swing.GroupLayout.Alignment.LEADING,
-                                                                                    javax.swing.GroupLayout.DEFAULT_SIZE,
+                                                                                    GroupLayout.Alignment.LEADING,
+                                                                                    GroupLayout.DEFAULT_SIZE,
                                                                                     330, Short.MAX_VALUE)))
                                       .addGap(18, 18, 18)
-                                      .addComponent(jxMap, javax.swing.GroupLayout.DEFAULT_SIZE, 508, Short.MAX_VALUE)
+                                      .addComponent(jxMap, GroupLayout.DEFAULT_SIZE, 508, Short.MAX_VALUE)
                                       .addContainerGap())
         );
         layout.setVerticalGroup(
-                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
                       .addGroup(layout.createSequentialGroup()
                                       .addContainerGap()
-                                      .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                                      .addGroup(javax.swing.GroupLayout.Alignment.TRAILING,
+                                      .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                                                      .addGroup(GroupLayout.Alignment.TRAILING,
                                                                 layout.createSequentialGroup()
                                                                       .addComponent(btnAddRoute,
-                                                                                    javax.swing.GroupLayout.PREFERRED_SIZE,
+                                                                                    GroupLayout.PREFERRED_SIZE,
                                                                                     35,
-                                                                                    javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                                    GroupLayout.PREFERRED_SIZE)
                                                                       .addGap(18, 18, 18)
                                                                       .addComponent(btnBulkAddSpecialEvents,
-                                                                                    javax.swing.GroupLayout.PREFERRED_SIZE,
+                                                                                    GroupLayout.PREFERRED_SIZE,
                                                                                     35,
-                                                                                    javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                                    GroupLayout.PREFERRED_SIZE)
                                                                       .addGap(18, 18, 18)
                                                                       .addComponent(jLabel1)
                                                                       .addPreferredGap(
-                                                                              javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                                              LayoutStyle.ComponentPlacement.RELATED)
                                                                       .addComponent(cbxYear,
-                                                                                    javax.swing.GroupLayout.PREFERRED_SIZE,
-                                                                                    javax.swing.GroupLayout.DEFAULT_SIZE,
-                                                                                    javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                                    GroupLayout.PREFERRED_SIZE,
+                                                                                    GroupLayout.DEFAULT_SIZE,
+                                                                                    GroupLayout.PREFERRED_SIZE)
                                                                       .addGap(18, 18, 18)
                                                                       .addComponent(jLabel2)
                                                                       .addPreferredGap(
-                                                                              javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                                                              LayoutStyle.ComponentPlacement.UNRELATED)
                                                                       .addComponent(jScrollPane3,
-                                                                                    javax.swing.GroupLayout.PREFERRED_SIZE,
+                                                                                    GroupLayout.PREFERRED_SIZE,
                                                                                     0, Short.MAX_VALUE)
                                                                       .addGap(18, 18, 18)
                                                                       .addGroup(layout.createParallelGroup(
-                                                                              javax.swing.GroupLayout.Alignment.BASELINE)
+                                                                              GroupLayout.Alignment.BASELINE)
                                                                                       .addComponent(btnDeleteSelection,
-                                                                                                    javax.swing.GroupLayout.PREFERRED_SIZE,
+                                                                                                    GroupLayout.PREFERRED_SIZE,
                                                                                                     30,
-                                                                                                    javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                                                    GroupLayout.PREFERRED_SIZE)
                                                                                       .addComponent(btnEditRoute,
-                                                                                                    javax.swing.GroupLayout.PREFERRED_SIZE,
+                                                                                                    GroupLayout.PREFERRED_SIZE,
                                                                                                     30,
-                                                                                                    javax.swing.GroupLayout.PREFERRED_SIZE)))
-                                                      .addComponent(jxMap, javax.swing.GroupLayout.DEFAULT_SIZE, 438,
+                                                                                                    GroupLayout.PREFERRED_SIZE)))
+                                                      .addComponent(jxMap, GroupLayout.DEFAULT_SIZE, 438,
                                                                     Short.MAX_VALUE))
                                       .addContainerGap())
         );
     }
 
     private void btnDeleteSelectionActionPerformed(
-            java.awt.event.ActionEvent evt) {
+            ActionEvent evt) {
         this.deleteSpecialEvents();
     }
 
     private void btnAddRouteActionPerformed(
-            java.awt.event.ActionEvent evt) {
+            ActionEvent evt) {
         this.createSpecialEvent();
     }
 
     private void btnEditRouteActionPerformed(
-            java.awt.event.ActionEvent evt) {
+            ActionEvent evt) {
         this.editSpecialEvent();
     }
 
 
     // Variables declaration - do not modify
     private org.jdesktop.http.async.event.AsyncRequestAdapter asyncRequestAdapter1;
-    private javax.swing.JButton btnAddRoute;
-    private javax.swing.JButton btnDeleteSelection;
-    private javax.swing.JButton btnEditRoute;
-    private javax.swing.JComboBox cbxYear;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JScrollPane jScrollPane3;
+    private JButton btnAddRoute;
+    private JButton btnDeleteSelection;
+    private JButton btnEditRoute;
+    private JComboBox cbxYear;
+    private JLabel jLabel1;
+    private JLabel jLabel2;
+    private JScrollPane jScrollPane3;
     private org.jdesktop.swingx.JXMapKit jxMap;
-    private javax.swing.JTable tbSEList;
+    private JTable tbSEList;
     // End of variables declaration:variables
 
 
     // faverolles 1/14/2020: Special Event Bulk Add From .csv File
-    private javax.swing.JButton btnBulkAddSpecialEvents;
+    private JButton btnBulkAddSpecialEvents;
 
-    private void onBulkAddSpecialEventsButtonPress(java.awt.event.ActionEvent evt) {
+    private void onBulkAddSpecialEventsButtonPress(ActionEvent evt) {
         String filepath = FileHelper.chooseFileToOpen(
                 ".", "Select CSV Special Event File", FileHelper.FileFilterForCSV);
         if (filepath != null) {

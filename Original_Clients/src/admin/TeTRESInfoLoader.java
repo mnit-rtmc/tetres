@@ -49,7 +49,7 @@ public class TeTRESInfoLoader {
     }
 
     public void init(final ICallback callback) {
-        HttpClient.get(admin.TeTRESConfig.getAPIUrl(admin.TeTRESConfig.API_TTRMS_INFO), new IResponseCallback<ResponseTTRMSInfo>() {
+        HttpClient.get(TeTRESConfig.getAPIUrl(TeTRESConfig.API_TTRMS_INFO), new IResponseCallback<ResponseTTRMSInfo>() {
 
             @Override
             public void success(ResponseTTRMSInfo result) {

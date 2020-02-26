@@ -27,5 +27,6 @@ import javax.swing.JCheckBox;
  */
 public interface IFilterInfoConverter {
     public List<FilterInfo> getFilterObjects(String[][] data, boolean hasNoCondition, boolean hasAnyCondition);
-    public void setFilterObjects(JTable table, JCheckBox chkNoCondition, JCheckBox chkAnyCondition, List<FilterInfo> filters);
+    public void setFilterObjects(JTable table, JCheckBox chkNoCondition, JCheckBox chkAnyCondition,
+        List<FilterInfo> filters);
 }

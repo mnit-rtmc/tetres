@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 __author__ = 'Chongmyung Park (chongmyung.park@gmail.com)'
 
-import common
 import dbinfo
+import global_settings
 from pyticas import tetresconf
 
 
@@ -21,7 +21,13 @@ if __name__ == '__main__':
     CAD_DB_INFO = dbinfo.cad_db_info()
     IRIS_DB_INFO = dbinfo.iris_incident_db_info()
 
-    print('DATA PATH : ', common.DATA_PATH)
+    if tetresconf.get_property("ticas.download_traffic_data_files").capitalize() is "TRUE":
+        global_settings.DOWNLOAD_TRAFFIC_DATA_FILES = True
+    else:
+        global_settings.DOWNLOAD_TRAFFIC_DATA_FILES = False
+
+    print(f"DOWNLOAD_TRAFFIC_DATA_FILES: {global_settings.DOWNLOAD_TRAFFIC_DATA_FILES}")
+    print('DATA PATH : ', global_settings.DATA_PATH)
     from colorama import init as initialize_colorama
 
     initialize_colorama(autoreset=True)
@@ -34,7 +40,7 @@ if __name__ == '__main__':
     from pyticas import ticas
     from pyticas.rn import infra_loader
 
-    data_path = common.DATA_PATH
+    data_path = global_settings.DATA_PATH
 
     # initialize with `DATA_PATH`
     ticas.initialize(data_path)

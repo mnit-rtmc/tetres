@@ -53,7 +53,7 @@ public class SnowMgmtPanel extends JPanel implements IInitializable {
     private void initComponents() {
 
         jTabbedPane1 = new javax.swing.JTabbedPane();
-        tabMgmt = new admin.snowmgmt.SNListPanel();
+        tabMgmt = new SNListPanel();
         tabSnowRoute = new admin.snowmgmt.truckroute.SNRouteListPanel();
 
         jTabbedPane1.addTab("Road Condition Info", tabMgmt);
@@ -77,7 +77,7 @@ public class SnowMgmtPanel extends JPanel implements IInitializable {
         );
     }// Variables declaration - do not modify
     private javax.swing.JTabbedPane jTabbedPane1;
-    private admin.snowmgmt.SNListPanel tabMgmt;
+    private SNListPanel tabMgmt;
     private admin.snowmgmt.truckroute.SNRouteListPanel tabSnowRoute;
     // End of variables declaration
 

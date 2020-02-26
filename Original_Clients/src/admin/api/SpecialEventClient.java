@@ -34,12 +34,12 @@ public class SpecialEventClient extends APIClient<SpecialEventInfo> {
         }.getType();
         this.DATA_TYPE = SpecialEventInfo.class;
 
-        this.URL_DELETE = Config.getAPIUrl(admin.api.ApiURIs.URI.SE_DELETE);
-        this.URL_YEARS = Config.getAPIUrl(admin.api.ApiURIs.URI.SE_YEARS);
-        this.URL_LIST = Config.getAPIUrl(admin.api.ApiURIs.URI.SE_LIST);
-        this.URL_LIST_BY_YEAR = Config.getAPIUrl(admin.api.ApiURIs.URI.SE_LIST_BY_YEAR);
-        this.URL_INSERT = Config.getAPIUrl(admin.api.ApiURIs.URI.SE_INSERT);
-        this.URL_UPDATE = Config.getAPIUrl(admin.api.ApiURIs.URI.SE_UPDATE);
+        this.URL_DELETE = Config.getAPIUrl(ApiURIs.URI.SE_DELETE);
+        this.URL_YEARS = Config.getAPIUrl(ApiURIs.URI.SE_YEARS);
+        this.URL_LIST = Config.getAPIUrl(ApiURIs.URI.SE_LIST);
+        this.URL_LIST_BY_YEAR = Config.getAPIUrl(ApiURIs.URI.SE_LIST_BY_YEAR);
+        this.URL_INSERT = Config.getAPIUrl(ApiURIs.URI.SE_INSERT);
+        this.URL_UPDATE = Config.getAPIUrl(ApiURIs.URI.SE_UPDATE);
         this.URL_GET = Config.getAPIUrl(ApiURIs.URI.SE_GET);
 
         // faverolles 1/15/2020: Adding URL_INSERT_All Initialization

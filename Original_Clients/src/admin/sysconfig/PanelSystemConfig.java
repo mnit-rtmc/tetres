@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2018 NATSRL @ UMD (University Minnesota Duluth)
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -16,204 +16,219 @@
  */
 package admin.sysconfig;
 
+import admin.TeTRESConfig;
+import admin.api.SystemConfigClient;
+import admin.types.ReliabilityRouteInfo;
+import admin.types.SystemConfigInfo;
 import common.infra.Corridor;
 import common.infra.Infra;
 import common.log.TICASLogger;
 import common.pyticas.HttpResult;
-import common.ui.map.MapHelper;
-import admin.TeTRESConfig;
-import admin.types.ReliabilityRouteInfo;
-import java.util.ArrayList;
-import java.util.List;
-import javax.swing.JOptionPane;
-import org.apache.logging.log4j.core.Logger;
 import common.pyticas.IHttpResultCallback;
 import common.ui.IInitializable;
-import admin.api.SystemConfigClient;
-import admin.types.SystemConfigInfo;
+import common.ui.map.MapHelper;
+import org.apache.logging.log4j.core.Logger;
+
+import javax.swing.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- *
  * @author Chongmyung Park
  */
-public class PanelSystemConfig extends javax.swing.JPanel implements IInitializable {
+public class PanelSystemConfig extends JPanel implements IInitializable {
 
-    private Infra infra;
-    private List<Corridor> corridors = new ArrayList<>();
-    private MapHelper mapHelper;
-    private List<ReliabilityRouteInfo> routeList = new ArrayList<>();
-    private List<ReliabilityRouteInfo> selectedRoutes = new ArrayList<>();
-    private Logger logger;
-    private SystemConfigClient model;
-    private SystemConfigInfo systemConfig;
+  private Infra infra;
+  private List<Corridor> corridors = new ArrayList<>();
+  private MapHelper mapHelper;
+  private List<ReliabilityRouteInfo> routeList = new ArrayList<>();
+  private List<ReliabilityRouteInfo> selectedRoutes = new ArrayList<>();
+  private Logger logger;
+  private SystemConfigClient model;
+  private SystemConfigInfo systemConfig;
 
-    /**
-     * Creates new form RouteEditorPanel
-     */
-    public PanelSystemConfig() {
-        initComponents();
+  /**
+   * Creates new form RouteEditorPanel
+   */
+  public PanelSystemConfig() {
+    initComponents();
+  }
+
+  /**
+   * *
+   * initialize variables and UI
+   */
+  @Override
+  public void init() {
+    this.logger = TICASLogger.getLogger(this.getClass().getName());
+    this.model = new SystemConfigClient();
+    this.getSystemConfigInfo();
+  }
+
+  @Override
+  public void refresh() {
+    this.getSystemConfigInfo();
+  }
+
+  private void getSystemConfigInfo() {
+    this.model.get(new IHttpResultCallback() {
+      @Override
+      public void ready(HttpResult result) {
+        updateSettingInUI();
+      }
+
+      @Override
+      public void fail(HttpResult result) {
+        JOptionPane.showMessageDialog(TeTRESConfig.mainFrame, "Fail to get system configuration information");
+      }
+    });
+  }
+
+  private void updateSettingInUI() {
+    this.systemConfig = this.model.getSystemConfig();
+    this.periodicJobSetingPanel.updateSettingInUI(this.systemConfig);
+    this.categorizationParameterPanel.updateSettingInUI(this.systemConfig);
+  }
+
+  private void applyConfiguration() {
+    int reply =
+        JOptionPane.showConfirmDialog(TeTRESConfig.mainFrame, "Do you want to apply the updated configurations?",
+            "Confirm", JOptionPane.YES_NO_OPTION);
+    if (reply != JOptionPane.YES_OPTION) {
+      JOptionPane.showMessageDialog(TeTRESConfig.mainFrame, "Aborted");
+      return;
     }
 
-    /**
-     * *
-     * initialize variables and UI
-     */
-    @Override
-    public void init() {
-        this.logger = TICASLogger.getLogger(this.getClass().getName());
-        this.model = new SystemConfigClient();
-        this.getSystemConfigInfo();
-    }
+    SystemConfigInfo newSysConfig = this.getUpdatedSystemConfigs();
 
-    @Override
-    public void refresh() {
-        this.getSystemConfigInfo();
-    }
-
-    private void getSystemConfigInfo() {
-        this.model.get(new IHttpResultCallback() {
-            @Override
-            public void ready(HttpResult result) {
-                updateSettingInUI();
-            }
-
-            @Override
-            public void fail(HttpResult result) {
-                JOptionPane.showMessageDialog(TeTRESConfig.mainFrame, "Fail to get system configuration information");
-            }
-        });
-    }
-
-    private void updateSettingInUI() {
-        this.systemConfig = this.model.getSystemConfig();
-        this.periodicJobSetingPanel.updateSettingInUI(this.systemConfig);
-        this.categorizationParameterPanel.updateSettingInUI(this.systemConfig);
-    }
-
-    private void applyConfiguration() {
-        int reply = JOptionPane.showConfirmDialog(TeTRESConfig.mainFrame, "Do you want to apply the updated configurations?", "Confirm", JOptionPane.YES_NO_OPTION);
+    if (this.systemConfig.data_archive_start_year.compareTo(newSysConfig.data_archive_start_year) != 0) {
+      if (this.systemConfig.data_archive_start_year < newSysConfig.data_archive_start_year) {
+        reply = JOptionPane.showConfirmDialog(TeTRESConfig.mainFrame,
+            "DATA ARCHIVE START YEAR has been shrunk.\nThe calculated data before " +
+            newSysConfig.data_archive_start_year + " will be deleted.\nDo you want to proceed?",
+            "Confirm", JOptionPane.YES_NO_OPTION);
         if (reply != JOptionPane.YES_OPTION) {
-            JOptionPane.showMessageDialog(TeTRESConfig.mainFrame, "Aborted");
-            return;
+          JOptionPane.showMessageDialog(TeTRESConfig.mainFrame, "Aborted");
+          return;
         }
-        
-        SystemConfigInfo newSysConfig = this.getUpdatedSystemConfigs();
-
-        if (this.systemConfig.data_archive_start_year.compareTo(newSysConfig.data_archive_start_year) != 0) {
-            if (this.systemConfig.data_archive_start_year < newSysConfig.data_archive_start_year) {
-                reply = JOptionPane.showConfirmDialog(TeTRESConfig.mainFrame,
-                        "DATA ARCHIVE START YEAR has been shrunk.\nThe calculated data before " + newSysConfig.data_archive_start_year + " will be deleted.\nDo you want to proceed?",
-                        "Confirm", JOptionPane.YES_NO_OPTION);
-                if (reply != JOptionPane.YES_OPTION) {
-                    JOptionPane.showMessageDialog(TeTRESConfig.mainFrame, "Aborted");
-                    return;
-                }
-            }
-            if (this.systemConfig.data_archive_start_year > newSysConfig.data_archive_start_year) {
-                reply = JOptionPane.showConfirmDialog(TeTRESConfig.mainFrame,
-                        "DATA ARCHIVE START YEAR has been extended.\nTravel time will be calculated after " + newSysConfig.data_archive_start_year + ".\nDo you want to proceed?",
-                        "Confirm", JOptionPane.YES_NO_OPTION);
-                if (reply != JOptionPane.YES_OPTION) {
-                    JOptionPane.showMessageDialog(TeTRESConfig.mainFrame, "Aborted");
-                    return;
-                }
-            }
+      }
+      if (this.systemConfig.data_archive_start_year > newSysConfig.data_archive_start_year) {
+        reply = JOptionPane.showConfirmDialog(TeTRESConfig.mainFrame,
+            "DATA ARCHIVE START YEAR has been extended.\nTravel time will be calculated after " +
+            newSysConfig.data_archive_start_year + ".\nDo you want to proceed?",
+            "Confirm", JOptionPane.YES_NO_OPTION);
+        if (reply != JOptionPane.YES_OPTION) {
+          JOptionPane.showMessageDialog(TeTRESConfig.mainFrame, "Aborted");
+          return;
         }
-
-        if (this.systemConfig.incident_downstream_distance_limit.compareTo(newSysConfig.incident_downstream_distance_limit) != 0
-                || this.systemConfig.incident_upstream_distance_limit.compareTo(newSysConfig.incident_upstream_distance_limit) != 0
-                || this.systemConfig.workzone_downstream_distance_limit.compareTo(newSysConfig.workzone_downstream_distance_limit) != 0
-                || this.systemConfig.workzone_upstream_distance_limit.compareTo(newSysConfig.workzone_upstream_distance_limit) != 0
-                || this.systemConfig.specialevent_arrival_window.compareTo(newSysConfig.specialevent_arrival_window) != 0
-                || this.systemConfig.specialevent_departure_window1.compareTo(newSysConfig.specialevent_departure_window1) != 0
-                || this.systemConfig.specialevent_departure_window2.compareTo(newSysConfig.specialevent_departure_window2) != 0) {
-            
-            reply = JOptionPane.showConfirmDialog(TeTRESConfig.mainFrame,
-                    "Categorization Parameters have been changed.\nCategorization process will be performed.\nDo you want to proceed?",
-                    "Confirm", JOptionPane.YES_NO_OPTION);
-            if (reply != JOptionPane.YES_OPTION) {
-                JOptionPane.showMessageDialog(TeTRESConfig.mainFrame, "Aborted");
-                return;
-            }
-        }
-
-        this.model.update(newSysConfig, new IHttpResultCallback() {
-            @Override
-            public void ready(HttpResult result) {
-                JOptionPane.showMessageDialog(TeTRESConfig.mainFrame, "Requested.\nThe process is running in the background process.");
-                model.getSystemConfig();
-            }
-
-            @Override
-            public void fail(HttpResult result) {
-                JOptionPane.showMessageDialog(TeTRESConfig.mainFrame, "Fail to apply");
-                model.getSystemConfig();
-            }
-        });
-
+      }
     }
 
-    private SystemConfigInfo getUpdatedSystemConfigs() {
-        SystemConfigInfo newSysConfig = new SystemConfigInfo();
-        this.periodicJobSetingPanel.fillSystemConfigInfo(newSysConfig);
-        this.categorizationParameterPanel.fillSystemConfigInfo(newSysConfig);
-        return newSysConfig;
+    if (this.systemConfig.incident_downstream_distance_limit.compareTo(
+        newSysConfig.incident_downstream_distance_limit) != 0
+        ||
+        this.systemConfig.incident_upstream_distance_limit.compareTo(newSysConfig.incident_upstream_distance_limit) != 0
+        || this.systemConfig.workzone_downstream_distance_limit.compareTo(
+        newSysConfig.workzone_downstream_distance_limit) != 0
+        ||
+        this.systemConfig.workzone_upstream_distance_limit.compareTo(newSysConfig.workzone_upstream_distance_limit) != 0
+        || this.systemConfig.specialevent_arrival_window.compareTo(newSysConfig.specialevent_arrival_window) != 0
+        || this.systemConfig.specialevent_departure_window1.compareTo(newSysConfig.specialevent_departure_window1) != 0
+        ||
+        this.systemConfig.specialevent_departure_window2.compareTo(newSysConfig.specialevent_departure_window2) != 0) {
+
+      reply = JOptionPane.showConfirmDialog(TeTRESConfig.mainFrame,
+          "Categorization Parameters have been changed.\nCategorization process will be performed.\nDo you want to " +
+          "proceed?",
+          "Confirm", JOptionPane.YES_NO_OPTION);
+      if (reply != JOptionPane.YES_OPTION) {
+        JOptionPane.showMessageDialog(TeTRESConfig.mainFrame, "Aborted");
+        return;
+      }
     }
 
-    /**
-     * This method is called from within the constructor to initialize the form.
-     * WARNING: Do NOT modify this code. The content of this method is always
-     * regenerated by the Form Editor.
-     */
-    @SuppressWarnings("unchecked")
-    // <editor-fold defaultstate="collapsed" desc="Generated Code">
-    private void initComponents() {
+    this.model.update(newSysConfig, new IHttpResultCallback() {
+      @Override
+      public void ready(HttpResult result) {
+        JOptionPane.showMessageDialog(TeTRESConfig.mainFrame,
+            "Requested.\nThe process is running in the background process.");
+        model.getSystemConfig();
+      }
 
-        asyncRequestAdapter1 = new org.jdesktop.http.async.event.AsyncRequestAdapter();
-        jTabbedPane1 = new javax.swing.JTabbedPane();
-        periodicJobSetingPanel = new admin.sysconfig.PanelPeriodicJobSeting();
-        categorizationParameterPanel = new admin.sysconfig.PanelCategorizationParameter();
-        btnApply = new javax.swing.JButton();
+      @Override
+      public void fail(HttpResult result) {
+        JOptionPane.showMessageDialog(TeTRESConfig.mainFrame, "Fail to apply");
+        model.getSystemConfig();
+      }
+    });
 
-        jTabbedPane1.addTab("Periodic Job Setting", periodicJobSetingPanel);
-        jTabbedPane1.addTab("Categorization Parameter Setting", categorizationParameterPanel);
+  }
 
-        btnApply.setText("Apply Configuration");
-        btnApply.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnApplyActionPerformed(evt);
-            }
-        });
+  private SystemConfigInfo getUpdatedSystemConfigs() {
+    SystemConfigInfo newSysConfig = new SystemConfigInfo();
+    this.periodicJobSetingPanel.fillSystemConfigInfo(newSysConfig);
+    this.categorizationParameterPanel.fillSystemConfigInfo(newSysConfig);
+    return newSysConfig;
+  }
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-        this.setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+  private void initComponents() {
+
+    asyncRequestAdapter1 = new org.jdesktop.http.async.event.AsyncRequestAdapter();
+    jTabbedPane1 = new JTabbedPane();
+    periodicJobSetingPanel = new admin.sysconfig.PanelPeriodicJobSeting();
+    categorizationParameterPanel = new admin.sysconfig.PanelCategorizationParameter();
+    btnApply = new JButton();
+
+    // faverolles 1/18/2020: Added Database Population List Panel
+    databasePopulationPanel = new DatabasePopulationPanel();
+
+    jTabbedPane1.addTab("Periodic Job Setting", periodicJobSetingPanel);
+    jTabbedPane1.addTab("Categorization Parameter Setting", categorizationParameterPanel);
+
+    // faverolles 1/18/2020: Added Database Population List Panel
+    jTabbedPane1.addTab("Current Database Population", databasePopulationPanel);
+
+    btnApply.setText("Apply Configuration");
+    btnApply.addActionListener(new java.awt.event.ActionListener() {
+      public void actionPerformed(java.awt.event.ActionEvent evt) {
+        btnApplyActionPerformed(evt);
+      }
+    });
+
+    GroupLayout layout = new GroupLayout(this);
+    this.setLayout(layout);
+    layout.setHorizontalGroup(
+        layout.createParallelGroup(GroupLayout.Alignment.LEADING)
             .addComponent(jTabbedPane1)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(btnApply, javax.swing.GroupLayout.PREFERRED_SIZE, 190, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addGroup(GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(btnApply, GroupLayout.PREFERRED_SIZE, 190,
+                    GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+    );
+    layout.setVerticalGroup(
+        layout.createParallelGroup(GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 537, Short.MAX_VALUE)
+                .addComponent(jTabbedPane1, GroupLayout.DEFAULT_SIZE, 537, Short.MAX_VALUE)
                 .addGap(18, 18, 18)
                 .addComponent(btnApply)
                 .addContainerGap())
-        );
-    }private void btnApplyActionPerformed(java.awt.event.ActionEvent evt) {
-        this.applyConfiguration();
-    }
+    );
+  }
+
+  private void btnApplyActionPerformed(java.awt.event.ActionEvent evt) {
+    this.applyConfiguration();
+  }
 
 
-    // Variables declaration - do not modify
-    private org.jdesktop.http.async.event.AsyncRequestAdapter asyncRequestAdapter1;
-    private javax.swing.JButton btnApply;
-    private admin.sysconfig.PanelCategorizationParameter categorizationParameterPanel;
-    private javax.swing.JTabbedPane jTabbedPane1;
-    private admin.sysconfig.PanelPeriodicJobSeting periodicJobSetingPanel;
-    // End of variables declaration
+  private org.jdesktop.http.async.event.AsyncRequestAdapter asyncRequestAdapter1;
+  private JButton btnApply;
+  private admin.sysconfig.PanelCategorizationParameter categorizationParameterPanel;
+  private JTabbedPane jTabbedPane1;
+  private admin.sysconfig.PanelPeriodicJobSeting periodicJobSetingPanel;
+
+  // faverolles 1/18/2020: Added Database Population List Panel
+  private DatabasePopulationPanel databasePopulationPanel;
+
 
 }

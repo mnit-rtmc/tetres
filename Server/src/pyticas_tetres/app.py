@@ -59,7 +59,7 @@ class TeTRESApp(TICASApp):
         from pyticas_tetres.api import data_api
 
         # faverolles 12/26/2019: Added "api_additions/api_endpoints" to modules to be registered as well
-        from api_additions import api_endpoints
+        from api_extension import api_endpoints
 
         modules = [ttroute, snowevent, snowmgmt, snowroute,
                    specialevent, tetres, wz, wz_group,
