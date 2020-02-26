@@ -1,7 +1,11 @@
+TMC_Workzone_Mapping/bin
+TMC_Workzone_Mapping/obj
+
+
 Original_Clients/lib/*
 !Original_Clients/lib/README.md
 
-
+Original_Clients/run/*
 
 Server/data/*
 !Server/data/README.md
@@ -14,16 +18,11 @@ Platforms/*
 *.log
 *.pyc
 *.swp
-*.conf
 .DS_Store
 .atom/
 .buildlog/
 .history
 .svn/
-ve/
-dist/
-build/
-deploy.sh
 
 # IntelliJ related
 *.iml
