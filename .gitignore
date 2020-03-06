@@ -18,11 +18,14 @@ Platforms/*
 *.log
 *.pyc
 *.swp
+*.orig
 .DS_Store
 .atom/
 .buildlog/
 .history
 .svn/
+build/
+dist/
 
 # IntelliJ related
 *.iml

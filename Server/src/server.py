@@ -16,7 +16,7 @@ def read_host_ip():
 
 
 if __name__ == '__main__':
-    port = 5001
+    port = 5000
 
     TeTRES_DB_INFO = dbinfo.tetres_db_info()
     CAD_DB_INFO = dbinfo.cad_db_info()
@@ -60,7 +60,7 @@ if __name__ == '__main__':
 
     # start server
     try:
-        ticasServer.start(host="127.0.0.1", port=5001, debug=True, use_reloader=False)
+        ticasServer.start(host="0.0.0.0", port=5000, debug=True, use_reloader=False)
     # ticasServer.start(host=read_host_ip(), port=port, debug=True, use_reloader=False)
     except Exception:
         traceback.print_exc()

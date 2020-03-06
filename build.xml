@@ -55,7 +55,7 @@
 		<mkdir dir="${dist.user.data}"/>
 		<mkdir dir="${dist.user.bin}/lib"/>
 
-		<copy file="${src.dir}/admin/dist/TeTRES-Admin.jar" todir="${dist.admin.bin}" flatten="true"/>
+		<copy file="${src.dir}/admin/build/dist/TeTRES-Admin.jar" todir="${dist.admin.bin}" flatten="true"/>
 		<copy todir="${dist.admin.data}">
 			<fileset dir="${data.dir}"/>
 		</copy>
@@ -72,7 +72,7 @@
 			</fileset>
 		</copy>
 
-		<copy file="${src.dir}/user/dist/TeTRES-User.jar" todir="${dist.user.bin}" flatten="true"/>
+		<copy file="${src.dir}/user/build/dist/TeTRES-User.jar" todir="${dist.user.bin}" flatten="true"/>
 		<copy todir="${dist.user.data}">
 			<fileset dir="${data.dir}"/>
 		</copy>

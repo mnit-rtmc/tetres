@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="TeTRES-NCRTES" basedir=".">
+	<property name="build.dir" value="build"/>
+	<property name="build.classes.dir" value="${build.dir}/bin"/>
+	<property name="dist.dir" value="${build.dir}/dist"/>
+	<property name="lib.dir" value="../../lib"/>
+
+	<path id="classpath">
+		<fileset dir="${lib.dir}" includes="**/*.jar" />
+		<fileset dir="../common/build" includes="**/*.jar" />
+	</path>
+
+	<target name="clean">
+		<delete dir="${build.dir}"/>
+	</target>
+
+	<target name="compile">
+		<subant target="jar">
+			<fileset dir="../common" includes="build.xml"/>
+		</subant>
+		<mkdir dir="${build.dir}"/>
+		<mkdir dir="${build.classes.dir}"/>
+		<javac destdir="${build.classes.dir}">
+			<src path="."/>
+			<exclude name="${build.dir}/**"/>
+			<classpath refid="classpath"/>
+		</javac>
+	</target>
+
+	<target name="jar" depends="compile">
+		<jar destfile="${dist.dir}/ticas-ncrtes.jar" basedir="${build.classes.dir}"/>
+	</target>
+</project>
