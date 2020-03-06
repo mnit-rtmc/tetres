@@ -25,7 +25,7 @@ import admin.specialevent.SEListPanel;
  * @author Chongmyung Park <chongmyung.park@gmail.com>
  */
 public class SpecialEventPanel extends JPanel implements IInitializable {
-    private admin.specialevent.SEListPanel panSEList;
+    private SEListPanel panSEList;
 
     /**
      * Creates new form SpecialEventPanel

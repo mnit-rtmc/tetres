@@ -12,7 +12,7 @@ import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
 
-public class DatabasePopulationPanel extends javax.swing.JPanel {
+public class DatabasePopulationPanel extends JPanel {
   JProgressBar progressBar;
   JPanel primaryPanel;
   JTextField trafficDataTextField;

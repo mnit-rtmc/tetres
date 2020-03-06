@@ -33,11 +33,11 @@ import java.util.Date;
 /**
  * @author Chongmyung Park
  */
-public final class SEEditDialog extends javax.swing.JDialog {
+public final class SEEditDialog extends JDialog {
 
     private SpecialEventInfo sei;
     protected GeoPosition selectedCoordinate;
-    private admin.specialevent.SEMapCtrl mapCtrl;
+    private SEMapCtrl mapCtrl;
     private SpecialEventClient model;
     private Integer year;
 
@@ -51,10 +51,10 @@ public final class SEEditDialog extends javax.swing.JDialog {
 
         this.sei = givenSEI;
         this.model = new SpecialEventClient();
-        this.mapCtrl = new admin.specialevent.SEMapCtrl(jxMap);
+        this.mapCtrl = new SEMapCtrl(jxMap);
 
         // coordinate changed event handler
-        admin.specialevent.SEMapCtrl.ICoordinateUpdated coordinateChangeListener = new SEMapCtrl.ICoordinateUpdated() {
+        SEMapCtrl.ICoordinateUpdated coordinateChangeListener = new SEMapCtrl.ICoordinateUpdated() {
             @Override
             public void coordinateUpdated(GeoPosition coordinate) {
                 selectedCoordinate = coordinate;
@@ -172,28 +172,28 @@ public final class SEEditDialog extends javax.swing.JDialog {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">
     private void initComponents() {
 
-        jLabel1 = new javax.swing.JLabel();
-        jPanel1 = new javax.swing.JPanel();
-        btnSave = new javax.swing.JButton();
-        btnCancel = new javax.swing.JButton();
-        jLabel4 = new javax.swing.JLabel();
-        tbxName = new javax.swing.JTextField();
-        jLabel5 = new javax.swing.JLabel();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        tbxDesc = new javax.swing.JTextArea();
-        jLabel6 = new javax.swing.JLabel();
-        jLabel7 = new javax.swing.JLabel();
-        jLabel8 = new javax.swing.JLabel();
-        tbxAttendance = new javax.swing.JTextField();
-        jLabel2 = new javax.swing.JLabel();
-        tbxCoordinates = new javax.swing.JTextField();
+        jLabel1 = new JLabel();
+        jPanel1 = new JPanel();
+        btnSave = new JButton();
+        btnCancel = new JButton();
+        jLabel4 = new JLabel();
+        tbxName = new JTextField();
+        jLabel5 = new JLabel();
+        jScrollPane1 = new JScrollPane();
+        tbxDesc = new JTextArea();
+        jLabel6 = new JLabel();
+        jLabel7 = new JLabel();
+        jLabel8 = new JLabel();
+        tbxAttendance = new JTextField();
+        jLabel2 = new JLabel();
+        tbxCoordinates = new JTextField();
         dtStartDatetime = new common.ui.TICASDateTimePicker();
         dtEndDatetime = new common.ui.TICASDateTimePicker();
         jxMap = new org.jdesktop.swingx.JXMapKit();
 
         jLabel1.setText("jLabel1");
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Edit");
 
         btnSave.setText("Apply Changes");
@@ -228,20 +228,20 @@ public final class SEEditDialog extends javax.swing.JDialog {
 
         tbxCoordinates.setEnabled(false);
 
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        GroupLayout jPanel1Layout = new GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
-                jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                jPanel1Layout.createParallelGroup(GroupLayout.Alignment.LEADING)
                              .addGroup(jPanel1Layout.createSequentialGroup()
                                                     .addContainerGap()
                                                     .addGroup(jPanel1Layout.createParallelGroup(
-                                                            javax.swing.GroupLayout.Alignment.LEADING)
+                                                            GroupLayout.Alignment.LEADING)
                                                                            .addComponent(jScrollPane1)
                                                                            .addGroup(
-                                                                                   javax.swing.GroupLayout.Alignment.TRAILING,
+                                                                                   GroupLayout.Alignment.TRAILING,
                                                                                    jPanel1Layout.createSequentialGroup()
                                                                                                 .addComponent(btnCancel,
-                                                                                                              javax.swing.GroupLayout.DEFAULT_SIZE,
+                                                                                                              GroupLayout.DEFAULT_SIZE,
                                                                                                               156,
                                                                                                               Short.MAX_VALUE)
                                                                                                 .addGap(18, 18, 18)
@@ -250,14 +250,14 @@ public final class SEEditDialog extends javax.swing.JDialog {
                                                                            .addComponent(tbxAttendance)
                                                                            .addComponent(tbxCoordinates)
                                                                            .addComponent(dtStartDatetime,
-                                                                                         javax.swing.GroupLayout.DEFAULT_SIZE,
-                                                                                         javax.swing.GroupLayout.DEFAULT_SIZE,
+                                                                                         GroupLayout.DEFAULT_SIZE,
+                                                                                         GroupLayout.DEFAULT_SIZE,
                                                                                          Short.MAX_VALUE)
                                                                            .addGroup(
                                                                                    jPanel1Layout.createSequentialGroup()
                                                                                                 .addGroup(jPanel1Layout
                                                                                                                   .createParallelGroup(
-                                                                                                                          javax.swing.GroupLayout.Alignment.LEADING)
+                                                                                                                          GroupLayout.Alignment.LEADING)
                                                                                                                   .addComponent(
                                                                                                                           jLabel4)
                                                                                                                   .addComponent(
@@ -273,92 +273,92 @@ public final class SEEditDialog extends javax.swing.JDialog {
                                                                                                 .addGap(0, 0,
                                                                                                         Short.MAX_VALUE))
                                                                            .addComponent(dtEndDatetime,
-                                                                                         javax.swing.GroupLayout.DEFAULT_SIZE,
-                                                                                         javax.swing.GroupLayout.DEFAULT_SIZE,
+                                                                                         GroupLayout.DEFAULT_SIZE,
+                                                                                         GroupLayout.DEFAULT_SIZE,
                                                                                          Short.MAX_VALUE))
                                                     .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
-                jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                jPanel1Layout.createParallelGroup(GroupLayout.Alignment.LEADING)
                              .addGroup(jPanel1Layout.createSequentialGroup()
                                                     .addContainerGap()
                                                     .addComponent(jLabel4)
-                                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                    .addComponent(tbxName, javax.swing.GroupLayout.PREFERRED_SIZE,
-                                                                  javax.swing.GroupLayout.DEFAULT_SIZE,
-                                                                  javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                                    .addComponent(tbxName, GroupLayout.PREFERRED_SIZE,
+                                                                  GroupLayout.DEFAULT_SIZE,
+                                                                  GroupLayout.PREFERRED_SIZE)
                                                     .addPreferredGap(
-                                                            javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                                            LayoutStyle.ComponentPlacement.UNRELATED)
                                                     .addComponent(jLabel5)
-                                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE,
-                                                                  82, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                                    .addComponent(jScrollPane1, GroupLayout.PREFERRED_SIZE,
+                                                                  82, GroupLayout.PREFERRED_SIZE)
                                                     .addGap(18, 18, 18)
                                                     .addComponent(jLabel6)
                                                     .addPreferredGap(
-                                                            javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                                            LayoutStyle.ComponentPlacement.UNRELATED)
                                                     .addComponent(dtStartDatetime,
-                                                                  javax.swing.GroupLayout.PREFERRED_SIZE,
-                                                                  javax.swing.GroupLayout.DEFAULT_SIZE,
-                                                                  javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                  GroupLayout.PREFERRED_SIZE,
+                                                                  GroupLayout.DEFAULT_SIZE,
+                                                                  GroupLayout.PREFERRED_SIZE)
                                                     .addGap(12, 12, 12)
                                                     .addComponent(jLabel7)
                                                     .addPreferredGap(
-                                                            javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                                    .addComponent(dtEndDatetime, javax.swing.GroupLayout.PREFERRED_SIZE,
-                                                                  javax.swing.GroupLayout.DEFAULT_SIZE,
-                                                                  javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                            LayoutStyle.ComponentPlacement.UNRELATED)
+                                                    .addComponent(dtEndDatetime, GroupLayout.PREFERRED_SIZE,
+                                                                  GroupLayout.DEFAULT_SIZE,
+                                                                  GroupLayout.PREFERRED_SIZE)
                                                     .addGap(17, 17, 17)
                                                     .addComponent(jLabel8)
-                                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                    .addComponent(tbxAttendance, javax.swing.GroupLayout.PREFERRED_SIZE,
-                                                                  javax.swing.GroupLayout.DEFAULT_SIZE,
-                                                                  javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                                                    .addComponent(tbxAttendance, GroupLayout.PREFERRED_SIZE,
+                                                                  GroupLayout.DEFAULT_SIZE,
+                                                                  GroupLayout.PREFERRED_SIZE)
                                                     .addGap(18, 18, 18)
                                                     .addComponent(jLabel2)
                                                     .addPreferredGap(
-                                                            javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                                            LayoutStyle.ComponentPlacement.UNRELATED)
                                                     .addComponent(tbxCoordinates,
-                                                                  javax.swing.GroupLayout.PREFERRED_SIZE,
-                                                                  javax.swing.GroupLayout.DEFAULT_SIZE,
-                                                                  javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED,
+                                                                  GroupLayout.PREFERRED_SIZE,
+                                                                  GroupLayout.DEFAULT_SIZE,
+                                                                  GroupLayout.PREFERRED_SIZE)
+                                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED,
                                                                      30, Short.MAX_VALUE)
                                                     .addGroup(jPanel1Layout.createParallelGroup(
-                                                            javax.swing.GroupLayout.Alignment.LEADING, false)
+                                                            GroupLayout.Alignment.LEADING, false)
                                                                            .addComponent(btnCancel,
-                                                                                         javax.swing.GroupLayout.DEFAULT_SIZE,
-                                                                                         javax.swing.GroupLayout.DEFAULT_SIZE,
+                                                                                         GroupLayout.DEFAULT_SIZE,
+                                                                                         GroupLayout.DEFAULT_SIZE,
                                                                                          Short.MAX_VALUE)
                                                                            .addComponent(btnSave,
-                                                                                         javax.swing.GroupLayout.DEFAULT_SIZE,
+                                                                                         GroupLayout.DEFAULT_SIZE,
                                                                                          35, Short.MAX_VALUE))
                                                     .addContainerGap())
         );
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+        GroupLayout layout = new GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
-                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
                       .addGroup(layout.createSequentialGroup()
                                       .addContainerGap()
-                                      .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE,
-                                                    javax.swing.GroupLayout.DEFAULT_SIZE,
-                                                    javax.swing.GroupLayout.PREFERRED_SIZE)
+                                      .addComponent(jPanel1, GroupLayout.PREFERRED_SIZE,
+                                                    GroupLayout.DEFAULT_SIZE,
+                                                    GroupLayout.PREFERRED_SIZE)
                                       .addGap(18, 18, 18)
-                                      .addComponent(jxMap, javax.swing.GroupLayout.DEFAULT_SIZE, 704, Short.MAX_VALUE)
+                                      .addComponent(jxMap, GroupLayout.DEFAULT_SIZE, 704, Short.MAX_VALUE)
                                       .addContainerGap())
         );
         layout.setVerticalGroup(
-                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
                       .addGroup(layout.createSequentialGroup()
                                       .addContainerGap()
-                                      .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                                      .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE,
-                                                                    javax.swing.GroupLayout.DEFAULT_SIZE,
+                                      .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                                                      .addComponent(jPanel1, GroupLayout.DEFAULT_SIZE,
+                                                                    GroupLayout.DEFAULT_SIZE,
                                                                     Short.MAX_VALUE)
-                                                      .addComponent(jxMap, javax.swing.GroupLayout.DEFAULT_SIZE,
-                                                                    javax.swing.GroupLayout.DEFAULT_SIZE,
+                                                      .addComponent(jxMap, GroupLayout.DEFAULT_SIZE,
+                                                                    GroupLayout.DEFAULT_SIZE,
                                                                     Short.MAX_VALUE))
                                       .addContainerGap())
         );
@@ -375,24 +375,24 @@ public final class SEEditDialog extends javax.swing.JDialog {
     }
 
     // Variables declaration - do not modify
-    private javax.swing.JButton btnCancel;
-    private javax.swing.JButton btnSave;
+    private JButton btnCancel;
+    private JButton btnSave;
     private common.ui.TICASDateTimePicker dtEndDatetime;
     private common.ui.TICASDateTimePicker dtStartDatetime;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel6;
-    private javax.swing.JLabel jLabel7;
-    private javax.swing.JLabel jLabel8;
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JScrollPane jScrollPane1;
+    private JLabel jLabel1;
+    private JLabel jLabel2;
+    private JLabel jLabel4;
+    private JLabel jLabel5;
+    private JLabel jLabel6;
+    private JLabel jLabel7;
+    private JLabel jLabel8;
+    private JPanel jPanel1;
+    private JScrollPane jScrollPane1;
     private org.jdesktop.swingx.JXMapKit jxMap;
-    private javax.swing.JTextField tbxAttendance;
-    private javax.swing.JTextField tbxCoordinates;
-    private javax.swing.JTextArea tbxDesc;
-    private javax.swing.JTextField tbxName;
+    private JTextField tbxAttendance;
+    private JTextField tbxCoordinates;
+    private JTextArea tbxDesc;
+    private JTextField tbxName;
     // End of variables declaration
 
 }

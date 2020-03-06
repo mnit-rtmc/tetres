@@ -36,7 +36,7 @@ import java.util.List;
 /**
  * @author Chongmyung Park
  */
-public class PanelSystemConfig extends javax.swing.JPanel implements IInitializable {
+public class PanelSystemConfig extends JPanel implements IInitializable {
 
   private Infra infra;
   private List<Corridor> corridors = new ArrayList<>();
@@ -174,10 +174,13 @@ public class PanelSystemConfig extends javax.swing.JPanel implements IInitializa
   private void initComponents() {
 
     asyncRequestAdapter1 = new org.jdesktop.http.async.event.AsyncRequestAdapter();
-    jTabbedPane1 = new javax.swing.JTabbedPane();
+    jTabbedPane1 = new JTabbedPane();
     periodicJobSetingPanel = new admin.sysconfig.PanelPeriodicJobSeting();
     categorizationParameterPanel = new admin.sysconfig.PanelCategorizationParameter();
-    btnApply = new javax.swing.JButton();
+    btnApply = new JButton();
+
+    // faverolles 1/18/2020: Added Database Population List Panel
+    databasePopulationPanel = new DatabasePopulationPanel();
 
     // faverolles 1/18/2020: Added Database Population List Panel
     databasePopulationPanel = new DatabasePopulationPanel();
@@ -195,21 +198,21 @@ public class PanelSystemConfig extends javax.swing.JPanel implements IInitializa
       }
     });
 
-    javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
+    GroupLayout layout = new GroupLayout(this);
     this.setLayout(layout);
     layout.setHorizontalGroup(
-        layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        layout.createParallelGroup(GroupLayout.Alignment.LEADING)
             .addComponent(jTabbedPane1)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(btnApply, javax.swing.GroupLayout.PREFERRED_SIZE, 190,
-                    javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addGroup(GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(btnApply, GroupLayout.PREFERRED_SIZE, 190,
+                    GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
     );
     layout.setVerticalGroup(
-        layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        layout.createParallelGroup(GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 537, Short.MAX_VALUE)
+                .addComponent(jTabbedPane1, GroupLayout.DEFAULT_SIZE, 537, Short.MAX_VALUE)
                 .addGap(18, 18, 18)
                 .addComponent(btnApply)
                 .addContainerGap())
@@ -222,9 +225,9 @@ public class PanelSystemConfig extends javax.swing.JPanel implements IInitializa
 
 
   private org.jdesktop.http.async.event.AsyncRequestAdapter asyncRequestAdapter1;
-  private javax.swing.JButton btnApply;
+  private JButton btnApply;
   private admin.sysconfig.PanelCategorizationParameter categorizationParameterPanel;
-  private javax.swing.JTabbedPane jTabbedPane1;
+  private JTabbedPane jTabbedPane1;
   private admin.sysconfig.PanelPeriodicJobSeting periodicJobSetingPanel;
 
   // faverolles 1/18/2020: Added Database Population List Panel

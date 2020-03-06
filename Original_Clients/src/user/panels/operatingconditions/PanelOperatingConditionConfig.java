@@ -1237,7 +1237,7 @@ public final class PanelOperatingConditionConfig extends javax.swing.JPanel impl
     private javax.swing.JScrollPane jScrollPane7;
     private javax.swing.JScrollPane jScrollPane8;
     private javax.swing.JScrollPane jScrollPane9;
-    private javax.swing.JList<user.types.OperatingConditionsInfo> listFilters;
+    private javax.swing.JList<OperatingConditionsInfo> listFilters;
     private javax.swing.JTabbedPane tabSubFilters;
     private JTable tblIncident;
     private JTable tblSnowmgmt;

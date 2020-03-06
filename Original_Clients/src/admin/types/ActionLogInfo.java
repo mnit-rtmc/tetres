@@ -60,19 +60,19 @@ public class ActionLogInfo extends InfoBase {
 
     public Object getStatus() {
 
-        if (admin.types.ActionType.STATUS_RUNNING.equals(this.status)) {
+        if (ActionType.STATUS_RUNNING.equals(this.status)) {
             return "running..";
         }
         
-        if (admin.types.ActionType.STATUS_FAIL.equals(this.status)) {
+        if (ActionType.STATUS_FAIL.equals(this.status)) {
             return String.format("process failed at %s (%s)", this.status_updated_date, this.reason);
         }        
         
         if (this.handled) {
-            if (admin.types.ActionType.DELETE.equals(this.action_type)) {
+            if (ActionType.DELETE.equals(this.action_type)) {
                 return String.format("deleted at %s", this.handled_date);
             }
-            if (admin.types.ActionType.UPDATE.equals(this.action_type)) {
+            if (ActionType.UPDATE.equals(this.action_type)) {
                 return String.format("updated and processed at %s", this.handled_date);
             }
             if (ActionType.INSERT.equals(this.action_type)) {

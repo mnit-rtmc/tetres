@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 __author__ = 'Chongmyung Park (chongmyung.park@gmail.com)'
 
-import traceback
 
 import dbinfo
 import global_settings

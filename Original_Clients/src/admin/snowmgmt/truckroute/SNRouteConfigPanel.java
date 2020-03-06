@@ -26,7 +26,7 @@ import admin.snowmgmt.truckroute.SNRouteListPanel;
  * @author Chongmyung Park <chongmyung.park@gmail.com>
  */
 public class SNRouteConfigPanel extends JPanel implements IInitializable {
-    private admin.snowmgmt.truckroute.SNRouteListPanel panRouteList;
+    private SNRouteListPanel panRouteList;
 
     /**
      * Creates new form RouteConfigPanel

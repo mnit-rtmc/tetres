@@ -29,5 +29,5 @@ import java.util.Map;
  */
 public class ResponseTTRMSInfo extends Response {
     public ApiURIs api_urls; 
-    public Map<String, admin.types.TTRMSDataType> data_types = new HashMap<String, TTRMSDataType>();
+    public Map<String, TTRMSDataType> data_types = new HashMap<String, TTRMSDataType>();
 }

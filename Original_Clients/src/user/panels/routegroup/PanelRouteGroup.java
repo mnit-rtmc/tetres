@@ -477,8 +477,8 @@ public final class PanelRouteGroup extends javax.swing.JPanel implements IInitia
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JSeparator jSeparator1;
-    private javax.swing.JList<user.types.RouteGroupInfo> lstRouteGroups;
-    private javax.swing.JList<user.types.ReliabilityRouteInfo> lstRouteList;
+    private javax.swing.JList<RouteGroupInfo> lstRouteGroups;
+    private javax.swing.JList<ReliabilityRouteInfo> lstRouteList;
     private common.ui.map.MapPanel panMap;
     // End of variables declaration
 

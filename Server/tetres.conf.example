@@ -6,5 +6,6 @@
 -ticas.iris_db_name=iris
 -ticas.cad_db_name=cad
 -ticas.rwis_db_name=rwis
+-ticas.download_traffic_data_files=false
 -# Comma-separated list:
 -ticas.admin_ip_addresses=0.0.0.0,127.0.0.1

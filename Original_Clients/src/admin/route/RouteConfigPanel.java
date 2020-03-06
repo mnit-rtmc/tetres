@@ -26,7 +26,7 @@ import admin.route.RouteListPanel;
  */
 public class RouteConfigPanel extends JPanel implements IInitializable {
 
-    private admin.route.RouteListPanel panRouteList;
+    private RouteListPanel panRouteList;
 
     /**
      * Creates new form RouteConfigPanel

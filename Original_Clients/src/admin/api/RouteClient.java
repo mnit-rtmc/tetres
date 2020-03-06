@@ -51,7 +51,7 @@ public class RouteClient {
     private final String URL_ROUTE_XLSX;
 
     public RouteClient() {
-        this.URL_ROUTE_FROM_CFG = Config.getAPIUrl(admin.api.ApiURIs.URI.ROUTE_FROM_CFG);
+        this.URL_ROUTE_FROM_CFG = Config.getAPIUrl(ApiURIs.URI.ROUTE_FROM_CFG);
         this.URL_ROUTE_XLSX = Config.getAPIUrl(ApiURIs.URI.ROUTE_XLSX);
     }
 

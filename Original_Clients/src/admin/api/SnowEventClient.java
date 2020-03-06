@@ -36,12 +36,12 @@ public class SnowEventClient extends APIClient<SnowEventInfo> {
         this.RESPONSE_TYPE = new TypeToken<ObjectResponse<SnowEventInfo>>(){}.getType();
         this.DATA_TYPE = SnowEventInfo.class;        
         
-        this.URL_DELETE = Config.getAPIUrl(admin.api.ApiURIs.URI.SNE_DELETE);
-        this.URL_YEARS = Config.getAPIUrl(admin.api.ApiURIs.URI.SNE_YEARS);
-        this.URL_LIST = Config.getAPIUrl(admin.api.ApiURIs.URI.SNE_LIST);
-        this.URL_LIST_BY_YEAR = Config.getAPIUrl(admin.api.ApiURIs.URI.SNE_LIST_BY_YEAR);
-        this.URL_INSERT = Config.getAPIUrl(admin.api.ApiURIs.URI.SNE_INSERT);
-        this.URL_UPDATE = Config.getAPIUrl(admin.api.ApiURIs.URI.SNE_UPDATE);
+        this.URL_DELETE = Config.getAPIUrl(ApiURIs.URI.SNE_DELETE);
+        this.URL_YEARS = Config.getAPIUrl(ApiURIs.URI.SNE_YEARS);
+        this.URL_LIST = Config.getAPIUrl(ApiURIs.URI.SNE_LIST);
+        this.URL_LIST_BY_YEAR = Config.getAPIUrl(ApiURIs.URI.SNE_LIST_BY_YEAR);
+        this.URL_INSERT = Config.getAPIUrl(ApiURIs.URI.SNE_INSERT);
+        this.URL_UPDATE = Config.getAPIUrl(ApiURIs.URI.SNE_UPDATE);
         this.URL_GET = Config.getAPIUrl(ApiURIs.URI.SNE_GET);
     }   
 

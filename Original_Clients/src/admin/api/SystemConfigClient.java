@@ -49,7 +49,7 @@ public class SystemConfigClient {
 
     public SystemConfigClient() {
         this.logger = TICASLogger.getLogger(this.getClass().getName());
-        this.URL_GET = Config.getAPIUrl(admin.api.ApiURIs.URI.SYSCFG_GET);
+        this.URL_GET = Config.getAPIUrl(ApiURIs.URI.SYSCFG_GET);
         this.URL_UPDATE = Config.getAPIUrl(ApiURIs.URI.SYSCFG_UPDATE);
     }
 

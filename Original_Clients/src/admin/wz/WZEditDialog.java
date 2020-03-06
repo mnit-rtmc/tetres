@@ -40,7 +40,7 @@ import java.util.List;
 /**
  * @author Chongmyung Park <chongmyung.park@gmail.com>
  */
-public class WZEditDialog extends javax.swing.JDialog {
+public class WZEditDialog extends JDialog {
 
   public Route route;
   private RouteCreationHelper routeCreationHelper;
@@ -244,28 +244,28 @@ public class WZEditDialog extends javax.swing.JDialog {
   // <editor-fold defaultstate="collapsed" desc="Generated Code">
   private void initComponents() {
 
-    jPanel1 = new javax.swing.JPanel();
-    jLabel2 = new javax.swing.JLabel();
-    cbxCorridors = new javax.swing.JComboBox();
-    jLabel3 = new javax.swing.JLabel();
-    btnSave = new javax.swing.JButton();
-    btnReset = new javax.swing.JButton();
-    jScrollPane2 = new javax.swing.JScrollPane();
-    lbxRoutes = new javax.swing.JList();
-    jLabel4 = new javax.swing.JLabel();
-    jScrollPane1 = new javax.swing.JScrollPane();
-    tbxDesc = new javax.swing.JTextArea();
-    jLabel5 = new javax.swing.JLabel();
-    jLabel6 = new javax.swing.JLabel();
+    jPanel1 = new JPanel();
+    jLabel2 = new JLabel();
+    cbxCorridors = new JComboBox();
+    jLabel3 = new JLabel();
+    btnSave = new JButton();
+    btnReset = new JButton();
+    jScrollPane2 = new JScrollPane();
+    lbxRoutes = new JList();
+    jLabel4 = new JLabel();
+    jScrollPane1 = new JScrollPane();
+    tbxDesc = new JTextArea();
+    jLabel5 = new JLabel();
+    jLabel6 = new JLabel();
     // faverolles 1/26/2020: removing the lane configuration option
     //  btnEditLaneConfig = new javax.swing.JButton();
-    btnImportRoute = new javax.swing.JButton();
+    btnImportRoute = new JButton();
     dtStartDatetime = new common.ui.TICASDateTimePicker();
     dtEndDatetime = new common.ui.TICASDateTimePicker();
-    btnCancel = new javax.swing.JButton();
+    btnCancel = new JButton();
     jmKit = new org.jdesktop.swingx.JXMapKit();
 
-    setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+    setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
     setTitle("Work Zone Editor");
     setModal(true);
 
@@ -328,39 +328,39 @@ public class WZEditDialog extends javax.swing.JDialog {
       }
     });
 
-    javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+    GroupLayout jPanel1Layout = new GroupLayout(jPanel1);
     jPanel1.setLayout(jPanel1Layout);
     jPanel1Layout.setHorizontalGroup(
-        jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        jPanel1Layout.createParallelGroup(GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jPanel1Layout.createParallelGroup(GroupLayout.Alignment.LEADING)
                     .addComponent(jScrollPane1)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                        .addComponent(btnCancel, javax.swing.GroupLayout.PREFERRED_SIZE, 76,
-                            javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED,
-                            javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(btnReset, javax.swing.GroupLayout.PREFERRED_SIZE, 76,
-                            javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                    .addGroup(GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                        .addComponent(btnCancel, GroupLayout.PREFERRED_SIZE, 76,
+                            GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED,
+                            GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(btnReset, GroupLayout.PREFERRED_SIZE, 76,
+                            GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnSave))
-                    .addComponent(dtEndDatetime, javax.swing.GroupLayout.DEFAULT_SIZE,
-                        javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(dtEndDatetime, GroupLayout.DEFAULT_SIZE,
+                        GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     // faverolles 1/26/2020: removing the lane configuration option
                     //  .addComponent(btnEditLaneConfig, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing
                     //  .GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jScrollPane2)
-                    .addComponent(cbxCorridors, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(cbxCorridors, 0, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(jLabel2)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED,
-                            javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED,
+                            GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(btnImportRoute))
-                    .addComponent(dtStartDatetime, javax.swing.GroupLayout.DEFAULT_SIZE,
-                        javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(dtStartDatetime, GroupLayout.DEFAULT_SIZE,
+                        GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(jPanel1Layout.createParallelGroup(GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel4)
                             .addComponent(jLabel3)
                             .addComponent(jLabel5)
@@ -369,68 +369,68 @@ public class WZEditDialog extends javax.swing.JDialog {
                 .addContainerGap())
     );
     jPanel1Layout.setVerticalGroup(
-        jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        jPanel1Layout.createParallelGroup(GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jLabel4)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 82,
-                    javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane1, GroupLayout.PREFERRED_SIZE, 82,
+                    GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(jLabel5)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(dtStartDatetime, javax.swing.GroupLayout.PREFERRED_SIZE,
-                    javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(dtStartDatetime, GroupLayout.PREFERRED_SIZE,
+                    GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                 .addGap(12, 12, 12)
                 .addComponent(jLabel6)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(dtEndDatetime, javax.swing.GroupLayout.PREFERRED_SIZE,
-                    javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(dtEndDatetime, GroupLayout.PREFERRED_SIZE,
+                    GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                 .addGap(22, 22, 22)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(jPanel1Layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2)
                     .addComponent(btnImportRoute))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(cbxCorridors, javax.swing.GroupLayout.PREFERRED_SIZE,
-                    javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(cbxCorridors, GroupLayout.PREFERRED_SIZE,
+                    GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(jLabel3)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 124, Short.MAX_VALUE)
+                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane2, GroupLayout.DEFAULT_SIZE, 124, Short.MAX_VALUE)
                 .addGap(18, 18, 18)
                 // faverolles 1/26/2020: removing the lane configuration option
                 //  .addComponent(btnEditLaneConfig, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing
                 //  .GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(btnSave, javax.swing.GroupLayout.DEFAULT_SIZE, 35, Short.MAX_VALUE)
-                    .addComponent(btnReset, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE,
+                .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(GroupLayout.Alignment.LEADING, false)
+                    .addComponent(btnSave, GroupLayout.DEFAULT_SIZE, 35, Short.MAX_VALUE)
+                    .addComponent(btnReset, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE,
                         Short.MAX_VALUE)
-                    .addComponent(btnCancel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE,
+                    .addComponent(btnCancel, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE,
                         Short.MAX_VALUE))
                 .addContainerGap())
     );
 
-    javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+    GroupLayout layout = new GroupLayout(getContentPane());
     getContentPane().setLayout(layout);
     layout.setHorizontalGroup(
-        layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        layout.createParallelGroup(GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE,
-                    javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jPanel1, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE,
+                    GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addComponent(jmKit, javax.swing.GroupLayout.DEFAULT_SIZE, 544, Short.MAX_VALUE)
+                .addComponent(jmKit, GroupLayout.DEFAULT_SIZE, 544, Short.MAX_VALUE)
                 .addContainerGap())
     );
     layout.setVerticalGroup(
-        layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        layout.createParallelGroup(GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE,
+                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanel1, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE,
                         Short.MAX_VALUE)
-                    .addComponent(jmKit, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE,
+                    .addComponent(jmKit, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE,
                         Short.MAX_VALUE))
                 .addContainerGap())
     );
@@ -463,28 +463,28 @@ public class WZEditDialog extends javax.swing.JDialog {
   }
 
   // Variables declaration - do not modify
-  private javax.swing.JButton btnCancel;
+  private JButton btnCancel;
 
   // faverolles 1/26/2020: removing the lane configuration option
   //    private javax.swing.JButton btnEditLaneConfig;
 
-  private javax.swing.JButton btnImportRoute;
-  private javax.swing.JButton btnReset;
-  private javax.swing.JButton btnSave;
-  private javax.swing.JComboBox cbxCorridors;
+  private JButton btnImportRoute;
+  private JButton btnReset;
+  private JButton btnSave;
+  private JComboBox cbxCorridors;
   private common.ui.TICASDateTimePicker dtEndDatetime;
   private common.ui.TICASDateTimePicker dtStartDatetime;
-  private javax.swing.JLabel jLabel2;
-  private javax.swing.JLabel jLabel3;
-  private javax.swing.JLabel jLabel4;
-  private javax.swing.JLabel jLabel5;
-  private javax.swing.JLabel jLabel6;
-  private javax.swing.JPanel jPanel1;
-  private javax.swing.JScrollPane jScrollPane1;
-  private javax.swing.JScrollPane jScrollPane2;
+  private JLabel jLabel2;
+  private JLabel jLabel3;
+  private JLabel jLabel4;
+  private JLabel jLabel5;
+  private JLabel jLabel6;
+  private JPanel jPanel1;
+  private JScrollPane jScrollPane1;
+  private JScrollPane jScrollPane2;
   private org.jdesktop.swingx.JXMapKit jmKit;
-  private javax.swing.JList lbxRoutes;
-  private javax.swing.JTextArea tbxDesc;
+  private JList lbxRoutes;
+  private JTextArea tbxDesc;
   // End of variables declaration
 
 }
