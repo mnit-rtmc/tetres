@@ -32,6 +32,7 @@
 		<jar destfile="${dist.dir}/TeTRES-User.jar" basedir="${build.classes.dir}">
 			<manifest>
 				<attribute name="Main-Class" value="user.TeTRESMain"/>
+				<attribute name="Permissions" value="all-permissions"/>
 			</manifest>
 		</jar>
 	</target>
