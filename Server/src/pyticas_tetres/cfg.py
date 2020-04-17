@@ -12,6 +12,12 @@ LOG_LEVEL = pyticas_cfg.ROOT_LOGGER_LEVEL
 LOG_TO_CONSOLE = pyticas_cfg.ROOT_LOGGER_TO_CONSOLE
 
 # Admin Client is Acceptable from this IP
+USE_WHITELIST  = tetresconf.get_property('ticas.use_whitelist')
+if USE_WHITELIST.upper() == "FALSE":
+	USE_WHITELIST = False
+else:
+	USE_WHITELIST = True
+
 ip_addresses = tetresconf.get_property('ticas.admin_ip_addresses')
 ip_list = [s.strip() for s in ip_addresses.split(',')]
 ADMIN_IP_ADDRESSES = []

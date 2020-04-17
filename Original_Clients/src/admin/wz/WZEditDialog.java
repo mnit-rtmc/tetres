@@ -174,8 +174,12 @@ public class WZEditDialog extends JDialog {
     }
 
     if (this.route == null) {
-      JOptionPane.showMessageDialog(TeTRESConfig.mainFrame, "Please make lane configuration before saving route");
-      return;
+      this.route = new Route("tmp route", "temporary");
+      for (RNode rn : this.routeCreationHelper.routePointList) {
+        this.route.addRNode(rn);
+      }
+      //JOptionPane.showMessageDialog(TeTRESConfig.mainFrame, "Please make lane configuration before saving route");
+      //return;
     }
 
     String desc = this.tbxDesc.getText();

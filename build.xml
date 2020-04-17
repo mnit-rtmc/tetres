@@ -61,7 +61,7 @@
 		</copy>
 		<copy todir="${dist.admin.bin}/lib" flatten="true">
 			<fileset dir="${src.dir}/..">
-				<include name="src/*/dist/**/*.jar"/>
+				<include name="src/*/build/dist/**/*.jar"/>
 				<include name="lib/*.jar"/>
 				<include name="lib/**/httpclient-4.5.6.jar"/>
 				<include name="lib/**/httpcore-4.4.10.jar"/>
@@ -78,7 +78,7 @@
 		</copy>
 		<copy todir="${dist.user.bin}/lib" flatten="true">
 			<fileset dir="${src.dir}/..">
-				<include name="src/*/dist/**/*.jar"/>
+				<include name="src/*/build/dist/**/*.jar"/>
 				<include name="lib/*.jar"/>
 				<include name="lib/**/httpclient-4.5.6.jar"/>
 				<include name="lib/**/httpcore-4.4.10.jar"/>

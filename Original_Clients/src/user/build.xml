@@ -16,12 +16,15 @@
 	</target>
 
 	<target name="compile">
+		<subant target="compile">
+			<fileset dir="../admin" includes="build.xml"/>
+		</subant>
 		<subant target="jar">
 			<fileset dir="../admin" includes="build.xml"/>
 		</subant>
 		<mkdir dir="${build.dir}"/>
 		<mkdir dir="${build.classes.dir}"/>
-		<javac destdir="${build.classes.dir}">
+		<javac destdir="${build.classes.dir}" debug="true" debuglevel="lines,vars,source">
 			<src path="."/>
 			<exclude name="${build.dir}/**"/>
 			<classpath refid="classpath"/>

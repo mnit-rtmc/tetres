@@ -16,7 +16,7 @@
 	<target name="compile">
 		<mkdir dir="${build.dir}"/>
 		<mkdir dir="${build.classes.dir}"/>
-		<javac destdir="${build.classes.dir}">
+		<javac destdir="${build.classes.dir}" debug="true" debuglevel="lines,vars,source">
 			<src path="."/>
 			<exclude name="${build.dir}/**"/>
 			<classpath refid="classpath"/>
@@ -24,6 +24,9 @@
 	</target>
 
 	<target name="jar" depends="compile">
-		<jar destfile="${dist.dir}/TeTRES-Common.jar" basedir="${build.classes.dir}"/>
+		<jar destfile="${dist.dir}/TeTRES-Common.jar">
+			<fileset dir="${build.classes.dir}"/>
+			<fileset dir=".." includes="common/**/*.png"/>
+		</jar>
 	</target>
 </project>

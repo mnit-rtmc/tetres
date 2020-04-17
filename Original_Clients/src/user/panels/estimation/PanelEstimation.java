@@ -312,6 +312,9 @@ public class PanelEstimation extends javax.swing.JPanel implements IInitializabl
                 File newOutputDir = new File(oldOutputDir.getParent() + File.separator + newFolderName);
                 oldOutputDir.renameTo(newOutputDir);
 
+				if (!newOutputDir.exists())
+                	newOutputDir.mkdir();
+
                 // open directory
                 FileHelper.openDirectory(newOutputDir.getAbsolutePath());
             }

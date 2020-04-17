@@ -8,4 +8,5 @@
 -ticas.rwis_db_name=rwis
 -ticas.download_traffic_data_files=false
 -# Comma-separated list:
+-ticas.use_whitelist=false
 -ticas.admin_ip_addresses=0.0.0.0,127.0.0.1

@@ -23,8 +23,8 @@ def check_auth():
     """
     :rtype: bool
     """
-    return request.remote_addr in cfg.ADMIN_IP_ADDRESSES
+    return (not cfg.USE_WHITELIST) or request.remote_addr in cfg.ADMIN_IP_ADDRESSES
 
 
 def authenticate():
-    return prot.response_invalid_request(message='Could not verify your access level for that URL')
+    return prot.response_invalid_request(message='Could not verify your access level for that URL (from admin_auth)')
