@@ -1,0 +1,65 @@
+ - Clone https://github.com/mnit-rtmc/tetres
+ - Copy libraries into Original_Clients/lib
+ - Build with `ant clean-all clean dist`
+ - Run commands:
+
+sudo cp --recursive --force dist/* /var/www/html/tetres/
+
+cd /opt
+sudo cp /var/www/html/tetres/server.zip . ; sudo unzip server.zip -d tetres
+
+
+ - Install/upgrade python3 gcc-c++ annobin libffi-devel freetype-devel (or corresponding packages)
+ - Run the following to set up the VE (make sure that pip-3 and python3 are the correct names):
+
+#!/bin/bash
+  
+# Sets up the virtual environment for the server in ./ve
+pip-3 install --user virtualenv
+virtualenv -p python3 ve
+source ve/bin/activate
+# Potentially different pip name inside ve
+pip3 install -r requirements.txt
+deactivate
+
+chmod +x server.sh
+
+
+ - Copy the tetres.conf.example to /etc/tetres/tetres.conf, removing the - at the beginning of each line
+ 	- Make sure to set the whitelist toggle to the desired option, and update the IPs that can access the server if necessary
+ - Make sure the following is in /opt/tetres/server.sh:
+
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
+cd $DIR
+
+_redText=\\e[31m
+_greenText=\\e[32m
+_yellowText=\\e[33m
+_blueText=\\e[34m
+_magentaText=\\e[35m
+_cyanText=\\e[36m
+_whiteText=\\e[37m
+_resetText=\\e[0m
+
+_serverPath="Server/src/server.py"
+
+
+echo -e "$_cyanText""Starting Server...""$_resetText"
+ve/bin/python3 $_serverPath
+echo -e "$_cyanText""Done""$_resetText"
+
+
+ - Run ./server.sh or use the following systemd unit file (put in /etc/systemd/system/tetres.service):
+
+[Unit]
+Description=TeTRES Application
+
+[Service]
+ExecStart=/bin/bash /opt/tetres/server.sh
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+
+
+ - Run systemctl start tetres; systemctl enable tetres
