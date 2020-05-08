@@ -28,11 +28,10 @@
 		<jar href="admin/bin/lib/swingx.jar"/>
 		<jar href="admin/bin/lib/zip4j_1.3.2.jar"/>
 		<jar href="user/bin/lib/TeTRES-Admin.jar"/>
-		<jar href="user/bin/lib/jarchivelib-0.7.1-jar-with-dependencies.jar"/>
 		<jar href="user/bin/lib/httpclient-4.5.6.jar"/>
 		<jar href="user/bin/lib/httpcore-4.4.10.jar"/>
 		<jar href="user/bin/lib/commons-logging-1.2.jar"/>
-		<jar href="user/bin/lib/httpmime-4.5.6.jar"/>
+		<jar href="user/bin/lib/httpmime-4.5.10.jar"/>
 	</resources>
 	<security>
 		<all-permissions/>

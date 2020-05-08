@@ -65,7 +65,7 @@
 				<include name="lib/*.jar"/>
 				<include name="lib/**/httpclient-4.5.6.jar"/>
 				<include name="lib/**/httpcore-4.4.10.jar"/>
-				<include name="lib/**/httpmime-4.5.6.jar"/>
+				<include name="lib/**/httpmime-4.5.10.jar"/>
 				<include name="lib/**/commons-logging-1.2.jar"/>
 				<exclude name="src/user/**"/>
 				<exclude name="**/cache/**"/>
@@ -82,7 +82,7 @@
 				<include name="lib/*.jar"/>
 				<include name="lib/**/httpclient-4.5.6.jar"/>
 				<include name="lib/**/httpcore-4.4.10.jar"/>
-				<include name="lib/**/httpmime-4.5.6.jar"/>
+				<include name="lib/**/httpmime-4.5.10.jar"/>
 				<include name="lib/**/commons-logging-1.2.jar"/>
 				<exclude name="**/cache/**"/>
 			</fileset>
