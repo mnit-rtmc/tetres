@@ -306,9 +306,15 @@ def get_workzone_values(extdata):
     names, lane_cfgs, closed_lengths, off_dists, locs = [], [], [], [], []
     for tt_wz in extdata.workzones:
         name = tt_wz._workzone._wz_group.name
-        _lane_cfg = list(set(['%s to %s' % (f.origin_lanes, f.open_lanes) for f in tt_wz._workzone._laneconfigs]))
+        try:
+            _lane_cfg = list(set(['%s to %s' % (f.origin_lanes, f.open_lanes) for f in tt_wz._workzone._laneconfigs]))
+        except Exception as e:
+            _lane_cfg = list()
         lane_cfg = ','.join(_lane_cfg)
-        _closed_length = list(set(['%.2f' % f.closed_length for f in tt_wz._workzone._features]))
+        try:
+            _closed_length = list(set(['%.2f' % f.closed_length for f in tt_wz._workzone._features]))
+        except Exception as e:
+            _closed_length = list()
         closed_length = ','.join(_closed_length)
         off_dist = float2str(tt_wz.off_distance)
         loc = ttypes.LOC_TYPE.get_by_value(tt_wz.loc_type).name if tt_wz.loc_type else ''
