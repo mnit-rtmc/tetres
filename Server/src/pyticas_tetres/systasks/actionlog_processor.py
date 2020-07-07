@@ -195,23 +195,20 @@ def _handler_ttroute(da, item, action_log):
     """
     # 1. calculate travel time
     # 2. categorize (all)
-    # faverolles 1/16/2020 NOTE: always starts at datetime.today
     daily_periods = _get_all_daily_periods()
     cnt = 0
-    try:
-        for prd in daily_periods:
+    for prd in daily_periods:
+        try:
             inserted_ids = traveltime.calculate_a_route(prd, item)
             if inserted_ids:
                 categorization.categorize(item, prd)
-
             if inserted_ids is not False:
                 cnt += len(inserted_ids)
+        except Exception as ex:
+            getLogger(__name__).warning(
+                'Exception occured when handling route changes : %s' % tb.traceback(ex, f_print=False))
 
-        return cnt > 0
-    except Exception as ex:
-        getLogger(__name__).warning(
-            'Exception occured when handling route changes : %s' % tb.traceback(ex, f_print=False))
-        return False
+    return cnt > 0
 
 
 def _handler_incident(da, item, action_log):
