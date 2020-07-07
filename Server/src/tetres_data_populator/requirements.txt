@@ -1,0 +1,5 @@
+requests==2.23.0
+xlrd==1.2.0
+# They are needed if we want to perform database migration
+alembic==1.4.2
+psycopg2==2.8.5
