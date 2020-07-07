@@ -26,6 +26,7 @@ WZ_UPDATE = '/tetres/adm/wz/update'
 WZ_INSERT = '/tetres/adm/wz/add'
 WZ_GET = '/tetres/adm/wz/get'
 WZ_YEARS = '/tetres/adm/wz/years'
+WZ_LIST_ALL= '/tetres/adm/wz/list_all'
 
 # special event
 SE_LIST = '/tetres/adm/sevent/list'
@@ -52,6 +53,7 @@ SNM_UPDATE = '/tetres/adm/snowmgmt/update'
 SNM_INSERT = '/tetres/adm/snowmgmt/add'
 SNM_INSERT_ALL = '/tetres/adm/snowmgmt/add_all'
 SNM_GET = '/tetres/adm/snowmgmt/get'
+SNM_LIST_ALL = '/tetres/adm/snowmgmt/list_all'
 
 # snow event
 SNE_LIST = '/tetres/adm/snowevent/list'

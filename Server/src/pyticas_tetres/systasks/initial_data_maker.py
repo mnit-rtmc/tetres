@@ -46,6 +46,16 @@ def run(start_date, end_date, db_info):
     _update_actionlogs()
 
 
+def calculate_tt_only(start_date, end_date, db_info):
+    _create_yearly_db_tables(start_date, end_date)
+    _calculate_tt_only(start_date, end_date, db_info)
+
+
+def categorize_tt_only(start_date, end_date, db_info):
+    _create_yearly_db_tables(start_date, end_date)
+    _categorize_tt_only(start_date, end_date, db_info)
+
+
 def _create_yearly_db_tables(start_date, end_date):
     """
 
@@ -88,7 +98,7 @@ def _load_incident_data(start_date, end_date):
         logger.debug('<<< end of _load_incident_data() : %s ~ %s' % (sdt, edt))
 
 
-def _run_multi_process(target_function, start_date, end_date, db_info):
+def _run_multi_process(target_function, start_date, end_date, db_info, **kwargs):
     """
     :type target_function: callable
     :type start_date: datetime.date
@@ -117,7 +127,7 @@ def _run_multi_process(target_function, start_date, end_date, db_info):
     procs = []
     for idx in range(N):
         p = Process(target=target_function,
-                    args=(idx, queue, lck, data_path, db_info))
+                    args=(idx, queue, lck, data_path, db_info), kwargs=kwargs)
         p.start()
         procs.append(p)
 
@@ -159,6 +169,204 @@ def _calculate_tt_and_categorize(start_date, end_date, db_info):
     logger.debug('>> Categorizing travel time data')
     _run_multi_process(_worker_process_to_calculate_tt_and_categorize, start_date, end_date, db_info)
     logger.debug('<< End of categorizing travel time data')
+
+
+def _calculate_tt_only(start_date, end_date, db_info):
+    """
+
+    :type start_date: datetime.date
+    :type end_date: datetime.date
+    :type db_info: dict
+    """
+    logger = getLogger(__name__)
+    logger.debug('>> Categorizing travel time data')
+    _run_multi_process(_worker_process_to_calculate_tt_only, start_date, end_date, db_info)
+    logger.debug('<< End of categorizing travel time data')
+
+
+def _categorize_tt_only(start_date, end_date, db_info):
+    """
+
+    :type start_date: datetime.date
+    :type end_date: datetime.date
+    :type db_info: dict
+    """
+    logger = getLogger(__name__)
+    logger.debug('>> Categorizing travel time data')
+    _run_multi_process(_worker_process_to_categorize_tt_only, start_date, end_date, db_info)
+    logger.debug('<< End of categorizing travel time data')
+
+
+def calculate_tt_for_routes(start_date, end_date, route_ids):
+    _create_yearly_db_tables(start_date, end_date)
+    _calculate_tt_for_routes(start_date, end_date, route_ids)
+
+
+def _calculate_tt_for_routes(start_date, end_date, ttr_ids):
+    stime = datetime.time(0, 0, 0, 0)
+    etime = datetime.time(23, 55, 0, 0)
+    da_route = TTRouteDataAccess()
+
+    daily_periods = period.create_periods(start_date, end_date,
+                                          stime, etime,
+                                          cfg.TT_DATA_INTERVAL,
+                                          target_days=[0, 1, 2, 3, 4, 5, 6],
+                                          remove_holiday=False)
+    for pidx, prd in enumerate(daily_periods):
+        for ridx, ttr_id in enumerate(ttr_ids):
+            ttri = da_route.get_by_id(ttr_id)
+            is_inserted = traveltime.calculate_a_route(prd, ttri, dbsession=da_route.get_session())
+
+
+def specific_tt_categorizer(start_date, end_date, categorizer_names, db_info):
+    _create_yearly_db_tables(start_date, end_date)
+    _specific_tt_categorization(start_date, end_date, categorizer_names, db_info)
+
+
+def _specific_tt_categorization(start_date, end_date, categorizer_names, db_info):
+    """
+
+    :type start_date: datetime.date
+    :type end_date: datetime.date
+    :type db_info: dict
+    """
+    logger = getLogger(__name__)
+    logger.debug('>> Categorizing travel time data')
+    _run_multi_process(_worker_process_to_specific_categorization, start_date, end_date, db_info,
+                       categorizer_names=categorizer_names)
+    logger.debug('<< End of categorizing travel time data')
+
+
+def _worker_process_to_specific_categorization(idx, queue, lck, data_path, db_info, **kwargs):
+    from pyticas_tetres.db.tetres import conn
+    from pyticas.infra import Infra
+    from pyticas.tool import tb
+    from pyticas_tetres.rengine.cats import incident, snowmgmt, specialevent, weather, workzone
+
+    logger = getLogger(__name__)
+    # initialize
+    logger.debug('[TT-Categorization Worker %d] starting...' % (idx))
+    ticas.initialize(data_path)
+    infra = Infra.get_infra()
+    conn.connect(db_info)
+    categorizers = []
+    categorizer_names = kwargs.get("categorizer_names")
+    categorizer_map = {
+        "incident": incident,
+        "snowmgmt": snowmgmt,
+        "specialevent": specialevent,
+        "weather": weather,
+        "workzone": workzone
+    }
+    for categorizer_name in categorizer_names:
+        categorizers.append(categorizer_map.get(categorizer_name))
+    da_route = TTRouteDataAccess()
+    logger.debug('[TT-Categorization Worker %d] is ready' % (idx))
+    while True:
+        ttr_id, prd, num, total = queue.get()
+        if prd is None:
+            da_route.close_session()
+            exit(1)
+        try:
+            ttri = da_route.get_by_id(ttr_id)
+            if not ttri:
+                logger.debug('[TT-Categorization Worker %d] route is not found (%s)' % (idx, ttr_id))
+                continue
+            logger.debug('[TT-Categorization Worker %d] (%d/%d) %s (id=%s) at %s' % (
+                idx, num, total, ttri.name, ttri.id, prd.get_date_string()))
+
+            tt_da = TravelTimeDataAccess(prd.start_date.year)
+            tt_data_list = tt_da.list_by_period(ttri.id, prd)
+            tt_da.close_session()
+
+            for cidx, categorizer in enumerate(categorizers):
+                n_inserted = categorizer.categorize(ttri, prd, tt_data_list, lock=lck)
+
+            gc.collect()
+
+        except Exception as ex:
+            tb.traceback(ex)
+            continue
+
+
+def _worker_process_to_calculate_tt_only(idx, queue, lck, data_path, db_info):
+    from pyticas_tetres.db.tetres import conn
+    from pyticas.infra import Infra
+    from pyticas.tool import tb
+
+    logger = getLogger(__name__)
+    # initialize
+    logger.debug('[TT-Categorization Worker %d] starting...' % (idx))
+    ticas.initialize(data_path)
+    infra = Infra.get_infra()
+    conn.connect(db_info)
+
+    da_route = TTRouteDataAccess()
+    logger.debug('[TT-Categorization Worker %d] is ready' % (idx))
+    while True:
+        ttr_id, prd, num, total = queue.get()
+        if prd is None:
+            da_route.close_session()
+            exit(1)
+        try:
+            ttri = da_route.get_by_id(ttr_id)
+            if not ttri:
+                logger.debug('[TT-Categorization Worker %d] route is not found (%s)' % (idx, ttr_id))
+                continue
+            logger.debug('[TT-Categorization Worker %d] (%d/%d) %s (id=%s) at %s' % (
+                idx, num, total, ttri.name, ttri.id, prd.get_date_string()))
+            is_inserted = traveltime.calculate_a_route(prd, ttri, dbsession=da_route.get_session(), lock=lck)
+            if not is_inserted:
+                logger.warning('[TT-Categorization Worker %d]  - fail to add travel time data' % idx)
+
+            gc.collect()
+
+        except Exception as ex:
+            tb.traceback(ex)
+            continue
+
+
+def _worker_process_to_categorize_tt_only(idx, queue, lck, data_path, db_info):
+    from pyticas_tetres.db.tetres import conn
+    from pyticas.infra import Infra
+    from pyticas.tool import tb
+    from pyticas_tetres.rengine.cats import weather, incident, snowmgmt, specialevent, workzone
+
+    logger = getLogger(__name__)
+    # initialize
+    logger.debug('[TT-Categorization Worker %d] starting...' % (idx))
+    ticas.initialize(data_path)
+    infra = Infra.get_infra()
+    conn.connect(db_info)
+
+    categorizers = [weather, incident, workzone, specialevent, snowmgmt]
+    da_route = TTRouteDataAccess()
+    logger.debug('[TT-Categorization Worker %d] is ready' % (idx))
+    while True:
+        ttr_id, prd, num, total = queue.get()
+        if prd is None:
+            da_route.close_session()
+            exit(1)
+        try:
+            ttri = da_route.get_by_id(ttr_id)
+            if not ttri:
+                logger.debug('[TT-Categorization Worker %d] route is not found (%s)' % (idx, ttr_id))
+                continue
+            logger.debug('[TT-Categorization Worker %d] (%d/%d) %s (id=%s) at %s' % (
+                idx, num, total, ttri.name, ttri.id, prd.get_date_string()))
+
+            tt_da = TravelTimeDataAccess(prd.start_date.year)
+            tt_data_list = tt_da.list_by_period(ttri.id, prd)
+            tt_da.close_session()
+
+            for cidx, categorizer in enumerate(categorizers):
+                n_inserted = categorizer.categorize(ttri, prd, tt_data_list, lock=lck)
+
+            gc.collect()
+
+        except Exception as ex:
+            tb.traceback(ex)
+            continue
 
 
 def _worker_process_to_calculate_tt_and_categorize(idx, queue, lck, data_path, db_info):
