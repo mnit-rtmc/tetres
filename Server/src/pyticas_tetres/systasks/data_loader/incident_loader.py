@@ -56,6 +56,8 @@ def import_all_corridor(start_date, end_date, **kwargs):
     for item in da_cad.list_as_generator(sdate=start_date, edate=end_date, window_size=window_size):
         if not item.lat or not item.lon:
             continue
+        if item.str2datetime(item.cdts) < start_date:
+            continue
         # stime = time.time()
         # logger.debug('- finding iris data : %s' % item)
         if item.eid in iris_data_cache:
@@ -64,7 +66,7 @@ def import_all_corridor(start_date, end_date, **kwargs):
             iris_data = _find_iris_data(iris_data_bucket, item)
             iris_data_cache[item.eid] = iris_data
         # logger.debug('- end of finding iris data (elapsed time=%s)' % (timeutil.human_time(seconds=(time.time() - stime))))
-        iris_data = None
+        # iris_data = None
 
         # logger.debug('- finding event type')
         et = _find_event_type(item.eventtype, item.eventsubtype, event_types)
@@ -143,6 +145,15 @@ def _find_iris_data(iris_data_bucket, cad_incident_info):
         return None
 
     for iris_data in iris_data_list:
+        try:
+            iris_description = iris_data.description
+            iris_classification = iris_description.split()[1]
+        except:
+            iris_classification = ""
+        cad_classification = cad_incident_info.iris_class
+        if cad_classification and iris_classification:
+            if str(cad_classification).lower() != str(iris_classification).lower():
+                continue
         distance = distutil.distance_in_mile_with_coordinate(iris_data.lat, iris_data.lon, cad_incident_info.lat,
                                                              cad_incident_info.lon)
         if distance > DISTANCE_THRESHOLD_FOR_SAME_EVENT:
