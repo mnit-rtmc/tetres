@@ -48,6 +48,28 @@ def has_workzone(**kwargs):
     ], **kwargs)
 
 
+def impact_low(**kwargs):
+    return _impact("Low", **kwargs)
+
+
+def impact_medium(**kwargs):
+    return _impact("Medium", **kwargs)
+
+
+def impact_high(**kwargs):
+    return _impact("High", **kwargs)
+
+
+def _impact(impact_value, **kwargs):
+    def _check_impact(item):
+        return impact_value == item._workzone._wz_group.impact
+
+    return ExtFilter(SLOT_WORKZONE, [
+        _distance_checker(**kwargs),
+        _check_impact
+    ], **kwargs)
+
+
 def loc_upstream(**kwargs):
     return _loc(1, **kwargs)
 
@@ -118,6 +140,19 @@ def closed_length(min_length, max_length, **kwargs):
             if min_length <= f.closed_length <= max_length:
                 return True
         return False
+
+    return ExtFilter(SLOT_WORKZONE, [
+        _distance_checker(**kwargs),
+        _func,
+    ], **kwargs)
+
+
+def length(min_length, max_length, **kwargs):
+    def _func(item):
+        try:
+            return min_length <= item._workzone.workzone_length <= max_length
+        except:
+            return False
 
     return ExtFilter(SLOT_WORKZONE, [
         _distance_checker(**kwargs),
