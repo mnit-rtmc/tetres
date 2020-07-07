@@ -26,18 +26,22 @@ import user.TeTRESConfig;
  */
 public class WorkzoneConditionInfo extends FilterInfo {
 
-    public String lane_config;
-    public String lane_closed_length;
+//    public String lane_config;
+//    public String lane_closed_length;
+    public String workzone_length;
     public String relative_location;
+    public String impact;
 
     public WorkzoneConditionInfo() {
         this.setTypeInfo(TeTRESConfig.INFO_TYPE_OC_WORKZONE);
     }
 
-    public WorkzoneConditionInfo(String lane_config, String lane_closed_length, String relative_location) {
-        this.lane_config = lane_config;
-        this.lane_closed_length = lane_closed_length;
+    public WorkzoneConditionInfo(String workzone_length, String relative_location, String impact) {
+//        this.lane_config = lane_config;
+//        this.lane_closed_length = lane_closed_length;
+        this.workzone_length = workzone_length;
         this.relative_location = relative_location;
+        this.impact = impact;
         this.setTypeInfo(TeTRESConfig.INFO_TYPE_OC_WORKZONE);
     }
 

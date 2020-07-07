@@ -203,15 +203,15 @@ public final class PanelOperatingConditionConfig extends javax.swing.JPanel impl
                 boolean hasNoCondition = false;
                 boolean hasAnyCondition = false;
                 for (WorkzoneConditionInfo fi : filterInfos) {
-                    if (fi.lane_config.equals(NO_CONDITION)) {
+                    if (fi.relative_location.equals(NO_CONDITION) && fi.impact.equals(NO_CONDITION) && fi.workzone_length.equals(NO_CONDITION)) {
                         hasNoCondition = true;
                         continue;
                     }
-                    if (fi.lane_config.equals(ANY_CONDITION)) {
+                    if (fi.relative_location.equals(ANY_CONDITION) && fi.impact.equals(ANY_CONDITION) && fi.workzone_length.equals(ANY_CONDITION)) {
                         hasAnyCondition = true;
                         continue;
                     }
-                    model.addRow(new Object[]{fi.lane_config, fi.lane_closed_length, fi.relative_location});
+                    model.addRow(new Object[]{fi.workzone_length, fi.relative_location, fi.impact});
                 }
                 chkNoCondition.setSelected(hasNoCondition);
                 chkAnyCondition.setSelected(hasAnyCondition);
@@ -252,7 +252,7 @@ public final class PanelOperatingConditionConfig extends javax.swing.JPanel impl
                         continue;
                     }
                     model.addRow(new Object[]{fi.distance, fi.event_size, fi.event_time});
-              
+
                 }
                 chkNoCondition.setSelected(hasNoCondition);
                 chkAnyCondition.setSelected(hasAnyCondition);
@@ -281,16 +281,22 @@ public final class PanelOperatingConditionConfig extends javax.swing.JPanel impl
                 List<SnowmanagementConditionInfo> filterInfos = (List<SnowmanagementConditionInfo>) (List<?>) filters;
                 boolean hasNoCondition = false;
                 boolean hasAnyCondition = false;
+                String ROAD_CONDITION_LOST = "Lost";
+                String ROAD_CONDITION_REGAINED = "Regained";
+                String ROAD_CONDITION_ANY = "Any Condition";
                 for (SnowmanagementConditionInfo fi : filterInfos) {
-                    if (fi.road_condition.equals(NO_CONDITION)) {
+                    if (fi.road_condition.equals(ROAD_CONDITION_ANY)){
+                        continue;
+                    }
+                    if (fi.road_condition.equals(NO_CONDITION) || fi.road_condition.equals(ROAD_CONDITION_REGAINED)) {
                         hasNoCondition = true;
                         continue;
                     }
-                    if (fi.road_condition.equals(ANY_CONDITION)) {
+                    if (fi.road_condition.equals(ANY_CONDITION)  || fi.road_condition.equals(ROAD_CONDITION_LOST)) {
                         hasAnyCondition = true;
                         continue;
                     }
-                   
+
                 }
                 chkNoCondition.setSelected(hasNoCondition);
                 chkAnyCondition.setSelected(hasAnyCondition);
@@ -557,7 +563,7 @@ public final class PanelOperatingConditionConfig extends javax.swing.JPanel impl
     private OperatingConditionsInfo getFilter() {
         OperatingConditionsInfo fig = new OperatingConditionsInfo();
         fig.name = this.tbxFilterName.getText().trim();
-        
+
         fig.desc = this.tbxFilterDesc.getText().trim();
         fig.weather_conditions = this.weatherEditor.getFilterObjects();
         fig.incident_conditions = this.incidentEditor.getFilterObjects();
@@ -892,7 +898,7 @@ public final class PanelOperatingConditionConfig extends javax.swing.JPanel impl
 
             },
             new String [] {
-                "Lane Config", "Lane Closed Length", "Relative Location"
+                "Workzone Length", "Relative Location", "Impact"
             }
         ) {
             Class[] types = new Class [] {
@@ -911,14 +917,6 @@ public final class PanelOperatingConditionConfig extends javax.swing.JPanel impl
             }
         });
         jScrollPane8.setViewportView(tblWorkzone);
-        if (tblWorkzone.getColumnModel().getColumnCount() > 0) {
-            tblWorkzone.getColumnModel().getColumn(0).setMinWidth(80);
-            tblWorkzone.getColumnModel().getColumn(0).setPreferredWidth(80);
-            tblWorkzone.getColumnModel().getColumn(0).setMaxWidth(160);
-            tblWorkzone.getColumnModel().getColumn(1).setMinWidth(120);
-            tblWorkzone.getColumnModel().getColumn(1).setPreferredWidth(120);
-            tblWorkzone.getColumnModel().getColumn(1).setMaxWidth(200);
-        }
 
         btnAddWorkzone.setText("Add Condition");
 
@@ -1043,14 +1041,14 @@ public final class PanelOperatingConditionConfig extends javax.swing.JPanel impl
 
         tabSubFilters.addTab("Special Event", jPanel13);
 
-        chkNoSnowmgmt.setText("Lane lost time only");
+        chkNoSnowmgmt.setText("Not including lane lost time");
         chkNoSnowmgmt.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
                 chkNoSnowmgmtActionPerformed(evt);
             }
         });
 
-        chkAnySnowmgmt.setText("Not including lane lost time");
+        chkAnySnowmgmt.setText("Lane lost time only");
         chkAnySnowmgmt.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
                 chkAnySnowmgmtActionPerformed(evt);
@@ -1077,18 +1075,18 @@ public final class PanelOperatingConditionConfig extends javax.swing.JPanel impl
             jPanel14Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel14Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(btnAddSnowmgmt, javax.swing.GroupLayout.PREFERRED_SIZE, 101, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(btnDeleteSnowmgmt)
-                .addGap(18, 18, 18)
-                .addComponent(chkNoSnowmgmt)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(chkAnySnowmgmt)
-                .addGap(0, 0, 0))
-            .addGroup(jPanel14Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jScrollPane2)
-                .addContainerGap())
+                .addGroup(jPanel14Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel14Layout.createSequentialGroup()
+                        .addComponent(btnAddSnowmgmt, javax.swing.GroupLayout.PREFERRED_SIZE, 101, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(btnDeleteSnowmgmt)
+                        .addGap(18, 18, 18)
+                        .addComponent(chkNoSnowmgmt)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(chkAnySnowmgmt))
+                    .addGroup(jPanel14Layout.createSequentialGroup()
+                        .addComponent(jScrollPane2)
+                        .addContainerGap())))
         );
         jPanel14Layout.setVerticalGroup(
             jPanel14Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
