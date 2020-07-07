@@ -49,6 +49,7 @@ class WorkZoneGroup(Base):
     description = Column(Text, nullable=True)
     corridors = Column(VARCHAR(255), nullable=True)
     years = Column(VARCHAR(255), nullable=True)
+    impact = Column(Text, nullable=True)
 
     def __repr__(self):
         return '<WorkZoneGroup id="%s" name="%s">' % (self.id, self.name)
@@ -67,6 +68,7 @@ class WorkZone(Base):
     route1 = Column(UnicodeText, nullable=False)
     route2 = Column(UnicodeText, nullable=False)
     reg_date = Column(DateTime, nullable=False, default=datetime.datetime.now)
+    workzone_length = Column(Float, nullable=True)
 
     def __repr__(self):
         return '<WorkZone id="%s" wz_group="%s">' % (self.id, self._wz_group.name)

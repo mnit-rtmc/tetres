@@ -37,6 +37,7 @@ class LocalDateTime(TypeDecorator):
 class CadeventView(Base):
     __table__ = Table('cadevent_view', Base.metadata,
                       Column('pkey', Integer, primary_key=True),
+                      Column('eid', Integer, nullable=True),
                       Column('openevent', BOOLEAN, nullable=True),
                       Column('cameranum', Integer, nullable=True),
                       Column('cdts', LocalDateTime(timezone=True), nullable=True),
