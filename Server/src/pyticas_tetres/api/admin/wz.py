@@ -26,6 +26,7 @@ from pyticas_tetres.da.wz_laneconfig import WZLaneConfigDataAccess
 from pyticas_tetres.protocol import json2wzi
 from pyticas_tetres.rengine.helper import wz as wz_helper
 from pyticas_tetres.ttypes import WorkZoneInfo, WZCharacteristics
+from pyticas.tool import distance as distance_util
 
 
 def register_api(app):
@@ -43,6 +44,14 @@ def register_api(app):
         wz_list = wzDA.search([('wz_group_id', wzgroup_id)])
         wzDA.close_session()
 
+        return prot.response_success({'list': wz_list})
+
+    @app.route(api_urls_admin.WZ_LIST_ALL, methods=['GET'])
+    @requires_auth
+    def tetres_workzone_list_all():
+        wzDA = WorkZoneDataAccess()
+        wz_list = wzDA.list()
+        wzDA.close_session()
         return prot.response_success({'list': wz_list})
 
     @app.route(api_urls_admin.WZ_INSERT, methods=['POST'])
@@ -86,6 +95,10 @@ def register_api(app):
             return prot.response_fail('fail to load_data route configuration file')
 
         wzgDA = WZGroupDataAccess(session=wzDA.get_session())
+        try:
+            info.workzone_length = route_length(info.route1)
+        except:
+            pass
 
         is_updated = wzDA.update(wz_id, info.get_dict())
         if not is_updated or not wzDA.commit():
@@ -101,10 +114,11 @@ def register_api(app):
 
         updatedWZObj = wzDA.get_by_id(wz_id)
 
-        inserted = _wz_insert_feature(updatedWZObj)
-        if not inserted:
-            wzDA.close_session()
-            return prot.response_fail('fail to update database (3)')
+        # commented out this part since currently we couldn't collect work zone feature and lane config data
+        # inserted = _wz_insert_feature(updatedWZObj)
+        # if not inserted:
+        #     wzDA.close_session()
+        #     return prot.response_fail('fail to update database (3)')
 
         # commit here
         # if not wzDA.commit():
@@ -134,6 +148,14 @@ def register_api(app):
 
         return (exObj.route1.is_same_route(newObj.route1) and exObj.route2.is_same_route(newObj.route2))
 
+    def route_length(route):
+        starting_r_node = route.rnodes[0]
+        ending_r_node = route.rnodes[-1]
+        distance = distance_util.distance_in_mile_with_coordinate(starting_r_node.lat, starting_r_node.lon,
+                                                                  ending_r_node.lat,
+                                                                  ending_r_node.lon)
+        return distance
+
     def _wz_insert_from_wz(wzi):
         """
         :type wzi: WorkZoneInfo
@@ -148,6 +170,10 @@ def register_api(app):
         wzi.route2.name = 'route2 - %s' % wzi.route2.rnodes[0].corridor.name
         wzi.route2.desc = ''
         # wzi.id = wzDA.da_base.get_next_pk()
+        try:
+            wzi.workzone_length = route_length(wzi.route1)
+        except:
+            pass
 
         wzm = wzDA.insert(wzi)
         if wzm is False or not wzDA.commit():
@@ -155,26 +181,17 @@ def register_api(app):
 
         wzi.id = wzm.id
 
-        inserted = _wz_insert_feature(wzi)
+        inserted_id = wzi.id
 
-        if inserted:
+        tetres_api.add_actionlog(ActionLogDataAccess.INSERT,
+                                 wzDA.get_tablename(),
+                                 inserted_id,
+                                 ActionLogDataAccess.data_description(ActionLogDataAccess.DT_WORKZONE, wzi),
+                                 handled=False,
+                                 dbsession=wzDA.get_session())
 
-            inserted_id = wzi.id
-
-            tetres_api.add_actionlog(ActionLogDataAccess.INSERT,
-                                     wzDA.get_tablename(),
-                                     inserted_id,
-                                     ActionLogDataAccess.data_description(ActionLogDataAccess.DT_WORKZONE, wzi),
-                                     handled=False,
-                                     dbsession=wzDA.get_session())
-
-            wzDA.close_session()
-            return prot.response_success(obj=inserted_id)
-        else:
-            # if failed to add features
-            wzDA.delete(wzm.id)
-            wzDA.close_session()
-            return prot.response_fail('fail to save workzone route data (2)')
+        wzDA.close_session()
+        return prot.response_success(obj=inserted_id)
 
     def _wz_insert_from_route(wzi, route_json):
         """
