@@ -30,6 +30,11 @@ import javax.swing.JOptionPane;
  */
 public class WZGroupEditDialog extends javax.swing.JDialog {
 
+    private final String IMPACT_LOW = "Low";
+    private final String IMPACT_MEDIUM = "Medium";
+    private final String IMPACT_HIGH = "High";
+    private final String[] impacts;
+
     public Route route;
     private WorkZoneGroupInfo wzgi;
     private WorkzoneGroupClient api;
@@ -39,19 +44,33 @@ public class WZGroupEditDialog extends javax.swing.JDialog {
      */
     public WZGroupEditDialog(java.awt.Frame parent, WorkZoneGroupInfo wzgi, boolean modal) {
         super(parent, modal);
-        initComponents();        
+        initComponents();
         this.wzgi = wzgi;
+        this.impacts = new String[]{IMPACT_LOW, IMPACT_MEDIUM, IMPACT_HIGH };
+        this.cbxImpact.removeAllItems();
+        this.cbxImpact.addItem(IMPACT_LOW);
+        this.cbxImpact.addItem(IMPACT_MEDIUM);
+        this.cbxImpact.addItem(IMPACT_HIGH);
         this.init();
     }
-    
+
     // initialize UI and variables
     private void init() {
         if(this.wzgi != null) {
             this.tbxName.setText(this.wzgi.name);
             this.tbxDesc.setText(this.wzgi.description);
+            int selectedImpactIndex = 0;
+            for (int i=0; i < this.impacts.length; i++){
+                if (this.impacts[i].equals(this.wzgi.impact)){
+                    selectedImpactIndex = i;
+                    break;
+                }
+            }
+            this.cbxImpact.setSelectedIndex(selectedImpactIndex);
+
         }
         this.api = new WorkzoneGroupClient();
-        this.api.addChangeListener(new AbstractDataChangeListener<WorkZoneGroupInfo>() {  
+        this.api.addChangeListener(new AbstractDataChangeListener<WorkZoneGroupInfo>() {
             @Override
             public void insertFailed(HttpResult result, WorkZoneGroupInfo obj) {
                 JOptionPane.showMessageDialog(TeTRESConfig.mainFrame, "Fail to add workzone group data");
@@ -61,12 +80,12 @@ public class WZGroupEditDialog extends javax.swing.JDialog {
             public void insertSuccess(Integer id) {
                 dispose();
             }
-            
-            
+
+
             @Override
             public void updateSuccess(int id) {
                 dispose();
-            }            
+            }
 
             @Override
             public void updateFailed(HttpResult result, WorkZoneGroupInfo obj) {
@@ -74,28 +93,30 @@ public class WZGroupEditDialog extends javax.swing.JDialog {
             }
         });
     }
-    
+
     /**
      * save or update work zone group information
      */
     private void saveOrUpdate() {
         String name = this.tbxName.getText();
         String desc = this.tbxDesc.getText();
+        String impact = this.cbxImpact.getSelectedItem().toString();
 
         WorkZoneGroupInfo mWzgi = new WorkZoneGroupInfo();
         mWzgi.name = name;
         mWzgi.description = desc;
-        
+        mWzgi.impact = impact;
+
         if(this.wzgi != null) {
             this.api.update(this.wzgi, mWzgi);
         } else {
             this.api.insert(mWzgi);
         }
     }
-    
+
     /**
      * returns work zone group info entered in UI
-     * 
+     *
      * @return work zone group info
      */
     public WorkZoneGroupInfo getWorkZoneGroupInfo() {
@@ -119,6 +140,8 @@ public class WZGroupEditDialog extends javax.swing.JDialog {
         jLabel5 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         tbxDesc = new javax.swing.JTextArea();
+        jLabel6 = new javax.swing.JLabel();
+        cbxImpact = new javax.swing.JComboBox<String>();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("New Work Zone ");
@@ -145,6 +168,10 @@ public class WZGroupEditDialog extends javax.swing.JDialog {
         tbxDesc.setRows(5);
         jScrollPane1.setViewportView(tbxDesc);
 
+        jLabel6.setText("Impact");
+
+        cbxImpact.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Upstream", "Overlapped", "Downstream" }));
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -155,14 +182,16 @@ public class WZGroupEditDialog extends javax.swing.JDialog {
                     .addComponent(jScrollPane1)
                     .addComponent(tbxName)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel4)
-                            .addComponent(jLabel5))
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(btnCancel, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
-                        .addComponent(btnSave, javax.swing.GroupLayout.DEFAULT_SIZE, 153, Short.MAX_VALUE)))
+                        .addComponent(btnSave, javax.swing.GroupLayout.DEFAULT_SIZE, 153, Short.MAX_VALUE))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel4)
+                            .addComponent(jLabel5)
+                            .addComponent(jLabel6))
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addComponent(cbxImpact, 0, 291, Short.MAX_VALUE))
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
@@ -172,10 +201,14 @@ public class WZGroupEditDialog extends javax.swing.JDialog {
                 .addComponent(jLabel4)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(tbxName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel6)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(cbxImpact, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel5)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 141, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(btnCancel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -201,23 +234,27 @@ public class WZGroupEditDialog extends javax.swing.JDialog {
         );
 
         pack();
-    }private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {
+    }// </editor-fold>//GEN-END:initComponents
+
+    private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
         saveOrUpdate();
-    }
+    }//GEN-LAST:event_btnSaveActionPerformed
 
-    private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {
+    private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
         dispose();
-    }
+    }//GEN-LAST:event_btnCancelActionPerformed
 
-    // Variables declaration - do not modify
+    // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCancel;
     private javax.swing.JButton btnSave;
+    private javax.swing.JComboBox<String> cbxImpact;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTextArea tbxDesc;
     private javax.swing.JTextField tbxName;
-    // End of variables declaration
+    // End of variables declaration//GEN-END:variables
 
 }
