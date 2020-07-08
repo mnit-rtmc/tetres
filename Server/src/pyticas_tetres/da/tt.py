@@ -132,7 +132,7 @@ class TravelTimeDataAccess(DataAccess):
             qry = qry.filter(self.da_base.dbModel.route_id == ttr_id)
 
         if sdt:
-            qry = qry.filter(self.da_base.dbModel.time < edt)
+            qry = qry.filter(self.da_base.dbModel.time <= edt)
 
         if edt:
             qry = qry.filter(self.da_base.dbModel.time >= sdt)
