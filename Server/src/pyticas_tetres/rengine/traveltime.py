@@ -153,14 +153,25 @@ def _calculate_tt(r, prd, moe_critical_density, moe_lane_capacity, **kwargs) -> 
     """
     # 1. update lane configuration according to work zone
     cloned_route = r.clone()
+    updated_route = cloned_route
+    if not kwargs.get('nowz', False):
+        try:
+            cloned_route.cfg = route_config.create_route_config(cloned_route.rnodes)
+            updated_route = cloned_route
+        except Exception as e:
+            getLogger(__name__).warning(
+                'Exception occurred while creating route config for route: {}. Error: {}'.format(r, tb.traceback(e,
+                                                                                                                 f_print=False)))
+        try:
+            updated_route = apply_workzone(cloned_route, prd)
+        except Exception as e:
+            getLogger(__name__).warning(
+                'Exception occurred while applying workzone for route: {}. For period: {}. Error: {}'.format(r, prd,
+                                                                                                             tb.traceback(
+                                                                                                                 e,
+                                                                                                                 f_print=False)))
 
-    if kwargs.get('nowz', False):
-        updated_route = cloned_route
-    else:
-        cloned_route.cfg = route_config.create_route_config(cloned_route.rnodes)
-        updated_route = apply_workzone(cloned_route, prd)
-
-    # 2. calculate TT and Speed and VMT
+        # 2. calculate TT and Speed and VMT
     try:
         return [moe.travel_time(updated_route, prd),
                 moe.speed(updated_route, prd),

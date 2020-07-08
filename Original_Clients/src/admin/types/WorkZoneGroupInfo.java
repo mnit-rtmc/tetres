@@ -31,6 +31,7 @@ public class WorkZoneGroupInfo extends InfoBase {
     public String description;
     public String years;
     public String corridors;
+    public String impact;
 
     public WorkZoneGroupInfo() {
         this.setTypeInfo(TeTRESConfig.INFO_TYPE_WORKZONE_GROUP);

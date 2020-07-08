@@ -85,15 +85,22 @@ WORKZONE_LANE_CONFIG_FUNCTIONS = {}
 
 
 def wz_laneconfig_decorator(from_lane, to_lane):
-    def func():
-        return workzone.lane_config(from_lane, to_lane)
+    def func(**kwargs):
+        return workzone.lane_config(from_lane, to_lane, **kwargs)
+
+    return func
+
+
+def wz_closed_length_decorator(min_length, max_length):
+    def func(**kwargs):
+        return workzone.closed_length(min_length, max_length, **kwargs)
 
     return func
 
 
 def wz_length_decorator(min_length, max_length):
     def func(**kwargs):
-        return workzone.closed_length(min_length, max_length, **kwargs)
+        return workzone.length(min_length, max_length, **kwargs)
 
     return func
 
@@ -104,6 +111,11 @@ for from_lane in range(2, 6):
         WORKZONE_LANE_CONFIGS.append(key)
         WORKZONE_LANE_CONFIG_FUNCTIONS[key] = wz_laneconfig_decorator(from_lane, to_lane)
 
+WORKZONE_LENGTH_SHORT = 'Short'
+WORKZONE_LENGTH_MEDIUM = 'Medium'
+WORKZONE_LENGTH_LONG = 'Long'
+WORKZONE_LENGTHS = [WORKZONE_LENGTH_SHORT, WORKZONE_LENGTH_MEDIUM, WORKZONE_LENGTH_LONG]
+
 WORKZONE_CLOSED_LENGTH_SHORT = 'Short'
 WORKZONE_CLOSED_LENGTH_MEDIUM = 'Medium'
 WORKZONE_CLOSED_LENGTH_LONG = 'Long'
@@ -113,10 +125,22 @@ WORKZONE_LOCATION_UPSTREAM = 'Upstream'
 WORKZONE_LOCATION_OVERLAPPED = 'Overlapped'
 WORKZONE_LOCATION_DOWNSTREAM = 'Downstream'
 WORKZONE_LOCATIONS = [WORKZONE_LOCATION_UPSTREAM, WORKZONE_LOCATION_OVERLAPPED, WORKZONE_LOCATION_DOWNSTREAM]
+
+WORKZONE_IMPACT_LOW = 'Low'
+WORKZONE_IMPACT_MEDIUM = 'Medium'
+WORKZONE_IMPACT_HIGH = 'High'
+
 WORKZONE_LOCATION_FUNCTIONS = {
     WORKZONE_LOCATION_UPSTREAM: workzone.loc_upstream,
     WORKZONE_LOCATION_OVERLAPPED: workzone.loc_overlapped,
     WORKZONE_LOCATION_DOWNSTREAM: workzone.loc_downstream,
+}
+
+WORKZONE_IMPACT_FUNCTIONS = {
+    WORKZONE_IMPACT_LOW: workzone.impact_low,
+    WORKZONE_IMPACT_MEDIUM: workzone.impact_medium,
+    WORKZONE_IMPACT_HIGH: workzone.impact_high,
+
 }
 
 SPECIALEVENT_NO_FUNCTION = specialevent.no_specialevent
@@ -141,11 +165,13 @@ SPECIALEVENT_EVENT_SIZES = [
     SPECIALEVENT_EVENT_SIZE_SMALL, SPECIALEVENT_EVENT_SIZE_MEDIUM, SPECIALEVENT_EVENT_SIZE_LARGE
 ]
 
+
 def se_event_size_decorator(min_attendance, max_attendance):
     def func():
         return specialevent.attendance(min_attendance, max_attendance)
 
     return func
+
 
 SPECIALEVENT_EVENT_TIME_BEFORE = 'Before'
 SPECIALEVENT_EVENT_TIME_DURING_AFTER = 'During-After'
@@ -156,6 +182,9 @@ SPECIALEVENT_EVENT_TIME_FUNCTIONS = {
 }
 SNOWMANAGEMENT_NO_FUNCTION = snowmanagement.no_snowmanagement
 SNOWMANAGEMENT_ANY_FUNCTION = snowmanagement.has_snowmanagement
+ROAD_CONDITION_LOST = "Lost"
+ROAD_CONDITION_REGAINED = "Regained"
+ROAD_CONDITION_ANY = "Any Condition"
 
 
 def get_weather_filter(filter_list, op_param):
@@ -198,7 +227,7 @@ def get_weather_filter(filter_list, op_param):
 
 def get_incident_filter(filter_list, op_param):
     """
-     
+
     :type filter_list: list[pyticas_tetres.ttypes.IncidentConditionInfo]
     :type op_param: pyticas_tetres.ttypes.OperatingConditionParamInfo
     :rtype: pyticas_tetres.rengine.filter.ftypes.ExtFilter
@@ -210,14 +239,15 @@ def get_incident_filter(filter_list, op_param):
     downstream_distance_limit = op_param.incident_downstream_distance_limit
     upstream_distance_limit = op_param.incident_upstream_distance_limit
 
-    args = {'downstream_distance_limit' : downstream_distance_limit,
-            'upstream_distance_limit' : upstream_distance_limit,
-            'keep_result_in_minute' : keep_result_in_minute}
+    args = {'downstream_distance_limit': downstream_distance_limit,
+            'upstream_distance_limit': upstream_distance_limit,
+            'keep_result_in_minute': keep_result_in_minute}
 
     funcs = []
     for finfo in filter_list:
         if finfo.type == NO_CONDITION:
-            funcs.append(INCIDENT_NO_FUNCTION(downstream_distance_limit=downstream_distance_limit, upstream_distance_limit=upstream_distance_limit))
+            funcs.append(INCIDENT_NO_FUNCTION(downstream_distance_limit=downstream_distance_limit,
+                                              upstream_distance_limit=upstream_distance_limit))
             continue
         if finfo.type == ANY_CONDITION:
             funcs.append(INCIDENT_ANY_FUNCTION(**args))
@@ -240,7 +270,7 @@ def get_incident_filter(filter_list, op_param):
 
 def get_workzone_filter(filter_list, op_param):
     """
-     
+
     :type filter_list: list[pyticas_tetres.ttypes.WorkzoneConditionInfo]
     :type op_param: pyticas_tetres.ttypes.OperatingConditionParamInfo
     :rtype: pyticas_tetres.rengine.filter.ftypes.ExtFilter
@@ -251,38 +281,46 @@ def get_workzone_filter(filter_list, op_param):
     downstream_distance_limit = op_param.workzone_downstream_distance_limit
     upstream_distance_limit = op_param.workzone_upstream_distance_limit
 
-    args = {'downstream_distance_limit' : downstream_distance_limit,
-            'upstream_distance_limit' : upstream_distance_limit}
+    args = {'downstream_distance_limit': downstream_distance_limit,
+            'upstream_distance_limit': upstream_distance_limit}
 
     wz_length_short = (op_param.workzone_length_short_from, op_param.workzone_length_short_to)
     wz_length_medium = (op_param.workzone_length_medium_from, op_param.workzone_length_medium_to)
     wz_length_long = (op_param.workzone_length_long_from, op_param.workzone_length_long_to)
 
-    WORKZONE_CLOSED_LENGTH_FUNCTIONS = {
-        WORKZONE_CLOSED_LENGTH_SHORT: wz_length_decorator(*wz_length_short),
-        WORKZONE_CLOSED_LENGTH_MEDIUM: wz_length_decorator(*wz_length_medium),
-        WORKZONE_CLOSED_LENGTH_LONG: wz_length_decorator(*wz_length_long),
+    # WORKZONE_CLOSED_LENGTH_FUNCTIONS = {
+    #     WORKZONE_CLOSED_LENGTH_SHORT: wz_closed_length_decorator(*wz_length_short),
+    #     WORKZONE_CLOSED_LENGTH_MEDIUM: wz_closed_length_decorator(*wz_length_medium),
+    #     WORKZONE_CLOSED_LENGTH_LONG: wz_closed_length_decorator(*wz_length_long),
+    # }
+    WORKZONE_LENGTH_FUNCTIONS = {
+        WORKZONE_LENGTH_SHORT: wz_length_decorator(*wz_length_short),
+        WORKZONE_LENGTH_MEDIUM: wz_length_decorator(*wz_length_medium),
+        WORKZONE_LENGTH_LONG: wz_length_decorator(*wz_length_long),
     }
 
     funcs = []
     for finfo in filter_list:
-        if finfo.lane_config == NO_CONDITION:
+        if finfo.relative_location == NO_CONDITION and finfo.impact == NO_CONDITION and finfo.workzone_length == NO_CONDITION:
             funcs.append(WORKZONE_NO_FUNCTION(**args))
             continue
-        if finfo.lane_config == ANY_CONDITION:
+        if finfo.relative_location == ANY_CONDITION and finfo.impact == ANY_CONDITION and finfo.workzone_length == ANY_CONDITION:
             funcs.append(WORKZONE_ANY_FUNCTION(**args))
             continue
-        if (not _check_field(finfo.lane_config, WORKZONE_LANE_CONFIGS)
-                or not _check_field(finfo.lane_closed_length, WORKZONE_CLOSED_LENGTHS)
-                or not _check_field(finfo.relative_location, WORKZONE_LOCATIONS)):
-            continue
+        # if (not _check_field(finfo.impact, WORKZONE_IMPACTS)
+        #     or not _check_field(finfo.relative_location, WORKZONE_LOCATIONS)):
+        #     continue
+
         and_funcs = []
-        if WORKZONE_LANE_CONFIG_FUNCTIONS.get(finfo.lane_config, None):
-            and_funcs.append(WORKZONE_LANE_CONFIG_FUNCTIONS[finfo.lane_config](*args))
-        if WORKZONE_CLOSED_LENGTH_FUNCTIONS.get(finfo.lane_closed_length, None):
-            and_funcs.append(WORKZONE_CLOSED_LENGTH_FUNCTIONS[finfo.lane_closed_length](*args))
+        # commented out this part since currently we couldn't collect work zone feature and lane config data
+        # if WORKZONE_LANE_CONFIG_FUNCTIONS.get(finfo.lane_config, None):
+        #     and_funcs.append(WORKZONE_LANE_CONFIG_FUNCTIONS[finfo.lane_config](**args))
+        if WORKZONE_LENGTH_FUNCTIONS.get(finfo.workzone_length, None):
+            and_funcs.append(WORKZONE_LENGTH_FUNCTIONS[finfo.workzone_length](**args))
+        if WORKZONE_IMPACT_FUNCTIONS.get(finfo.impact, None):
+            and_funcs.append(WORKZONE_IMPACT_FUNCTIONS[finfo.impact](**args))
         if WORKZONE_LOCATION_FUNCTIONS.get(finfo.relative_location, None):
-            and_funcs.append(WORKZONE_LOCATION_FUNCTIONS[finfo.relative_location](*args))
+            and_funcs.append(WORKZONE_LOCATION_FUNCTIONS[finfo.relative_location](**args))
         ext_filter = And_(*and_funcs)
         funcs.append(ext_filter)
     return Or_(*funcs)
@@ -290,7 +328,7 @@ def get_workzone_filter(filter_list, op_param):
 
 def get_specialevent_filter(filter_list, op_param):
     """
-     
+
     :type filter_list: list[pyticas_tetres.ttypes.SpecialeventConditionInfo]
     :type op_param: pyticas_tetres.ttypes.OperatingConditionParamInfo
     :rtype: pyticas_tetres.rengine.filter.ftypes.ExtFilter
@@ -343,7 +381,7 @@ def get_specialevent_filter(filter_list, op_param):
 
 def get_snowmanagement_filter(filter_list, op_param):
     """
-     
+
     :type filter_list: list[pyticas_tetres.ttypes.SnowmanagementConditionInfo]
     :type op_param: pyticas_tetres.ttypes.OperatingConditionParamInfo
     :rtype: pyticas_tetres.rengine.filter.ftypes.ExtFilter
@@ -352,9 +390,11 @@ def get_snowmanagement_filter(filter_list, op_param):
         return None
 
     for finfo in filter_list:
-        if finfo.road_condition == NO_CONDITION:
+        if finfo.road_condition == ROAD_CONDITION_ANY:
+            return None
+        if finfo.road_condition == NO_CONDITION or finfo.road_condition == ROAD_CONDITION_REGAINED:
             return SNOWMANAGEMENT_NO_FUNCTION()
-        if finfo.road_condition == ANY_CONDITION:
+        if finfo.road_condition == ANY_CONDITION or finfo.road_condition == ROAD_CONDITION_LOST:
             return SNOWMANAGEMENT_ANY_FUNCTION()
     return None
 

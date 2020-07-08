@@ -274,6 +274,8 @@ class WorkZoneGroupInfo(InfoBase):
         """:type: str """
         self.corridors = None
         """:type: str """
+        self.impact = None
+        """:type: str """
 
     def __str__(self):
         return '<WorkZoneGroupInfo id="%s" name="%s">' % (self.id, self.name)
@@ -304,6 +306,8 @@ class WorkZoneInfo(InfoBase):
         """:type: pyticas.ttypes.Route """
         self.route2 = None
         """:type: pyticas.ttypes.Route """
+        self.workzone_length = None
+        """:type: float """
 
     def __str__(self):
         return '<WorkzoneInfo id="%d" wz_group_id="%d" start_time="%s" end_time="%s">' % (
@@ -980,14 +984,14 @@ class TTIncidentInfo(TTExtInfo):
         """:type: float """
 
     def get_incident(self):
-        """        
-        :rtype: IncidentInfo 
+        """
+        :rtype: IncidentInfo
         """
         return self._incident
 
     def get_tt_info(self):
         """
-        :rtype: TravelTimeInfo 
+        :rtype: TravelTimeInfo
         """
         return self._tt
 
@@ -1279,16 +1283,16 @@ class WorkzoneConditionInfo(InfoBase):
     _info_type_ = 'workzone condition'
 
     def __init__(self):
-        self.lane_config = None
-        """:type: str """
-        self.lane_closed_length = None
-        """:type: str """
         self.relative_location = None
+        """:type: str """
+        self.impact = None
+        """:type: str """
+        self.workzone_length = None
         """:type: str """
 
     def __str__(self):
-        return ('<WorkzoneConditionInfo lane_config="%s" lane_closed_length="%s" relative_location="%s">'
-                % (self.lane_config, self.lane_closed_length, self.relative_location))
+        return ('<WorkzoneConditionInfo relative_location="%s" impact="%s">'
+                % (self.relative_location, self.impact))
 
 
 class SpecialeventConditionInfo(InfoBase):

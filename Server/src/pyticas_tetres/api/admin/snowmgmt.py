@@ -24,6 +24,7 @@ from pyticas_tetres.protocol import json2snmi
 def register_api(app):
     TeTRESApi(app, ActionLogDataAccess.DT_SNOWMGMT, json2snmi, SnowMgmtDataAccess, {
         'insert': (api_urls_admin.SNM_INSERT, ['POST']),
+        'list': (api_urls_admin.SNM_LIST_ALL, ['GET']),
         'insert_all': (api_urls_admin.SNM_INSERT_ALL, ['POST']),
         'update': (api_urls_admin.SNM_UPDATE, ['POST'], ['lane_lost_time', 'lane_regain_time']),
         'delete': (api_urls_admin.SNM_DELETE, ['POST']),

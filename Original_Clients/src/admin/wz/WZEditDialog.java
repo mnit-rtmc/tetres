@@ -116,7 +116,7 @@ public class WZEditDialog extends JDialog {
 
   public void setCopied(WorkZoneInfo wzi) {
 
-    this.route = wzi.route1;
+    this.route = this.wzi.route1;
 
     this.dtStartDatetime.setDate(wzi.getStartDate());
     this.dtEndDatetime.setDate(wzi.getEndDate());
@@ -174,12 +174,18 @@ public class WZEditDialog extends JDialog {
     }
 
     if (this.route == null) {
-      this.route = new Route("tmp route", "temporary");
-      for (RNode rn : this.routeCreationHelper.routePointList) {
-        this.route.addRNode(rn);
-      }
-      //JOptionPane.showMessageDialog(TeTRESConfig.mainFrame, "Please make lane configuration before saving route");
-      //return;
+        if (this.wzi != null && this.wzi.route1 != null){
+            this.route = this.wzi.route1;
+        }
+        else{
+            Route r = null;
+            r = new Route("tmp route", "temporary");
+            for (RNode rn : this.routeCreationHelper.routePointList) {
+                r.addRNode(rn);
+            }
+            this.route = r;
+
+        }
     }
 
     String desc = this.tbxDesc.getText();
@@ -454,9 +460,9 @@ public class WZEditDialog extends JDialog {
     this.routeCreationHelper.reset();
   }
 
-  private void btnEditLaneConfigActionPerformed(java.awt.event.ActionEvent evt) {
-    openLaneConfigurationDialog();
-  }
+//   private void btnEditLaneConfigActionPerformed(java.awt.event.ActionEvent evt) {
+//     openLaneConfigurationDialog();
+//   }
 
   private void btnImportRouteActionPerformed(java.awt.event.ActionEvent evt) {
     importRoute();
