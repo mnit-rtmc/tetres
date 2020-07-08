@@ -157,6 +157,112 @@ def calculate_a_route(prd, ttri, **kwargs):
     return inserted_ids
 
 
+def create_or_update_tt_and_moe_a_route(prd, ttri, **kwargs):
+    """
+
+    :type prd: pyticas.ttypes.Period
+    :type ttri: pyticas_tetres.ttypes.TTRouteInfo
+    """
+
+    logger = getLogger(__name__)
+    dbsession = kwargs.get('dbsession', None)
+
+    cur_config = get_system_config_info()
+
+    if dbsession:
+        da_tt = TravelTimeDataAccess(prd.start_date.year, session=dbsession)
+    else:
+        da_tt = TravelTimeDataAccess(prd.start_date.year)
+    existing_data_list = da_tt.list_by_period(ttri.id, prd)
+    existing_data_dict = {}
+    creatable_list = list()
+    updatable_dict = {}
+    for existing_data in existing_data_list:
+        existing_data_dict[(existing_data.route_id, existing_data.time)] = existing_data
+    print(f"{Fore.LIGHTBLUE_EX}"
+          f" moe_crit_dens[{cur_config.moe_critical_density}]"
+          f" moe_lane_cap[{cur_config.moe_lane_capacity}]"
+          f" moe_cong_thresh_speed[{cur_config.moe_congestion_threshold_speed}]")
+
+    lock = kwargs.get('lock', nonop_with())
+
+    print(f"{Fore.GREEN}CALCULATING TRAVEL-TIME FOR ROUTE[{ttri.name}]")
+
+    res_dict = _calculate_tt(ttri.route, prd, cur_config.moe_critical_density, cur_config.moe_lane_capacity,
+                             cur_config.moe_congestion_threshold_speed)
+
+    if res_dict is None or res_dict['tt'] is None:
+        logger.warning('fail to calculate travel time')
+        return False
+
+    travel_time = res_dict['tt'][-1].data
+    avg_speeds = _route_avgs(res_dict['speed'])
+    total_vmt = _route_total(res_dict['vmt'])  # flow
+    res_vht = _route_total(res_dict['vht'])  # speed
+    res_dvh = _route_total(res_dict['dvh'])  # flow
+    res_lvmt = _route_total(res_dict['lvmt'])  # density
+    res_uvmt = _route_total(res_dict['uvmt'])
+    res_cm = _route_total(res_dict['cm'])
+    res_cmh = _route_total(res_dict['cmh'])
+    res_acceleration = _route_avgs(res_dict['acceleration'])
+    raw_flow_data = res_dict["raw_flow_data"]
+    raw_speed_data = res_dict["raw_speed_data"]
+    raw_lane_data = res_dict['raw_lane_data']
+    raw_density_data = res_dict['raw_density_data']
+    raw_speed_data_without_virtual_node = res_dict['speed']
+    res_mrf = res_dict["mrf"]
+    timeline = prd.get_timeline(as_datetime=False, with_date=True)
+    print(f"{Fore.CYAN}Start[{timeline[0]}] End[{timeline[-1]}] TimelineLength[{len(timeline)}]")
+    for index, dateTimeStamp in enumerate(timeline):
+        meta_data = generate_meta_data(raw_flow_data, raw_speed_data, raw_lane_data, raw_density_data,
+                                       raw_speed_data_without_virtual_node, res_mrf, index)
+        meta_data_string = json.dumps(meta_data)
+        tt_data = {
+            'route_id': ttri.id,
+            'time': dateTimeStamp,
+            'tt': travel_time[index],
+            'speed': avg_speeds[index],
+            'vmt': total_vmt[index],
+            'vht': res_vht[index],
+            'dvh': res_dvh[index],
+            'lvmt': res_lvmt[index],
+            'uvmt': res_uvmt[index],
+            'cm': res_cm[index],
+            'cmh': res_cmh[index],
+            'acceleration': res_acceleration[index],
+            'meta_data': meta_data_string,
+
+        }
+        existing_data = existing_data_dict.get((tt_data['route_id'], tt_data['time']))
+
+        if existing_data:
+            updatable_dict[existing_data.id] = tt_data
+        else:
+            creatable_list.append(tt_data)
+    if creatable_list:
+        with lock:
+            inserted_ids = da_tt.bulk_insert(creatable_list)
+            if not inserted_ids or not da_tt.commit():
+                logger.warning('fail to insert the calculated travel time into database')
+    if updatable_dict:
+        with lock:
+            for id, tt_data in updatable_dict.items():
+                da_tt.update(id, generate_updatable_moe_dict(tt_data))
+            da_tt.commit()
+    if not dbsession:
+        da_tt.close_session()
+
+
+def generate_updatable_moe_dict(tt_data):
+    return {
+        'vht': tt_data['vht'],
+        'dvh': tt_data['dvh'],
+        'acceleration': tt_data['acceleration'],
+        'meta_data': tt_data['meta_data'],
+
+    }
+
+
 def generate_meta_data(raw_flow_data, raw_speed_data, raw_lane_data, raw_density_data,
                        raw_speed_data_without_virtual_node, mrf_data, time_index):
     logger = getLogger(__name__)

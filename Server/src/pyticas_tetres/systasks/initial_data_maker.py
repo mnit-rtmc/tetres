@@ -51,6 +51,11 @@ def calculate_tt_only(start_date, end_date, db_info):
     _calculate_tt_only(start_date, end_date, db_info)
 
 
+def create_or_update_tt_and_moe(start_date, end_date, db_info):
+    _create_yearly_db_tables(start_date, end_date)
+    _create_or_update_tt_and_moe(start_date, end_date, db_info)
+
+
 def categorize_tt_only(start_date, end_date, db_info):
     _create_yearly_db_tables(start_date, end_date)
     _categorize_tt_only(start_date, end_date, db_info)
@@ -181,6 +186,19 @@ def _calculate_tt_only(start_date, end_date, db_info):
     logger = getLogger(__name__)
     logger.debug('>> Categorizing travel time data')
     _run_multi_process(_worker_process_to_calculate_tt_only, start_date, end_date, db_info)
+    logger.debug('<< End of categorizing travel time data')
+
+
+def _create_or_update_tt_and_moe(start_date, end_date, db_info):
+    """
+
+    :type start_date: datetime.date
+    :type end_date: datetime.date
+    :type db_info: dict
+    """
+    logger = getLogger(__name__)
+    logger.debug('>> Categorizing travel time data')
+    _run_multi_process(_worker_process_to_create_or_update_tt_and_moe, start_date, end_date, db_info)
     logger.debug('<< End of categorizing travel time data')
 
 
@@ -322,6 +340,41 @@ def _worker_process_to_calculate_tt_only(idx, queue, lck, data_path, db_info):
             gc.collect()
 
         except Exception as ex:
+            tb.traceback(ex)
+            continue
+
+
+def _worker_process_to_create_or_update_tt_and_moe(idx, queue, lck, data_path, db_info):
+    from pyticas_tetres.db.tetres import conn
+    from pyticas.infra import Infra
+    from pyticas.tool import tb
+
+    logger = getLogger(__name__)
+    # initialize
+    logger.debug('[TT-Categorization Worker %d] starting...' % (idx))
+    ticas.initialize(data_path)
+    infra = Infra.get_infra()
+    conn.connect(db_info)
+
+    da_route = TTRouteDataAccess()
+    logger.debug('[TT-Categorization Worker %d] is ready' % (idx))
+    while True:
+        ttr_id, prd, num, total = queue.get()
+        if prd is None:
+            da_route.close_session()
+            exit(1)
+        try:
+            ttri = da_route.get_by_id(ttr_id)
+            if not ttri:
+                logger.debug('[TT-Categorization Worker %d] route is not found (%s)' % (idx, ttr_id))
+                continue
+            logger.debug('[TT-Categorization Worker %d] (%d/%d) %s (id=%s) at %s' % (
+                idx, num, total, ttri.name, ttri.id, prd.get_date_string()))
+            traveltime.create_or_update_tt_and_moe_a_route(prd, ttri, dbsession=da_route.get_session(), lock=lck)
+            gc.collect()
+
+        except Exception as ex:
+            logger.warning('[TT-Categorization Worker %d]  - fail to add travel time data' % idx)
             tb.traceback(ex)
             continue
 
