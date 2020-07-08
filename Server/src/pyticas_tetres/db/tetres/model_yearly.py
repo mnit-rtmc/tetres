@@ -5,7 +5,7 @@ __author__ = 'Chongmyung Park (chongmyung.park@gmail.com)'
 import time
 
 from sqlalchemy import Column, Integer
-from sqlalchemy import ForeignKey, DateTime, Float, UniqueConstraint, VARCHAR, CHAR
+from sqlalchemy import ForeignKey, DateTime, Float, UniqueConstraint, VARCHAR, CHAR, UnicodeText
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, backref
 
@@ -54,6 +54,11 @@ def create_year_table(year):
         'dvh': Column(Float, nullable=True),
         'lvmt': Column(Float, nullable=True),
         'uvmt': Column(Float, nullable=True),
+        "cm": Column(Float, nullable=True),
+        "cmh": Column(Float, nullable=True),
+        "acceleration": Column(Float, nullable=True),
+        "meta_data": Column(UnicodeText, nullable=False),
+
         # 'sv': Column(Float, nullable=True),
         '_tt_weathers': relationship('TTWeather%d' % year, lazy='joined'),
         '_tt_incidents': relationship('TTIncident%d' % year, lazy='joined'),
@@ -66,12 +71,6 @@ def create_year_table(year):
         '<TravelTime%d id="%d" route_id="%d" time="%s" tt="%.1f" vmt="%.1f" speed="%.1f>' % (
             year, self.id, self.route_id, self.time, self.tt, self.vmt, self.speed)
     tt_table.__str__ = tt_table.__repr__
-
-
-
-
-
-
 
     noaa_table = type('Noaa%d' % year, (Base,), {
         '__tablename__': 'noaa_weather_%d' % year,
@@ -98,7 +97,6 @@ def create_year_table(year):
         'wind_speed_qc': Column(VARCHAR(4), nullable=True),
         'wind_gust': Column(Float, nullable=True),
         'wind_gust_qc': Column(VARCHAR(4), nullable=True),
-
 
     })
     noaa_table.__repr__ = lambda self: \
@@ -259,4 +257,3 @@ def _yearly_table(tables, year):
         create_year_table(year)
         table = tables.get(year)
     return table
-

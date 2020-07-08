@@ -8,7 +8,7 @@ from pyticas.moe.imputation import spatial_avg
 
 __author__ = 'Chongmyung Park (chongmyung.park@gmail.com)'
 
-CONGESTED_SPEED = 45
+from pyticas_tetres.util.systemconfig import get_system_config_info
 
 
 def run(route, prd, **kwargs):
@@ -20,6 +20,8 @@ def run(route, prd, **kwargs):
     """
 
     # load_data speed data
+    moe_congestion_threshold_speed = kwargs.pop("moe_congestion_threshold_speed",
+                                                get_system_config_info().moe_congestion_threshold_speed)
     us = moe_helper.get_speed(route.get_stations(), prd, **kwargs)
     us_results = moe_helper.add_virtual_rnodes(us, route)
 
@@ -33,14 +35,31 @@ def run(route, prd, **kwargs):
         cm_results[ridx].prd = prd
 
     # calculate CM
-    cm_data = _calculate_cm(us_data, prd.interval, **kwargs)
+    cm_data = _calculate_cm(us_data, prd.interval, moe_congestion_threshold_speed, **kwargs)
     for ridx, res in enumerate(cm_results):
         res.data = cm_data[ridx]
 
     return cm_results
 
 
-def _calculate_cm(data, interval, **kwargs):
+def calculate_cm_dynamically(data, moe_congestion_threshold_speed, **kwargs):
+    try:
+        vd = moe_helper.VIRTUAL_RNODE_DISTANCE
+        cm_data = []
+        for index, each_station_speed_data in enumerate(data['speed']):
+            value = 0 if each_station_speed_data >= moe_congestion_threshold_speed or each_station_speed_data < 0 else vd
+            cm_data.append(value)
+        cm_data[-1] = 0
+
+        return sum(cm_data)
+    except Exception as e:
+        from pyticas_tetres.logger import getLogger
+        logger = getLogger(__name__)
+        logger.warning('fail to calculate calculate cm dynamically. Error: {}'.format(e))
+        return 0
+
+
+def _calculate_cm(data, interval, moe_congestion_threshold_speed, **kwargs):
     """
      Congested Miles (Miles, %)
      => CM(j): Sum of freeway segments whose speed values are less than or equal to 'User specified threshold'
@@ -64,7 +83,7 @@ def _calculate_cm(data, interval, **kwargs):
     cm_data = copy.deepcopy(data)
     for ridx, rnode_data in enumerate(data):
         for tidx, value in enumerate(rnode_data):
-            cm_data[ridx][tidx] = 0 if value >= CONGESTED_SPEED or value < 0 else vd
+            cm_data[ridx][tidx] = 0 if value >= moe_congestion_threshold_speed or value < 0 else vd
     cm_data[-1] = ['-'] * len(cm_data[-1])
 
     return cm_data
@@ -178,7 +197,6 @@ def post_book_writer(wb, results, r, **kwargs):
         tdata = [tcm_data[1][row] for tcm_data in data]
         avg_data.append(sum(tdata) / len(tdata))
     sheet.write_column(row=0, col=col, data=['Average'] + avg_data + [sum(avg_data)])
-
 
 # if __name__ == '__main__':
 #     import os

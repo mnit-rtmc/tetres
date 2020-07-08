@@ -255,7 +255,7 @@ def lvmt_md(route, prds, **kwargs):
 
 
 # faverolles 1/22/2020: Added For TICAS MOE Integration
-def uvmt(route, prd, default_critical_density=40, default_lane_capacity=2200, **kwargs):
+def uvmt(route, prd, **kwargs):
     """
 
     :param default_lane_capacity:
@@ -265,14 +265,11 @@ def uvmt(route, prd, default_critical_density=40, default_lane_capacity=2200, **
     :rtype: list[list[RNodeData]]
     """
 
-    kwargs["critical_k"] = default_critical_density
-    kwargs["lan_capacity"] = default_lane_capacity
-
     return _do_moe(route, prd, 'uvmt', **kwargs)
 
 
 # faverolles 1/22/2020: Added For TICAS MOE Integration
-def uvmt_md(route, prds, default_critical_density=40, default_lane_capacity=2200, **kwargs):
+def uvmt_md(route, prds, **kwargs):
     """
 
     :param default_lane_capacity:
@@ -281,9 +278,6 @@ def uvmt_md(route, prds, default_critical_density=40, default_lane_capacity=2200
     :type prds: list[Period]
     :rtype: list[list[RNodeData]]
     """
-
-    kwargs["critical_k"] = default_critical_density
-    kwargs["lan_capacity"] = default_lane_capacity
 
     return _do_moe_md(route, prds, 'uvmt', **kwargs)
 

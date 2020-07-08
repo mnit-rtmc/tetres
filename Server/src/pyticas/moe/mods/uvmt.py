@@ -11,8 +11,7 @@ from pyticas.moe.mods import total_flow
 __author__ = 'Chongmyung Park (chongmyung.park@gmail.com)'
 
 # faverolles 1/14/2020: These values match the default values in TICAS
-DEFAULT_CRITICAL_DENSITY = 40
-DEFAULT_LANE_CAPACITY = 2200
+from pyticas_tetres.util.systemconfig import get_system_config_info
 
 
 def run(route, prd, **kwargs):
@@ -23,8 +22,8 @@ def run(route, prd, **kwargs):
     :return:
     """
 
-    critical_density = kwargs.get('critical_k', DEFAULT_CRITICAL_DENSITY)
-    lane_capacity = kwargs.get('lan_capacity', DEFAULT_LANE_CAPACITY)
+    critical_density = kwargs.get('moe_critical_density', get_system_config_info().moe_critical_density)
+    lane_capacity = kwargs.get('moe_lane_capacity', get_system_config_info().moe_lane_capacity)
 
     # load_data total flow data
     tq_results = total_flow.run(route, prd)
@@ -86,10 +85,7 @@ def _calculate_uvmt(tq_results, ks_results, interval, critical_denisty, lane_cap
             k = value  # lane density
             tq = tq_data[ridx][tidx]
             lanes = tq_results[ridx].lanes
-
-            total_density = ks_data[ridx][tidx]
-
-            if k <= critical_denisty or (total_density <= (critical_denisty * lanes)):
+            if k <= critical_denisty:
                 lvmt = max(lane_capacity * lanes - tq, 0)
                 lvmt = (lvmt * interval / seconds_per_hour * vd)
             else:
@@ -97,3 +93,27 @@ def _calculate_uvmt(tq_results, ks_results, interval, critical_denisty, lane_cap
             lvmt_data[ridx][tidx] = lvmt
 
     return lvmt_data
+
+
+def calculate_uvmt_dynamically(data, interval, critical_denisty, lane_capacity):
+    try:
+        vd = moe_helper.VIRTUAL_RNODE_DISTANCE
+        seconds_per_hour = 3600
+        density_data = data['density']
+        flow_data = data['flow']
+        lane_data = data['lanes']
+        uvmt_data = []
+        for flow, density, lanes in zip(flow_data, density_data, lane_data):
+            if density <= critical_denisty:
+                uvmt = max(lane_capacity * lanes - flow, 0)
+                uvmt = (uvmt * interval / seconds_per_hour * vd)
+            else:
+                uvmt = 0
+
+            uvmt_data.append(uvmt)
+        return sum(uvmt_data)
+    except Exception as e:
+        from pyticas_tetres.logger import getLogger
+        logger = getLogger(__name__)
+        logger.warning('fail to calculate calculate uvmt dynamically. Error: {}'.format(e))
+        return 0

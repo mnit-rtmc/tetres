@@ -1,11 +1,14 @@
 # -*- coding: utf-8 -*-
+import json
+import statistics
 from typing import List
 
 import numpy as np
 from colorama import Fore
-
 from pyticas.moe import moe
 from pyticas.moe.imputation import spatial_avg
+from pyticas.moe.mods import total_flow_with_virtual_nodes, speed_with_virtual_nodes, lanes_with_virtual_nodes, \
+    density_with_virtual_nodes
 from pyticas.rc import route_config
 from pyticas.tool import tb
 from pyticas.ttypes import RNodeData
@@ -93,32 +96,36 @@ def calculate_a_route(prd, ttri, **kwargs):
 
     print(f"{Fore.GREEN}CALCULATING TRAVEL-TIME FOR ROUTE[{ttri.name}]")
 
-    res_list = _calculate_tt(ttri.route, prd, cur_config.moe_critical_density, cur_config.moe_lane_capacity)
+    res_dict = _calculate_tt(ttri.route, prd, cur_config.moe_critical_density, cur_config.moe_lane_capacity,
+                             cur_config.moe_congestion_threshold_speed)
 
-    names = ["tt", "speed", "vmt", "vht", "dvh", "lvmt", "uvmt"]
-
-    ctr = 0
-    for i in res_list:
-        print(f"{Fore.YELLOW}MOE[{names[ctr]}] RNodeDataCount[{len(i)}] RNodeDataLen[{len(i[0].data)}]")
-        # print_rnode_data(i)
-        ctr += 1
-
-    if res_list[0] is None:
+    if res_dict is None or res_dict['tt'] is None:
         logger.warning('fail to calculate travel time')
         return False
 
-    travel_time = res_list[0][-1].data
-    avg_speeds = _route_avgs(res_list[1])
-    total_vmt = _route_total(res_list[2])  # flow
-    res_vht = _route_total(res_list[3])  # speed
-    res_dvh = _route_total(res_list[4])  # flow
-    res_lvmt = _route_total(res_list[5])  # density
-    res_uvmt = _route_total(res_list[6])
-
+    travel_time = res_dict['tt'][-1].data
+    avg_speeds = _route_avgs(res_dict['speed'])
+    total_vmt = _route_total(res_dict['vmt'])  # flow
+    res_vht = _route_total(res_dict['vht'])  # speed
+    res_dvh = _route_total(res_dict['dvh'])  # flow
+    res_lvmt = _route_total(res_dict['lvmt'])  # density
+    res_uvmt = _route_total(res_dict['uvmt'])
+    res_cm = _route_total(res_dict['cm'])
+    res_cmh = _route_total(res_dict['cmh'])
+    res_acceleration = _route_avgs(res_dict['acceleration'])
+    raw_flow_data = res_dict["raw_flow_data"]
+    raw_speed_data = res_dict["raw_speed_data"]
+    raw_lane_data = res_dict['raw_lane_data']
+    raw_density_data = res_dict['raw_density_data']
+    raw_speed_data_without_virtual_node = res_dict['speed']
+    res_mrf = res_dict["mrf"]
     timeline = prd.get_timeline(as_datetime=False, with_date=True)
     print(f"{Fore.CYAN}Start[{timeline[0]}] End[{timeline[-1]}] TimelineLength[{len(timeline)}]")
     data = []
     for index, dateTimeStamp in enumerate(timeline):
+        meta_data = generate_meta_data(raw_flow_data, raw_speed_data, raw_lane_data, raw_density_data,
+                                       raw_speed_data_without_virtual_node, res_mrf, index)
+        meta_data_string = json.dumps(meta_data)
         data.append({
             'route_id': ttri.id,
             'time': dateTimeStamp,
@@ -128,7 +135,12 @@ def calculate_a_route(prd, ttri, **kwargs):
             'vht': res_vht[index],
             'dvh': res_dvh[index],
             'lvmt': res_lvmt[index],
-            'uvmt': res_uvmt[index]
+            'uvmt': res_uvmt[index],
+            'cm': res_cm[index],
+            'cmh': res_cmh[index],
+            'acceleration': res_acceleration[index],
+            'meta_data': meta_data_string,
+
         })
 
     with lock:
@@ -145,7 +157,73 @@ def calculate_a_route(prd, ttri, **kwargs):
     return inserted_ids
 
 
-def _calculate_tt(r, prd, moe_critical_density, moe_lane_capacity, **kwargs) -> List[List[RNodeData]]:
+def generate_meta_data(raw_flow_data, raw_speed_data, raw_lane_data, raw_density_data,
+                       raw_speed_data_without_virtual_node, mrf_data, time_index):
+    logger = getLogger(__name__)
+    raw_meta_data = {
+        "flow": [],
+        "speed": [],
+        "density": [],
+        "lanes": [],
+        "speed_average": 0,
+        "speed_variance": 0,
+        "speed_max_u": 0,
+        "speed_min_u": 0,
+        "speed_difference": 0,
+        "number_of_vehicles_entered": 0,
+        "number_of_vehicles_exited": 0
+    }
+    for flow, speed, lanes, density in zip(raw_flow_data, raw_speed_data, raw_lane_data, raw_density_data):
+        raw_meta_data['flow'].append(flow[time_index])
+        raw_meta_data['speed'].append(speed[time_index])
+        raw_meta_data['density'].append(density[time_index])
+        raw_meta_data['lanes'].append(lanes)
+    speed_meta_data = list()
+    for speed_rnode_data in raw_speed_data_without_virtual_node:
+        if speed_rnode_data and speed_rnode_data.data:
+            speed_data = speed_rnode_data.data
+            if speed_data[time_index]:
+                speed_meta_data.append(speed_data[time_index])
+    try:
+        ent_data = [rnd.data[time_index] for rnd in mrf_data
+                    if rnd.data[time_index] > 0 and not isinstance(rnd.rnode, str) and rnd.rnode.is_entrance()]
+        ent_total = sum(ent_data)
+        raw_meta_data["number_of_vehicles_entered"] = ent_total
+    except Exception as e:
+        logger.warning('fail to calculate number of vehicles entered. Error: {}'.format(e))
+    try:
+        ext_data = [rnd.data[time_index] for rnd in mrf_data
+                    if rnd.data[time_index] > 0 and not isinstance(rnd.rnode, str) and rnd.rnode.is_exit()]
+
+        ext_total = sum(ext_data)
+        raw_meta_data["number_of_vehicles_exited"] = ext_total
+    except Exception as e:
+        logger.warning('fail to calculate number of vehicles exited. Error: {}'.format(e))
+    try:
+        avg = statistics.mean(speed_meta_data)
+        raw_meta_data["speed_average"] = avg
+    except Exception as e:
+        logger.warning('fail to calculate speed average. Error: {}'.format(e))
+    try:
+        variance = statistics.variance(speed_meta_data)
+        raw_meta_data["speed_variance"] = variance
+    except Exception as e:
+        logger.warning('fail to calculate speed variance. Error: {}'.format(e))
+    try:
+        max_u = max(speed_meta_data)
+        raw_meta_data["speed_max_u"] = max_u
+    except Exception as e:
+        logger.warning('fail to calculate speed max. Error: {}'.format(e))
+    try:
+        min_u = min(speed_meta_data)
+        raw_meta_data["speed_min_u"] = min_u
+    except Exception as e:
+        logger.warning('fail to calculate speed min. Error: {}'.format(e))
+    raw_meta_data["speed_difference"] = raw_meta_data["speed_max_u"] - raw_meta_data["speed_min_u"]
+    return raw_meta_data
+
+
+def _calculate_tt(r, prd, moe_critical_density, moe_lane_capacity, moe_congestion_threshold_speed, **kwargs):
     """
 
     :type r: pyticas.ttypes.Route
@@ -173,18 +251,25 @@ def _calculate_tt(r, prd, moe_critical_density, moe_lane_capacity, **kwargs) -> 
 
         # 2. calculate TT and Speed and VMT
     try:
-        return [moe.travel_time(updated_route, prd),
-                moe.speed(updated_route, prd),
-                moe.vmt(updated_route, prd),
-                moe.vht(updated_route, prd),
-                moe.dvh(updated_route, prd),
-                moe.lvmt(updated_route, prd),
-                moe.uvmt(updated_route, prd, moe_critical_density, moe_lane_capacity),
-                # moe.cm(updated_route, prd),
-                # moe.cmh(updated_route, prd),
-                # moe.sv(updated_route, prd),
-                # moe.acceleration(updated_route, prd)
-                ]
+        return {
+            "tt": moe.travel_time(updated_route, prd),
+            "speed": moe.speed(updated_route, prd),
+            "vmt": moe.vmt(updated_route, prd),
+            "vht": moe.vht(updated_route, prd),
+            "dvh": moe.dvh(updated_route, prd),
+            "lvmt": moe.lvmt(updated_route, prd, moe_critical_density=moe_critical_density,
+                             moe_lane_capacity=moe_lane_capacity),
+            "uvmt": moe.uvmt(updated_route, prd, moe_critical_density=moe_critical_density,
+                             moe_lane_capacity=moe_lane_capacity),
+            "cm": moe.cm(updated_route, prd, moe_congestion_threshold_speed=moe_congestion_threshold_speed),
+            "cmh": moe.cmh(updated_route, prd, moe_congestion_threshold_speed=moe_congestion_threshold_speed),
+            "acceleration": moe.acceleration(updated_route, prd),
+            "raw_flow_data": total_flow_with_virtual_nodes.run(updated_route, prd),
+            "raw_speed_data": speed_with_virtual_nodes.run(updated_route, prd),
+            "raw_density_data": density_with_virtual_nodes.run(updated_route, prd),
+            "raw_lane_data": lanes_with_virtual_nodes.run(updated_route, prd),
+            "mrf": moe.mrf(updated_route, prd)
+        }
 
     except Exception as ex:
         getLogger(__name__).warning(tb.traceback(ex))
@@ -218,5 +303,6 @@ def _route_total(res_list):
     n_data = len(res_list[0].prd.get_timeline())
     total_values = []
     for didx in range(n_data):
-        total_values.append(sum([data_list[sidx][didx] for sidx in range(n_stations)]))
+        total_values.append(
+            sum([data_list[sidx][didx] for sidx in range(n_stations) if str(data_list[sidx][didx]) != '-']))
     return total_values

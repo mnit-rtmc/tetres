@@ -1,13 +1,20 @@
 # -*- coding: utf-8 -*-
+import json
 import math
 import traceback
 from typing import List
 
 import xlsxwriter
+from pyticas.moe.mods.cm import calculate_cm_dynamically
+from pyticas.moe.mods.cmh import calculate_cmh_dynamically
+from pyticas.moe.mods.lvmt import calculate_lvmt_dynamically
+from pyticas.moe.mods.uvmt import calculate_uvmt_dynamically
 
 from pyticas_noaa.isd import isdtypes
 from pyticas_tetres import ttypes
+from pyticas_tetres.cfg import TT_DATA_INTERVAL
 from pyticas_tetres.rengine.filter.ftypes import ExtFilterGroup
+from pyticas_tetres.util.systemconfig import get_system_config_info
 
 __author__ = 'Chongmyung Park (chongmyung.park@gmail.com)'
 
@@ -110,25 +117,61 @@ def write_moe_data_sheet(eparam, ext_filter_groups, wb):
         ws.write_row(0, 0, ['Operating Condition:', eparam.operating_conditions[idx].name])
         ws.write_row(1, 0, [
             '', '', '', '',
-            'moe-values', '', '', '', '',
+            'moe-values', '', '', '',
+            '', '', '', '', '',
+            'Speed Variation', '', '', '', '',
+            'weather', '', '', '', '',
+            'incident', '', '', '', '', '', '',
+            'workzone', '', '', '', '',
+            'special-event', '', '', '',
+            'snow-management'
+
         ])
 
         ws.write_row(2, 0, [
             'time', 'tt', 'speed', 'vmt',
             'vht', 'dvh', 'lvmt', 'uvmt',
+            'cm', 'cmh', 'acceleration', 'number_of_vehicles_entered', 'number_of_vehicles_exited',
+            'speed_average', 'speed_variance', 'speed_max_u', 'speed_min_u', 'speed_difference',
+            'usaf', 'wban', 'precip_type', 'precip', 'precip_intensity',  # weather
+            'type', 'impact', 'cdts', 'udts', 'xdts', 'distance', 'off_distance',  # incident
+            'name', 'lane_config', 'closed_length', 'location', 'off_distance',  # workzone
+            'name', 'distance', 'attendance', 'type',  # special event
+            'truck_route', 'road_status', 'location', 'off_distance'
+
         ])
 
         for idx, extdata in enumerate(ef.whole_data):
             x = extdata.tti
             dts = x.time.strftime('%Y-%m-%d %H:%M')
+            meta_data = json.loads(x.meta_data)
+            interval = TT_DATA_INTERVAL
+            moe_lane_capacity = get_system_config_info().moe_lane_capacity
+            moe_critical_density = get_system_config_info().moe_critical_density
+            moe_congestion_threshold_speed = get_system_config_info().moe_congestion_threshold_speed
+            lvmt = cleanMOE(calculate_lvmt_dynamically(meta_data, interval, moe_critical_density, moe_lane_capacity))
+            uvmt = cleanMOE(calculate_uvmt_dynamically(meta_data, interval, moe_critical_density, moe_lane_capacity))
+            cm = cleanMOE(calculate_cm_dynamically(meta_data, moe_congestion_threshold_speed))
+            cmh = cleanMOE(calculate_cmh_dynamically(meta_data, interval, moe_congestion_threshold_speed))
+            speed_average = cleanMOE(meta_data.get("speed_average", 0))
+            speed_variance = cleanMOE(meta_data.get("speed_variance", 0))
+            speed_max_u = cleanMOE(meta_data.get("speed_max_u", 0))
+            speed_min_u = cleanMOE(meta_data.get("speed_min_u", 0))
+            speed_difference = cleanMOE(meta_data.get("speed_difference", 0))
+            number_of_vehicles_entered = cleanMOE(meta_data.get("number_of_vehicles_entered", 0))
+            number_of_vehicles_exited = cleanMOE(meta_data.get("number_of_vehicles_exited", 0))
             ws.write_row(idx + 3, 0, [
                 dts, clean(x.tt), clean(x.speed), clean(x.vmt),
-                cleanMOE(x.vht), cleanMOE(x.dvh), cleanMOE(x.lvmt), cleanMOE(x.uvmt)]
+                cleanMOE(x.vht), cleanMOE(x.dvh), lvmt, uvmt,
+                cm, cmh, cleanMOE(x.acceleration), number_of_vehicles_entered, number_of_vehicles_exited,
+                speed_average, speed_variance, speed_max_u, speed_min_u, speed_difference
+            ]
                          + get_weather_values(extdata)
                          + get_incident_values(extdata)
                          + get_workzone_values(extdata)
                          + get_specialevent_values(extdata)
-                         + get_snowmangement_values(extdata))
+                         + get_snowmangement_values(extdata)
+                         )
 
 
 def write_moe_data_sheet_daily(eparam, ext_filter_groups, wb, daily):
