@@ -120,6 +120,7 @@ def write_moe_data_sheet(eparam, ext_filter_groups, wb):
             'moe-values', '', '', '',
             '', '', '', '', '',
             'Speed Variation', '', '', '', '',
+            'MOE Parameters', '', '',
             'weather', '', '', '', '',
             'incident', '', '', '', '', '', '',
             'workzone', '', '', '', '',
@@ -133,6 +134,7 @@ def write_moe_data_sheet(eparam, ext_filter_groups, wb):
             'vht', 'dvh', 'lvmt', 'uvmt',
             'cm', 'cmh', 'acceleration', 'number_of_vehicles_entered', 'number_of_vehicles_exited',
             'speed_average', 'speed_variance', 'speed_max_u', 'speed_min_u', 'speed_difference',
+            'moe_lane_capacity', 'moe_critical_density', 'moe_congestion_threshold_speed',
             'usaf', 'wban', 'precip_type', 'precip', 'precip_intensity',  # weather
             'type', 'impact', 'cdts', 'udts', 'xdts', 'distance', 'off_distance',  # incident
             'name', 'lane_config', 'closed_length', 'location', 'off_distance',  # workzone
@@ -145,14 +147,14 @@ def write_moe_data_sheet(eparam, ext_filter_groups, wb):
             x = extdata.tti
             dts = x.time.strftime('%Y-%m-%d %H:%M')
             meta_data = json.loads(x.meta_data)
-            interval = TT_DATA_INTERVAL
-            moe_lane_capacity = get_system_config_info().moe_lane_capacity
-            moe_critical_density = get_system_config_info().moe_critical_density
-            moe_congestion_threshold_speed = get_system_config_info().moe_congestion_threshold_speed
-            lvmt = cleanMOE(calculate_lvmt_dynamically(meta_data, interval, moe_critical_density, moe_lane_capacity))
-            uvmt = cleanMOE(calculate_uvmt_dynamically(meta_data, interval, moe_critical_density, moe_lane_capacity))
-            cm = cleanMOE(calculate_cm_dynamically(meta_data, moe_congestion_threshold_speed))
-            cmh = cleanMOE(calculate_cmh_dynamically(meta_data, interval, moe_congestion_threshold_speed))
+            # interval = TT_DATA_INTERVAL
+            moe_lane_capacity = cleanMOE(meta_data.get("moe_lane_capacity", 0))
+            moe_critical_density = cleanMOE(meta_data.get("moe_critical_density", 0))
+            moe_congestion_threshold_speed = cleanMOE(meta_data.get("moe_congestion_threshold_speed", 0))
+            # lvmt = cleanMOE(calculate_lvmt_dynamically(meta_data, interval, moe_critical_density, moe_lane_capacity))
+            # uvmt = cleanMOE(calculate_uvmt_dynamically(meta_data, interval, moe_critical_density, moe_lane_capacity))
+            # cm = cleanMOE(calculate_cm_dynamically(meta_data, moe_congestion_threshold_speed))
+            # cmh = cleanMOE(calculate_cmh_dynamically(meta_data, interval, moe_congestion_threshold_speed))
             speed_average = cleanMOE(meta_data.get("speed_average", 0))
             speed_variance = cleanMOE(meta_data.get("speed_variance", 0))
             speed_max_u = cleanMOE(meta_data.get("speed_max_u", 0))
@@ -162,9 +164,10 @@ def write_moe_data_sheet(eparam, ext_filter_groups, wb):
             number_of_vehicles_exited = cleanMOE(meta_data.get("number_of_vehicles_exited", 0))
             ws.write_row(idx + 3, 0, [
                 dts, clean(x.tt), clean(x.speed), clean(x.vmt),
-                cleanMOE(x.vht), cleanMOE(x.dvh), lvmt, uvmt,
-                cm, cmh, cleanMOE(x.acceleration), number_of_vehicles_entered, number_of_vehicles_exited,
-                speed_average, speed_variance, speed_max_u, speed_min_u, speed_difference
+                cleanMOE(x.vht), cleanMOE(x.dvh), cleanMOE(x.lvmt), cleanMOE(x.uvmt),
+                cleanMOE(x.cm), cleanMOE(x.cmh), cleanMOE(x.acceleration), number_of_vehicles_entered, number_of_vehicles_exited,
+                speed_average, speed_variance, speed_max_u, speed_min_u, speed_difference,
+                moe_lane_capacity, moe_critical_density, moe_congestion_threshold_speed,
             ]
                          + get_weather_values(extdata)
                          + get_incident_values(extdata)
