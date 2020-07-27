@@ -260,14 +260,15 @@ def _calculate_tt(r, prd, moe_critical_density, moe_lane_capacity, moe_congestio
             getLogger(__name__).warning(
                 'Exception occurred while creating route config for route: {}. Error: {}'.format(r, tb.traceback(e,
                                                                                                                  f_print=False)))
-        try:
-            updated_route = apply_workzone(cloned_route, prd)
-        except Exception as e:
-            getLogger(__name__).warning(
-                'Exception occurred while applying workzone for route: {}. For period: {}. Error: {}'.format(r, prd,
-                                                                                                             tb.traceback(
-                                                                                                                 e,
-                                                                                                                 f_print=False)))
+        # Work zone application deactivated as we do not have enough lane closure information
+        # try:
+        #     updated_route = apply_workzone(cloned_route, prd)
+        # except Exception as e:
+        #     getLogger(__name__).warning(
+        #         'Exception occurred while applying workzone for route: {}. For period: {}. Error: {}'.format(r, prd,
+        #                                                                                                      tb.traceback(
+        #                                                                                                          e,
+        #                                                                                                          f_print=False)))
 
         # 2. calculate TT and Speed and VMT
     try:
