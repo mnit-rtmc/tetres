@@ -29,7 +29,7 @@ class LocalDateTime(TypeDecorator):
             return value
 
 class IrisIncident(Base):
-    __tablename__ = 'iris_incident'
+    __tablename__ = 'incident_view'
     event_id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(VARCHAR(16), unique=True, nullable=True)
     event_date = Column(LocalDateTime(timezone=True), nullable=True)
