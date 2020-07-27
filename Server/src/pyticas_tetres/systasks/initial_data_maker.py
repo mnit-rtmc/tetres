@@ -46,6 +46,16 @@ def run(start_date, end_date, db_info):
     _update_actionlogs()
 
 
+def load_incident_data(start_date, end_date):
+    _create_yearly_db_tables(start_date, end_date)
+    _load_incident_data(start_date, end_date)
+
+
+def load_weather_data(start_date, end_date):
+    _create_yearly_db_tables(start_date, end_date)
+    _load_weather_data(start_date, end_date)
+
+
 def calculate_tt_only(start_date, end_date, db_info):
     _create_yearly_db_tables(start_date, end_date)
     _calculate_tt_only(start_date, end_date, db_info)
