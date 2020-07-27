@@ -281,6 +281,32 @@ class WorkZoneGroupInfo(InfoBase):
         return '<WorkZoneGroupInfo id="%s" name="%s">' % (self.id, self.name)
 
 
+class RouteWiseMOEParametersInfo(InfoBase):
+    _info_type_ = 'route wise moe parameters'
+    _db_model_ = model.RouteWiseMOEParameters
+
+    def __init__(self):
+        self.id = None
+        """:type: int """
+        self.route_id = None
+        """:type: int """
+        self.moe_lane_capacity = None
+        """:type: float """
+        self.moe_critical_density = None
+        """:type: float """
+        self.moe_congestion_threshold_speed = None
+        """:type: float """
+        self.start_time = None
+        """:type: str """
+        self.end_time = None
+        """:type: str """
+        self.update_time = None
+        """:type: str """
+
+    def __str__(self):
+        return '<Route Wise MOE Parameters id="%s" route_id="%s">' % (self.id, self.route_id)
+
+
 class WorkZoneInfo(InfoBase):
     _info_type_ = 'work zone'
     _route_attrs_ = ['route1', 'route2']
@@ -828,7 +854,6 @@ class TravelTimeInfo(InfoBase):
         #        f'acceleration="{self.acceleration:s}" uvmt="{self.uvmt:s}">'
 
 
-
 class TODReliabilityInfo(InfoBase):
     _info_type_ = 'tod reliability'
     _dt_attrs_ = ['time']
@@ -1129,8 +1154,6 @@ class EstimationRequestInfo(InfoBase):
 
         self._dbsession = None
         """:type: sqlalchemy.orm.Session """
-
-
 
     def get_start_date(self):
         return self._get_date(self.start_date)
