@@ -63,8 +63,8 @@ class RouteWiseMOEParameters(Base):
     moe_lane_capacity = Column(Float, nullable=False)
     moe_critical_density = Column(Float, nullable=False)
     moe_congestion_threshold_speed = Column(Float, nullable=False)
-    start_time = Column(DateTime, nullable=False)
-    end_time = Column(DateTime, nullable=False)
+    start_time = Column(DateTime, nullable=True)
+    end_time = Column(DateTime, nullable=True)
     update_time = Column(DateTime, nullable=False)
 
     def __repr__(self):

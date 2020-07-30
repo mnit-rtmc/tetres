@@ -6,6 +6,8 @@ systemconfig.py
 this module handles the request from `system configuration tab` of `admin client`
 
 """
+from pyticas_tetres.da.route_wise_moe_parameters import RouteWiseMOEParametersDataAccess
+
 __author__ = 'Chongmyung Park (chongmyung.park@gmail.com)'
 
 import datetime
@@ -22,7 +24,7 @@ from pyticas_tetres.db.tetres.model import Config
 from pyticas_tetres.logger import getLogger
 from pyticas_tetres.sched import scheduler, worker
 from pyticas_tetres.systasks import actionlog_processor as actionlog_proc
-from pyticas_tetres.ttypes import SystemConfigInfo
+from pyticas_tetres.ttypes import SystemConfigInfo, RouteWiseMOEParametersInfo
 from pyticas_tetres.util import actionlog, systemconfig
 
 
@@ -56,8 +58,33 @@ def register_api(app):
             return prot.response_fail('fail to update configuration')
 
         put_task_to_actionlog(prev_syscfg)
-
+        # TODO: Run this in a separate process or thread
+        handle_route_wise_moe_parameters(cfginfo_json)
         return prot.response_success()
+
+
+def handle_route_wise_moe_parameters(config_json_string):
+    import json
+    config_json = json.loads(config_json_string)
+    route_id = config_json.get("route_id")
+    rw_moe_critical_density = config_json.get("rw_moe_critical_density")
+    rw_moe_lane_capacity = config_json.get("rw_moe_lane_capacity")
+    rw_moe_congestion_threshold_speed = config_json.get("rw_moe_congestion_threshold_speed")
+    rw_moe_start_date = config_json.get("rw_moe_start_date")
+    rw_moe_end_date = config_json.get("rw_moe_end_date")
+    if route_id:
+        rw_moe_param_info = RouteWiseMOEParametersInfo()
+        rw_moe_param_info.route_id = route_id
+        rw_moe_param_info.moe_critical_density = rw_moe_critical_density
+        rw_moe_param_info.moe_lane_capacity = rw_moe_lane_capacity
+        rw_moe_param_info.moe_congestion_threshold_speed = rw_moe_congestion_threshold_speed
+        rw_moe_param_info.start_time = rw_moe_start_date if rw_moe_start_date else None
+        rw_moe_param_info.end_time = rw_moe_end_date if rw_moe_end_date else None
+        rw_moe_param_info.update_time = datetime.datetime.now().strftime("%m-%d-%Y, %H:%M:%S")
+        rw_da = RouteWiseMOEParametersDataAccess()
+        rw_da.insert(rw_moe_param_info)
+        rw_da.commit()
+        rw_da.close_session()
 
 
 def put_task_to_actionlog(prev_syscfg):

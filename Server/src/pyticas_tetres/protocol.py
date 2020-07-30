@@ -14,8 +14,10 @@ def json2sei(json_str):
     sei.set_years()
     return sei
 
+
 def json2snei(json_str):
     return json.loads(json_str)
+
 
 def json2snmi(json_str):
     snmi = json.loads(json_str)
@@ -24,6 +26,7 @@ def json2snmi(json_str):
     if not hasattr(snmi, '_snowroute'):
         setattr(snmi, '_snowroute', None)
     return snmi
+
 
 def json2ttri(json_str):
     """ convert json to `pyticas_tetres.types.TTRouteInfo` object from TICAS client
@@ -67,8 +70,14 @@ def json2wzi(wzi_json):
 
     return wzi
 
+
 def json2wzgi(json_str):
     return json.loads(json_str)
+
+
+def json2route_wise_moe_parameters(json_str):
+    return json.loads(json_str)
+
 
 def json2snri(json_str):
     """ convert json to `pyticas_tetres.types.SnowRouteInfo` object from TICAS client

@@ -16,7 +16,12 @@ class RouteWiseMOEParametersDataAccess(DataAccess):
         """
         :rtype: list[pyticas_tetres.ttypes.WorkZoneGroupInfo]
         """
-        return self.da_base.list()
+        data_list = self.da_base.list()
+        for data in data_list:
+            data.start_time = str(data.start_time) if data.start_time else ""
+            data.end_time = str(data.end_time) if data.end_time else ""
+            data.update_time = str(data.update_time) if data.update_time else ""
+        return data_list
 
     def get_by_id(self, moe_param_id):
         """

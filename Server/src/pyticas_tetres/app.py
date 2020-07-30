@@ -51,7 +51,7 @@ class TeTRESApp(TICASApp):
 
         from pyticas_tetres.api import tetres
         from pyticas_tetres.api.admin import (snowmgmt, snowevent, wz_group, specialevent, wz, snowroute, ttroute,
-                                              actionlog, route, systemconfig)
+                                              actionlog, route, systemconfig, route_wise_moe_parameters)
         from pyticas_tetres.api.user import traveltime_info
 
         from pyticas_tetres.api.user import route as user_route
@@ -64,7 +64,7 @@ class TeTRESApp(TICASApp):
         modules = [ttroute, snowevent, snowmgmt, snowroute,
                    specialevent, tetres, wz, wz_group,
                    traveltime_info, user_route, user_estimation, data_api,
-                   actionlog, route, systemconfig, api_endpoints]
+                   actionlog, route, systemconfig, api_endpoints, route_wise_moe_parameters]
 
         for module in modules:
             module.register_api(app)
