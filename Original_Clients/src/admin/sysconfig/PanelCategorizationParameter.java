@@ -140,7 +140,7 @@ public class PanelCategorizationParameter extends javax.swing.JPanel {
     private String getDateString(Date date) {
         String dateString = "";
         if (date != null){
-            DateFormat sdf = new SimpleDateFormat("MM-dd-yyyy HH:mm:ss");
+            DateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             dateString = sdf.format(date);
 
         }
