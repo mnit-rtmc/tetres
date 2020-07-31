@@ -46,7 +46,7 @@ public class SystemConfigInfo extends InfoBase {
     public Float moe_congestion_threshold_speed;
 
     // faverolles 1/12/2020: Adding MOE Parameters
-    public Integer route_id;
+    public Integer reference_tt_route_id;
     public Float rw_moe_critical_density;
     public Float rw_moe_lane_capacity;
     public Float rw_moe_congestion_threshold_speed;

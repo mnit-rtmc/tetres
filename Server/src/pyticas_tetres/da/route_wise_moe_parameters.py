@@ -36,3 +36,19 @@ class RouteWiseMOEParametersDataAccess(DataAccess):
         :rtype: model.WorkZoneGroup
         """
         return self.da_base.insert(route_wise_moe_param_info, **kwargs)
+
+    def search_by_route_id(self, route_id, *args, **kwargs):
+        return self.da_base.search([('reference_tt_route_id', route_id)])
+
+    def get_latest_moe_param_for_a_route(self, route_id, *args, **kwargs):
+        latest_object = None
+        data_list = self.search_by_route_id(route_id, *args, **kwargs)
+        if not data_list:
+            return latest_object
+        latest_update_time = data_list[0].update_time
+        latest_object = data_list[0]
+        for data in data_list:
+            if data.update_time > latest_update_time:
+                latest_update_time = data.update_time
+                latest_object = data
+        return latest_object

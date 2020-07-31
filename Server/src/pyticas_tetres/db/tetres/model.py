@@ -58,8 +58,8 @@ class WorkZoneGroup(Base):
 class RouteWiseMOEParameters(Base):
     __tablename__ = 'route_wise_moe_parameters'
     id = Column(Integer, primary_key=True, unique=True, autoincrement=True)
-    route_id = Column(Integer, ForeignKey('route.id', ondelete='CASCADE'), nullable=False, index=True)
-    route = relationship(TTRoute, backref=backref('route_wise_moe_parameters'))
+    reference_tt_route_id = Column(Integer, ForeignKey('route.id', ondelete='CASCADE'), nullable=False, index=True)
+    reference_tt_route = relationship(TTRoute)
     moe_lane_capacity = Column(Float, nullable=False)
     moe_critical_density = Column(Float, nullable=False)
     moe_congestion_threshold_speed = Column(Float, nullable=False)

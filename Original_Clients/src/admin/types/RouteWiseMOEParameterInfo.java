@@ -26,7 +26,7 @@ import admin.TeTRESConfig;
  */
 public class RouteWiseMOEParameterInfo extends InfoBase {
 
-    public int route_id;
+    public int reference_tt_route_id;
     public Float moe_lane_capacity;
     public Float moe_critical_density;
     public Float moe_congestion_threshold_speed;
@@ -39,7 +39,7 @@ public class RouteWiseMOEParameterInfo extends InfoBase {
     }
     @Override
     public String toString() {
-        return this.route_id + "";
+        return this.reference_tt_route_id + "";
     }
 
     @Override

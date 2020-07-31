@@ -11,13 +11,16 @@ from pyticas.moe.mods import total_flow_with_virtual_nodes, speed_with_virtual_n
     lanes_with_virtual_nodes
 from pyticas.moe.mods.cm import calculate_cm_dynamically
 from pyticas.moe.mods.cmh import calculate_cmh_dynamically
+from pyticas.moe.mods.lvmt import calculate_lvmt_dynamically
+from pyticas.moe.mods.uvmt import calculate_uvmt_dynamically
 from pyticas.rc import route_config
 from pyticas.tool import tb
 from pyticas.ttypes import RNodeData
+from pyticas_tetres.cfg import TT_DATA_INTERVAL
 from pyticas_tetres.da.route import TTRouteDataAccess
+from pyticas_tetres.da.route_wise_moe_parameters import RouteWiseMOEParametersDataAccess
 from pyticas_tetres.da.tt import TravelTimeDataAccess
 from pyticas_tetres.logger import getLogger
-from pyticas_tetres.rengine.helper.wz import apply_workzone
 from pyticas_tetres.util.noop_context import nonop_with
 from pyticas_tetres.util.systemconfig import get_system_config_info
 
@@ -100,9 +103,21 @@ def calculate_a_route(prd, ttri, **kwargs):
                 return False
 
     print(f"{Fore.GREEN}CALCULATING TRAVEL-TIME FOR ROUTE[{ttri.name}]")
-
-    res_dict = _calculate_tt(ttri.route, prd, cur_config.moe_critical_density, cur_config.moe_lane_capacity,
-                             cur_config.moe_congestion_threshold_speed)
+    latest_moe_parameter_object = None
+    try:
+        rw_moe_da = RouteWiseMOEParametersDataAccess()
+        latest_moe_parameter_object = rw_moe_da.get_latest_moe_param_for_a_route(ttri.id)
+        rw_moe_da.close_session()
+    except Exception as e:
+        logger = getLogger(__name__)
+        logger.warning('fail to fetch the latest MOE parameter for this route. Error: {}'.format(e))
+    if latest_moe_parameter_object:
+        res_dict = _calculate_tt(ttri.route, prd, latest_moe_parameter_object.moe_critical_density,
+                                 latest_moe_parameter_object.moe_lane_capacity,
+                                 latest_moe_parameter_object.moe_congestion_threshold_speed)
+    else:
+        res_dict = _calculate_tt(ttri.route, prd, cur_config.moe_critical_density, cur_config.moe_lane_capacity,
+                                 cur_config.moe_congestion_threshold_speed)
 
     if res_dict is None or res_dict['tt'] is None:
         logger.warning('fail to calculate travel time')
@@ -127,8 +142,13 @@ def calculate_a_route(prd, ttri, **kwargs):
     timeline = prd.get_timeline(as_datetime=False, with_date=True)
     print(f"{Fore.CYAN}Start[{timeline[0]}] End[{timeline[-1]}] TimelineLength[{len(timeline)}]")
     for index, dateTimeStamp in enumerate(timeline):
-        meta_data = generate_meta_data(raw_flow_data, raw_speed_data, raw_lane_data, raw_density_data,
-                                       raw_speed_data_without_virtual_node, res_mrf, cur_config, index)
+        if latest_moe_parameter_object:
+            meta_data = generate_meta_data(raw_flow_data, raw_speed_data, raw_lane_data, raw_density_data,
+                                           raw_speed_data_without_virtual_node, res_mrf, latest_moe_parameter_object,
+                                           index)
+        else:
+            meta_data = generate_meta_data(raw_flow_data, raw_speed_data, raw_lane_data, raw_density_data,
+                                           raw_speed_data_without_virtual_node, res_mrf, cur_config, index)
         meta_data_string = json.dumps(meta_data)
         tt_data = {
             'route_id': ttri.id,
@@ -166,6 +186,62 @@ def calculate_a_route(prd, ttri, **kwargs):
             da_tt.commit()
     if not dbsession:
         da_tt.close_session()
+
+
+def update_moe_values_a_route(prd, ttri_id, **kwargs):
+    """
+
+    :type prd: pyticas.ttypes.Period
+    :type ttri: pyticas_tetres.ttypes.TTRouteInfo
+    """
+    import json
+    dbsession = kwargs.get('dbsession', None)
+
+    if dbsession:
+        da_tt = TravelTimeDataAccess(prd.start_date.year, session=dbsession)
+    else:
+        da_tt = TravelTimeDataAccess(prd.start_date.year)
+    rw_moe_param_json = kwargs.get("rw_moe_param_json")
+    updatable_dict = {}
+    existing_data_list = da_tt.list_by_period(ttri_id, prd)
+    for existing_data in existing_data_list:
+        meta_data = json.loads(existing_data.meta_data)
+        updatable_data = dict()
+        if meta_data.get('moe_congestion_threshold_speed') != rw_moe_param_json.get(
+                'rw_moe_congestion_threshold_speed'):
+            cm = (calculate_cm_dynamically(meta_data, rw_moe_param_json.get('rw_moe_congestion_threshold_speed')))
+            cmh = (calculate_cmh_dynamically(meta_data, TT_DATA_INTERVAL,
+                                             rw_moe_param_json.get('rw_moe_congestion_threshold_speed')))
+            if existing_data.cm != cm:
+                updatable_data['cm'] = cm
+            if existing_data.cmh != cmh:
+                updatable_data['cmh'] = cmh
+            meta_data['moe_congestion_threshold_speed'] = rw_moe_param_json.get('rw_moe_congestion_threshold_speed')
+            updatable_data['meta_data'] = json.dumps(meta_data)
+        if meta_data.get('moe_lane_capacity') != rw_moe_param_json.get('rw_moe_lane_capacity') or meta_data.get(
+                'moe_critical_density') != rw_moe_param_json.get('rw_moe_critical_density'):
+            lvmt = calculate_lvmt_dynamically(meta_data, TT_DATA_INTERVAL,
+                                              rw_moe_param_json.get('rw_moe_critical_density'),
+                                              rw_moe_param_json.get('rw_moe_lane_capacity'))
+            uvmt = calculate_uvmt_dynamically(meta_data, TT_DATA_INTERVAL,
+                                              rw_moe_param_json.get('rw_moe_critical_density'),
+                                              rw_moe_param_json.get('rw_moe_lane_capacity'))
+            if existing_data.lvmt != lvmt:
+                updatable_data['lvmt'] = lvmt
+            if existing_data.uvmt != uvmt:
+                updatable_data['uvmt'] = uvmt
+            meta_data['moe_lane_capacity'] = rw_moe_param_json.get('rw_moe_lane_capacity')
+            meta_data['moe_critical_density'] = rw_moe_param_json.get('rw_moe_critical_density')
+            updatable_data['meta_data'] = json.dumps(meta_data)
+        if updatable_data:
+            updatable_dict[existing_data.id] = updatable_data
+    lock = kwargs.get('lock', nonop_with())
+    if updatable_dict:
+        with lock:
+            for id, updatable_data in updatable_dict.items():
+                da_tt.update(id, updatable_data)
+            da_tt.commit()
+    da_tt.close_session()
 
 
 def generate_updatable_moe_dict(tt_data):

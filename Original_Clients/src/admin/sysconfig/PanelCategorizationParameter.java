@@ -98,8 +98,8 @@ public class PanelCategorizationParameter extends javax.swing.JPanel {
         this.modelMOE.list();
         DefaultTableModel model = (DefaultTableModel) this.RWMOETable.getModel();
         for (RouteWiseMOEParameterInfo r: this.modelMOE.dataList){
-                if (idVsRouteMap.get(r.route_id) != null){
-                    model.addRow(new Object[]{ idVsRouteMap.get(r.route_id).name, r.moe_critical_density, r.moe_lane_capacity, r.moe_congestion_threshold_speed, r.start_time, r.end_time, r.update_time});
+                if (idVsRouteMap.get(r.reference_tt_route_id) != null){
+                    model.addRow(new Object[]{ idVsRouteMap.get(r.reference_tt_route_id).name, r.moe_critical_density, r.moe_lane_capacity, r.moe_congestion_threshold_speed, r.start_time, r.end_time, r.update_time});
 
                 }
         }
@@ -123,11 +123,11 @@ public class PanelCategorizationParameter extends javax.swing.JPanel {
 
         int selectedRouteIndex = this.selectRoute.getSelectedIndex();
         if (selectedRouteIndex == 0) {
-            newSysConfig.route_id = 0;
+            newSysConfig.reference_tt_route_id = 0;
         } else {
             selectedRouteIndex--;
             ReliabilityRouteInfo selectedRoute = this.routeList.get(selectedRouteIndex);
-            newSysConfig.route_id = selectedRoute.id;
+            newSysConfig.reference_tt_route_id = selectedRoute.id;
         }
         newSysConfig.rw_moe_critical_density = Float.parseFloat(this.RWmoeTextFieldCD.getText());
         newSysConfig.rw_moe_lane_capacity = Float.parseFloat(this.RWmoeTextFieldLC.getText());

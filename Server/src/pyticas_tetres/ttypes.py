@@ -288,7 +288,7 @@ class RouteWiseMOEParametersInfo(InfoBase):
     def __init__(self):
         self.id = None
         """:type: int """
-        self.route_id = None
+        self.reference_tt_route_id = None
         """:type: int """
         self.moe_lane_capacity = None
         """:type: float """
