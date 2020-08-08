@@ -133,6 +133,10 @@ def _estimation_process(id, queue, counters, lock, data_path, DB_INFO, CAD_DB_IN
         try:
             logger.debug('[EST WORKER %d] >>>>> start estimation (uid=%s, route=%d)' % (id, uid, a_route_id))
             _eparam = eparam.clone()
+            try:
+                _eparam.add_start_time_offset(offset=5)
+            except Exception as e:
+                logger.debug('Could not add five minutes offset to the starting time. Error: {}'.format(e))
             _eparam.travel_time_route = ttr_da.get_by_id(a_route_id)
             estimation.estimate(_eparam, uid)
             logger.debug('[EST WORKER %d] <<<<< end of estimation (uid=%s, route=%d)' % (id, uid, a_route_id))
