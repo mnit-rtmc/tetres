@@ -202,7 +202,6 @@ def _handler_ttroute(da, item, action_log):
             inserted_ids = traveltime.calculate_a_route(prd, item)
             if inserted_ids:
                 categorization.categorize(item, prd)
-            if inserted_ids is not False:
                 cnt += len(inserted_ids)
         except Exception as ex:
             getLogger(__name__).warning(

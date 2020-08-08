@@ -174,18 +174,23 @@ def calculate_a_route(prd, ttri, **kwargs):
                 creatable_list.append(tt_data)
         else:
             creatable_list.append(tt_data)
+    inserted_ids = list()
     if creatable_list:
         with lock:
             inserted_ids = da_tt.bulk_insert(creatable_list)
             if not inserted_ids or not da_tt.commit():
                 logger.warning('fail to insert the calculated travel time into database')
+    if not inserted_ids:
+        inserted_ids = list()
     if updatable_dict:
         with lock:
             for id, tt_data in updatable_dict.items():
                 da_tt.update(id, generate_updatable_moe_dict(tt_data))
+                inserted_ids.append(id)
             da_tt.commit()
     if not dbsession:
         da_tt.close_session()
+    return inserted_ids
 
 
 def update_moe_values_a_route(prd, ttri_id, **kwargs):
