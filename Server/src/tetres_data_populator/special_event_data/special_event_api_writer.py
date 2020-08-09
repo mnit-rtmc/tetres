@@ -1,8 +1,12 @@
+import sys
+
 import json
 import requests
 from xlrd.sheet import ctype_text
 
-from special_event_api_reader import SpecialEventAPIReader
+sys.path.append("Server/src")
+
+from tetres_data_populator.special_event_data.special_event_api_reader import SpecialEventAPIReader
 
 
 class SpecialEventAPIWriter:
