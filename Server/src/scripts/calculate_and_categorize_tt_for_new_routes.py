@@ -58,20 +58,21 @@ if __name__ == '__main__':
     from pyticas_tetres.systasks import initial_data_maker
 
     try:
-        initial_data_maker._calculate_tt_and_categorize(sdate, edate, db_info=dbinfo.tetres_db_info(),
-                                                        route_ids=route_ids)
-        with open(filename, 'a+') as f:
-            f.write('ended at ' + datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + '\n')
-        for an_actionlog in action_logs:
-            now = datetime.datetime.now()
-            da_actionlog.update(an_actionlog.id, {'handled': True,
-                                                  'handled_date': now,
-                                                  'status': ActionLogDataAccess.STATUS_DONE,
-                                                  'status_updated_date': now,
-                                                  'processed_start_date': sdate,
-                                                  'processed_end_date': edate
-                                                  })
-            da_actionlog.commit()
+        if route_ids:
+            initial_data_maker._calculate_tt_and_categorize(sdate, edate, db_info=dbinfo.tetres_db_info(),
+                                                            route_ids=route_ids)
+            with open(filename, 'a+') as f:
+                f.write('ended at ' + datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S') + '\n')
+            for an_actionlog in action_logs:
+                now = datetime.datetime.now()
+                da_actionlog.update(an_actionlog.id, {'handled': True,
+                                                      'handled_date': now,
+                                                      'status': ActionLogDataAccess.STATUS_DONE,
+                                                      'status_updated_date': now,
+                                                      'processed_start_date': sdate,
+                                                      'processed_end_date': edate
+                                                      })
+                da_actionlog.commit()
 
     except Exception as ex:
         print('exception:', ex)
