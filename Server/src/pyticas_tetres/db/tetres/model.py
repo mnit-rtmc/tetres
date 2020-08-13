@@ -282,6 +282,8 @@ class ActionLog(Base):
     reason = Column(VARCHAR(255), nullable=True)
     user_ip = Column(VARCHAR(15), nullable=True)
     reg_date = Column(DateTime, nullable=False, default=datetime.datetime.now)
+    processed_start_date = Column(DateTime, nullable=True)
+    processed_end_date = Column(DateTime, nullable=True)
 
     def __repr__(self):
         return ('<ActionLog id="%s" action_type="%s" target_datatype="%s" target_table="%s" target_id="%s" '
