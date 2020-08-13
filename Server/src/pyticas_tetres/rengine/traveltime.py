@@ -95,21 +95,21 @@ def calculate_a_route(prd, ttri, **kwargs):
             return False
 
     print(f"{Fore.GREEN}CALCULATING TRAVEL-TIME FOR ROUTE[{ttri.name}]")
-    latest_moe_parameter_object = None
-    try:
-        rw_moe_da = RouteWiseMOEParametersDataAccess()
-        latest_moe_parameter_object = rw_moe_da.get_latest_moe_param_for_a_route(ttri.id)
-        rw_moe_da.close_session()
-    except Exception as e:
-        logger = getLogger(__name__)
-        logger.warning('fail to fetch the latest MOE parameter for this route. Error: {}'.format(e))
-    if latest_moe_parameter_object:
-        res_dict = _calculate_tt(ttri.route, prd, latest_moe_parameter_object.moe_critical_density,
-                                 latest_moe_parameter_object.moe_lane_capacity,
-                                 latest_moe_parameter_object.moe_congestion_threshold_speed)
-    else:
-        res_dict = _calculate_tt(ttri.route, prd, cur_config.moe_critical_density, cur_config.moe_lane_capacity,
-                                 cur_config.moe_congestion_threshold_speed)
+    # latest_moe_parameter_object = None
+    # try:
+    #     rw_moe_da = RouteWiseMOEParametersDataAccess()
+    #     latest_moe_parameter_object = rw_moe_da.get_latest_moe_param_for_a_route(ttri.id)
+    #     rw_moe_da.close_session()
+    # except Exception as e:
+    #     logger = getLogger(__name__)
+    #     logger.warning('fail to fetch the latest MOE parameter for this route. Error: {}'.format(e))
+    # if latest_moe_parameter_object:
+    #     res_dict = _calculate_tt(ttri.route, prd, latest_moe_parameter_object.moe_critical_density,
+    #                              latest_moe_parameter_object.moe_lane_capacity,
+    #                              latest_moe_parameter_object.moe_congestion_threshold_speed)
+    # else:
+    res_dict = _calculate_tt(ttri.route, prd, cur_config.moe_critical_density, cur_config.moe_lane_capacity,
+                             cur_config.moe_congestion_threshold_speed)
 
     if res_dict is None or res_dict['tt'] is None:
         logger.warning('fail to calculate travel time')
@@ -118,44 +118,44 @@ def calculate_a_route(prd, ttri, **kwargs):
     travel_time = res_dict['tt'][-1].data
     avg_speeds = _route_avgs(res_dict['speed'])
     total_vmt = _route_total(res_dict['vmt'])  # flow
-    res_vht = _route_total(res_dict['vht'])  # speed
-    res_dvh = _route_total(res_dict['dvh'])  # flow
-    res_lvmt = _route_total(res_dict['lvmt'])  # density
-    res_uvmt = _route_total(res_dict['uvmt'])
-    res_cm = _route_total(res_dict['cm'])
-    res_cmh = _route_total(res_dict['cmh'])
-    res_acceleration = _route_avgs(res_dict['acceleration'])
-    raw_flow_data = res_dict["raw_flow_data"]
-    raw_speed_data = res_dict["raw_speed_data"]
-    raw_lane_data = res_dict['raw_lane_data']
-    raw_density_data = res_dict['raw_density_data']
-    raw_speed_data_without_virtual_node = res_dict['speed']
-    res_mrf = res_dict["mrf"]
+    # res_vht = _route_total(res_dict['vht'])  # speed
+    # res_dvh = _route_total(res_dict['dvh'])  # flow
+    # res_lvmt = _route_total(res_dict['lvmt'])  # density
+    # res_uvmt = _route_total(res_dict['uvmt'])
+    # res_cm = _route_total(res_dict['cm'])
+    # res_cmh = _route_total(res_dict['cmh'])
+    # res_acceleration = _route_avgs(res_dict['acceleration'])
+    # raw_flow_data = res_dict["raw_flow_data"]
+    # raw_speed_data = res_dict["raw_speed_data"]
+    # raw_lane_data = res_dict['raw_lane_data']
+    # raw_density_data = res_dict['raw_density_data']
+    # raw_speed_data_without_virtual_node = res_dict['speed']
+    # res_mrf = res_dict["mrf"]
     timeline = prd.get_timeline(as_datetime=False, with_date=True)
     print(f"{Fore.CYAN}Start[{timeline[0]}] End[{timeline[-1]}] TimelineLength[{len(timeline)}]")
     for index, dateTimeStamp in enumerate(timeline):
-        if latest_moe_parameter_object:
-            meta_data = generate_meta_data(raw_flow_data, raw_speed_data, raw_lane_data, raw_density_data,
-                                           raw_speed_data_without_virtual_node, res_mrf, latest_moe_parameter_object,
-                                           index)
-        else:
-            meta_data = generate_meta_data(raw_flow_data, raw_speed_data, raw_lane_data, raw_density_data,
-                                           raw_speed_data_without_virtual_node, res_mrf, cur_config, index)
-        meta_data_string = json.dumps(meta_data)
+        # if latest_moe_parameter_object:
+        #     meta_data = generate_meta_data(raw_flow_data, raw_speed_data, raw_lane_data, raw_density_data,
+        #                                    raw_speed_data_without_virtual_node, res_mrf, latest_moe_parameter_object,
+        #                                    index)
+        # else:
+        #     meta_data = generate_meta_data(raw_flow_data, raw_speed_data, raw_lane_data, raw_density_data,
+        #                                    raw_speed_data_without_virtual_node, res_mrf, cur_config, index)
+        # meta_data_string = json.dumps(meta_data)
         tt_data = {
             'route_id': ttri.id,
             'time': dateTimeStamp,
             'tt': travel_time[index],
             'speed': avg_speeds[index],
             'vmt': total_vmt[index],
-            'vht': res_vht[index],
-            'dvh': res_dvh[index],
-            'lvmt': res_lvmt[index],
-            'uvmt': res_uvmt[index],
-            'cm': res_cm[index],
-            'cmh': res_cmh[index],
-            'acceleration': res_acceleration[index],
-            'meta_data': meta_data_string,
+            'vht': None,
+            'dvh': None,
+            'lvmt': None,
+            'uvmt': None,
+            'cm': None,
+            'cmh': None,
+            'acceleration': None,
+            'meta_data': None,
 
         }
         creatable_list.append(tt_data)
@@ -471,20 +471,20 @@ def _calculate_tt(r, prd, moe_critical_density, moe_lane_capacity, moe_congestio
             "tt": moe.travel_time(updated_route, prd),
             "speed": moe.speed(updated_route, prd),
             "vmt": moe.vmt(updated_route, prd),
-            "vht": moe.vht(updated_route, prd),
-            "dvh": moe.dvh(updated_route, prd),
-            "lvmt": moe.lvmt(updated_route, prd, moe_critical_density=moe_critical_density,
-                             moe_lane_capacity=moe_lane_capacity),
-            "uvmt": moe.uvmt(updated_route, prd, moe_critical_density=moe_critical_density,
-                             moe_lane_capacity=moe_lane_capacity),
-            "cm": moe.cm(updated_route, prd, moe_congestion_threshold_speed=moe_congestion_threshold_speed),
-            "cmh": moe.cmh(updated_route, prd, moe_congestion_threshold_speed=moe_congestion_threshold_speed),
-            "acceleration": moe.acceleration(updated_route, prd),
-            "raw_flow_data": total_flow_with_virtual_nodes.run(updated_route, prd),
-            "raw_speed_data": speed_with_virtual_nodes.run(updated_route, prd),
-            "raw_density_data": density_with_virtual_nodes.run(updated_route, prd),
-            "raw_lane_data": lanes_with_virtual_nodes.run(updated_route, prd),
-            "mrf": moe.mrf(updated_route, prd)
+            # "vht": moe.vht(updated_route, prd),
+            # "dvh": moe.dvh(updated_route, prd),
+            # "lvmt": moe.lvmt(updated_route, prd, moe_critical_density=moe_critical_density,
+            #                  moe_lane_capacity=moe_lane_capacity),
+            # "uvmt": moe.uvmt(updated_route, prd, moe_critical_density=moe_critical_density,
+            #                  moe_lane_capacity=moe_lane_capacity),
+            # "cm": moe.cm(updated_route, prd, moe_congestion_threshold_speed=moe_congestion_threshold_speed),
+            # "cmh": moe.cmh(updated_route, prd, moe_congestion_threshold_speed=moe_congestion_threshold_speed),
+            # "acceleration": moe.acceleration(updated_route, prd),
+            # "raw_flow_data": total_flow_with_virtual_nodes.run(updated_route, prd),
+            # "raw_speed_data": speed_with_virtual_nodes.run(updated_route, prd),
+            # "raw_density_data": density_with_virtual_nodes.run(updated_route, prd),
+            # "raw_lane_data": lanes_with_virtual_nodes.run(updated_route, prd),
+            # "mrf": moe.mrf(updated_route, prd)
         }
 
     except Exception as ex:

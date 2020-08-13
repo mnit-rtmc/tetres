@@ -318,7 +318,7 @@ class TravelTime(object):
     cm = Column(Float, nullable=True)
     cmh = Column(Float, nullable=True)
     acceleration = Column(Float, nullable=True)
-    meta_data = Column(UnicodeText, nullable=False)
+    meta_data = Column(UnicodeText, nullable=True)
 
     inc_severity = Column(Integer, nullable=True)
     inc_impact = Column(Integer, nullable=True)
