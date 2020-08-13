@@ -58,3 +58,30 @@ def _calculate_vmt(data, interval, **kwargs):
                 vmt = missing_data
             vmt_data[ridx][tidx] = vmt
     return vmt_data
+
+
+def calculate_vmt_dynamically(meta_data, interval, **kwargs):
+    """
+    Vehicle Miles Traveled (Trips per vehicle X miles per trip)
+    Equation : VMT = total flow of station(v/h) * interval(hour) * 0.1(distance in mile);
+
+    :param data: list of speed data list for each rnode.
+                 e.g. data = [ [ u(i,t), u(i,t+1), u(i,t+2) .. ], [ u(i+1,t), u(i+1,t+1), u(i+1,t+2) .. ], [ u(i+2,t), u(i+2,t+1), u(i+2,t+2) .. ],,,]
+    :type data: list[list[float]]
+    :param interval: data interval in second
+    :type interval: int
+    :type kwargs: dict
+    :return:
+    """
+    data = meta_data.get('flow')
+    missing_data = kwargs.get('missing_data', cfg.MISSING_VALUE)
+    vd = moe_helper.VIRTUAL_RNODE_DISTANCE
+    seconds_per_hour = 3600
+    vmt_data = copy.deepcopy(data)
+    for ridx, rnode_data in enumerate(data):
+        for tidx, value in enumerate(rnode_data):
+            vmt = value * interval / seconds_per_hour * vd
+            if value == missing_data:
+                vmt = missing_data
+            vmt_data[ridx][tidx] = vmt
+    return vmt_data

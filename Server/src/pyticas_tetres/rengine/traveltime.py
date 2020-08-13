@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import json
 import statistics
+from pyticas.moe.mods.vmt import calculate_vmt_dynamically
 from typing import List
 
 import numpy as np
@@ -95,7 +96,7 @@ def calculate_a_route(prd, ttri, **kwargs):
             return False
 
     print(f"{Fore.GREEN}CALCULATING TRAVEL-TIME FOR ROUTE[{ttri.name}]")
-    # latest_moe_parameter_object = None
+    latest_moe_parameter_object = None
     # try:
     #     rw_moe_da = RouteWiseMOEParametersDataAccess()
     #     latest_moe_parameter_object = rw_moe_da.get_latest_moe_param_for_a_route(ttri.id)
@@ -117,45 +118,57 @@ def calculate_a_route(prd, ttri, **kwargs):
 
     travel_time = res_dict['tt'][-1].data
     avg_speeds = _route_avgs(res_dict['speed'])
-    total_vmt = _route_total(res_dict['vmt'])  # flow
-    # res_vht = _route_total(res_dict['vht'])  # speed
-    # res_dvh = _route_total(res_dict['dvh'])  # flow
+    res_vht = _route_total(res_dict['vht'])  # speed
+    res_dvh = _route_total(res_dict['dvh'])  # flow
+    res_acceleration = _route_avgs(res_dict['acceleration'])
+    raw_flow_data = res_dict["raw_flow_data"]
+    raw_speed_data = res_dict["raw_speed_data"]
+    raw_lane_data = res_dict['raw_lane_data']
+    raw_density_data = res_dict['raw_density_data']
+    raw_speed_data_without_virtual_node = res_dict['speed']
+    res_mrf = res_dict["mrf"]
+
+    # total_vmt = _route_total(res_dict['vmt'])  # flow
     # res_lvmt = _route_total(res_dict['lvmt'])  # density
     # res_uvmt = _route_total(res_dict['uvmt'])
     # res_cm = _route_total(res_dict['cm'])
     # res_cmh = _route_total(res_dict['cmh'])
-    # res_acceleration = _route_avgs(res_dict['acceleration'])
-    # raw_flow_data = res_dict["raw_flow_data"]
-    # raw_speed_data = res_dict["raw_speed_data"]
-    # raw_lane_data = res_dict['raw_lane_data']
-    # raw_density_data = res_dict['raw_density_data']
-    # raw_speed_data_without_virtual_node = res_dict['speed']
-    # res_mrf = res_dict["mrf"]
     timeline = prd.get_timeline(as_datetime=False, with_date=True)
     print(f"{Fore.CYAN}Start[{timeline[0]}] End[{timeline[-1]}] TimelineLength[{len(timeline)}]")
     for index, dateTimeStamp in enumerate(timeline):
-        # if latest_moe_parameter_object:
-        #     meta_data = generate_meta_data(raw_flow_data, raw_speed_data, raw_lane_data, raw_density_data,
-        #                                    raw_speed_data_without_virtual_node, res_mrf, latest_moe_parameter_object,
-        #                                    index)
-        # else:
-        #     meta_data = generate_meta_data(raw_flow_data, raw_speed_data, raw_lane_data, raw_density_data,
-        #                                    raw_speed_data_without_virtual_node, res_mrf, cur_config, index)
-        # meta_data_string = json.dumps(meta_data)
+        if latest_moe_parameter_object:
+            moe_param_config = latest_moe_parameter_object
+        else:
+            moe_param_config = cur_config
+
+        meta_data = generate_meta_data(raw_flow_data, raw_speed_data, raw_lane_data, raw_density_data,
+                                       raw_speed_data_without_virtual_node, res_mrf, moe_param_config,
+                                       index)
+        meta_data_string = json.dumps(meta_data)
+        interval = TT_DATA_INTERVAL
+        moe_critical_density = moe_param_config.moe_critical_density
+        moe_lane_capacity = moe_param_config.moe_lane_capacity
+        moe_congestion_threshold_speed = moe_param_config.moe_congestion_threshold_speed
+        lvmt = calculate_lvmt_dynamically(meta_data, interval, moe_critical_density, moe_lane_capacity)
+        uvmt = calculate_uvmt_dynamically(meta_data, interval, moe_critical_density, moe_lane_capacity)
+        cm = calculate_cm_dynamically(meta_data, moe_congestion_threshold_speed)
+        cmh = calculate_cmh_dynamically(meta_data, interval, moe_congestion_threshold_speed)
+        vmt = calculate_vmt_dynamically(meta_data, interval)
+
         tt_data = {
             'route_id': ttri.id,
             'time': dateTimeStamp,
             'tt': travel_time[index],
             'speed': avg_speeds[index],
-            'vmt': total_vmt[index],
-            'vht': None,
-            'dvh': None,
-            'lvmt': None,
-            'uvmt': None,
-            'cm': None,
-            'cmh': None,
-            'acceleration': None,
-            'meta_data': None,
+            'vmt': vmt,
+            'vht': res_vht[index],
+            'dvh': res_dvh[index],
+            'lvmt': lvmt,
+            'uvmt': uvmt,
+            'cm': cm,
+            'cmh': cmh,
+            'acceleration': res_acceleration[index],
+            'meta_data': meta_data_string,
 
         }
         creatable_list.append(tt_data)
@@ -376,6 +389,7 @@ def generate_meta_data(raw_flow_data, raw_speed_data, raw_lane_data, raw_density
     raw_meta_data = {
         "flow": [],
         "speed": [],
+        "speed_without_virtual_nodes": [],
         "density": [],
         "lanes": [],
         "speed_average": 0,
@@ -393,6 +407,8 @@ def generate_meta_data(raw_flow_data, raw_speed_data, raw_lane_data, raw_density
         raw_meta_data['speed'].append(speed[time_index])
         raw_meta_data['density'].append(density[time_index])
         raw_meta_data['lanes'].append(lanes)
+    for speed in zip(raw_speed_data_without_virtual_node):
+        raw_meta_data['speed_without_virtual_nodes'].append(speed[time_index])
     speed_meta_data = list()
     for speed_rnode_data in raw_speed_data_without_virtual_node:
         if speed_rnode_data and speed_rnode_data.data:
@@ -470,21 +486,21 @@ def _calculate_tt(r, prd, moe_critical_density, moe_lane_capacity, moe_congestio
         return {
             "tt": moe.travel_time(updated_route, prd),
             "speed": moe.speed(updated_route, prd),
-            "vmt": moe.vmt(updated_route, prd),
-            # "vht": moe.vht(updated_route, prd),
-            # "dvh": moe.dvh(updated_route, prd),
+            # "vmt": moe.vmt(updated_route, prd),
+            "vht": moe.vht(updated_route, prd),
+            "dvh": moe.dvh(updated_route, prd),
             # "lvmt": moe.lvmt(updated_route, prd, moe_critical_density=moe_critical_density,
             #                  moe_lane_capacity=moe_lane_capacity),
             # "uvmt": moe.uvmt(updated_route, prd, moe_critical_density=moe_critical_density,
             #                  moe_lane_capacity=moe_lane_capacity),
             # "cm": moe.cm(updated_route, prd, moe_congestion_threshold_speed=moe_congestion_threshold_speed),
             # "cmh": moe.cmh(updated_route, prd, moe_congestion_threshold_speed=moe_congestion_threshold_speed),
-            # "acceleration": moe.acceleration(updated_route, prd),
-            # "raw_flow_data": total_flow_with_virtual_nodes.run(updated_route, prd),
-            # "raw_speed_data": speed_with_virtual_nodes.run(updated_route, prd),
-            # "raw_density_data": density_with_virtual_nodes.run(updated_route, prd),
-            # "raw_lane_data": lanes_with_virtual_nodes.run(updated_route, prd),
-            # "mrf": moe.mrf(updated_route, prd)
+            "acceleration": moe.acceleration(updated_route, prd),
+            "raw_flow_data": total_flow_with_virtual_nodes.run(updated_route, prd),
+            "raw_speed_data": speed_with_virtual_nodes.run(updated_route, prd),
+            "raw_density_data": density_with_virtual_nodes.run(updated_route, prd),
+            "raw_lane_data": lanes_with_virtual_nodes.run(updated_route, prd),
+            "mrf": moe.mrf(updated_route, prd)
         }
 
     except Exception as ex:
