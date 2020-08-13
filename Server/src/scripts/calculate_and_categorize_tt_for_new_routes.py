@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from pyticas_tetres.da.actionlog import ActionLogDataAccess
 
 __author__ = 'Chongmyung Park (chongmyung.park@gmail.com)'
 import sys
@@ -16,6 +15,7 @@ if __name__ == '__main__':
     from pyticas_tetres.db.cad import conn as conn_cad
     from pyticas_tetres.db.iris import conn as conn_iris
     from pyticas_tetres.db.tetres import conn
+    from pyticas_tetres.da.actionlog import ActionLogDataAccess
 
     ticas.initialize(global_settings.DATA_PATH)
     infra = Infra.get_infra()
