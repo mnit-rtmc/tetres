@@ -79,12 +79,14 @@ class SpecialEventAPIWriter:
 
         lat = float(str(row[6].value).strip())
         lon = float(str(row[7].value).strip())
-
+        start_date_time = self.get_formatted_date_time(date, start_time)
+        end_date_time = self.get_formatted_date_time(date, end_time)
+        end_date_time = self.adjust_end_date_time(start_date_time, end_date_time)
         special_event_data = {
             "name": title,
             "description": event_type,
-            "start_time": self.get_formatted_date_time(date, start_time),
-            "end_time": self.get_formatted_date_time(date, end_time),
+            "start_time": start_date_time,
+            "end_time": end_date_time,
             "lat": lat,
             "lon": lon,
             "attendance": int(float(number_of_attendees.replace(",", ""))),
@@ -93,6 +95,14 @@ class SpecialEventAPIWriter:
         }
 
         return special_event_data
+
+    def adjust_end_date_time(self, start_date_time, end_date_time):
+        import datetime
+        start_date_time_object = datetime.datetime.strptime(start_date_time, '%Y-%m-%d %H:%M:%S')
+        end_date_time_object = datetime.datetime.strptime(end_date_time, '%Y-%m-%d %H:%M:%S')
+        if start_date_time_object > end_date_time_object:
+            end_date_time_object = end_date_time_object + datetime.timedelta(days=1)
+        return end_date_time_object.strftime('%Y-%m-%d %H:%M:%S')
 
     def get_creatable_special_event_dict(self, special_event_excel_reader):
         creatable_dict = dict()

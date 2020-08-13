@@ -56,9 +56,9 @@ def load_weather_data(start_date, end_date):
     _load_weather_data(start_date, end_date)
 
 
-def calculate_tt_only(start_date, end_date, db_info):
+def calculate_tt_only(start_date, end_date, db_info, **kwargs):
     _create_yearly_db_tables(start_date, end_date)
-    _calculate_tt_only(start_date, end_date, db_info)
+    _calculate_tt_only(start_date, end_date, db_info, **kwargs)
 
 
 def create_or_update_tt_and_moe(start_date, end_date, db_info):
@@ -208,7 +208,7 @@ def _calculate_tt_and_categorize(start_date, end_date, db_info):
     logger.debug('<< End of categorizing travel time data')
 
 
-def _calculate_tt_only(start_date, end_date, db_info):
+def _calculate_tt_only(start_date, end_date, db_info, **kwargs):
     """
 
     :type start_date: datetime.date
@@ -217,7 +217,7 @@ def _calculate_tt_only(start_date, end_date, db_info):
     """
     logger = getLogger(__name__)
     logger.debug('>> Categorizing travel time data')
-    _run_multi_process(_worker_process_to_calculate_tt_only, start_date, end_date, db_info)
+    _run_multi_process(_worker_process_to_calculate_tt_only, start_date, end_date, db_info, **kwargs)
     logger.debug('<< End of categorizing travel time data')
 
 
@@ -339,7 +339,7 @@ def _worker_process_to_specific_categorization(idx, queue, lck, data_path, db_in
             continue
 
 
-def _worker_process_to_calculate_tt_only(idx, queue, lck, data_path, db_info):
+def _worker_process_to_calculate_tt_only(idx, queue, lck, data_path, db_info, **kwargs):
     from pyticas_tetres.db.tetres import conn
     from pyticas.infra import Infra
     from pyticas.tool import tb
