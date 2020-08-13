@@ -52,7 +52,7 @@ OPT_NAME_ACTIONLOG_ID_IN_PROCESSING = 'actionlog_id_in_processing'
 # default system configuration  ############################################################################
 #   - these values are updated in administrator user and stored in to db ('config' table)
 
-DATA_ARCHIVE_START_YEAR = 2011
+DATA_ARCHIVE_START_YEAR = 2018
 DAILY_JOB_OFFSET_DAYS = 3  # daily tasks run the task for the day of `today` - `DAILY_JOB_OFFSET_DAYS`
 
 DAILY_JOB_START_TIME = '23:00'
