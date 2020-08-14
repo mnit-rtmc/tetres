@@ -23,4 +23,4 @@ def run(route, prd, **kwargs):
     us_data = [res.data for res in us_results]
     us_data = spatial_avg.imputation(us_data)
 
-    return us_data
+    return us, us_results, us_data

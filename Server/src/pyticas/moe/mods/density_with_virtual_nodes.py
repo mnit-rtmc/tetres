@@ -19,4 +19,4 @@ def run(route, prd, **kwargs):
     ks_results = moe_helper.add_virtual_rnodes(ks_results, route)
     ks_data = [res.data for res in ks_results]
 
-    return ks_data
+    return ks_results, ks_data

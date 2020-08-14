@@ -77,11 +77,10 @@ def calculate_vmt_dynamically(meta_data, interval, **kwargs):
     missing_data = kwargs.get('missing_data', cfg.MISSING_VALUE)
     vd = moe_helper.VIRTUAL_RNODE_DISTANCE
     seconds_per_hour = 3600
-    vmt_data = copy.deepcopy(data)
-    for ridx, rnode_data in enumerate(data):
-        for tidx, value in enumerate(rnode_data):
-            vmt = value * interval / seconds_per_hour * vd
-            if value == missing_data:
-                vmt = missing_data
-            vmt_data[ridx][tidx] = vmt
-    return vmt_data
+    vmt_data = []
+    for value in data:
+        vmt = value * interval / seconds_per_hour * vd
+        if value == missing_data:
+            vmt = missing_data
+        vmt_data.append(vmt)
+    return sum(vmt_data)

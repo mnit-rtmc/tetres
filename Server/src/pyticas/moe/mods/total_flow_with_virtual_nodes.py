@@ -19,4 +19,4 @@ def run(route, prd, **kwargs):
     tq_results = moe_helper.add_virtual_rnodes(tq_results, route)
     tq_data = [res.data for res in tq_results]
 
-    return tq_data
+    return tq_results, tq_data
