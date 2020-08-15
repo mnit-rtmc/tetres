@@ -9,7 +9,7 @@ if __name__ == '__main__':
     ctx = MigrationContext.configure(conn)
     op = Operations(ctx)
     print("Adding column vht...")
-    for i in range(2010, 2020):
+    for i in range(2010, 2021):
         try:
             vht = Column("vht", Float, nullable=True)
             op.add_column("tt_{}".format(i), vht)
