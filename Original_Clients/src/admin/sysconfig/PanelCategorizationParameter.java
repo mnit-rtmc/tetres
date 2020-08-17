@@ -99,7 +99,7 @@ public class PanelCategorizationParameter extends javax.swing.JPanel {
         DefaultTableModel model = (DefaultTableModel) this.RWMOETable.getModel();
         for (RouteWiseMOEParameterInfo r: this.modelMOE.dataList){
                 if (idVsRouteMap.get(r.reference_tt_route_id) != null){
-                    model.addRow(new Object[]{ idVsRouteMap.get(r.reference_tt_route_id).name, r.moe_critical_density, r.moe_lane_capacity, r.moe_congestion_threshold_speed, r.start_time, r.end_time, r.update_time});
+                    model.addRow(new Object[]{ idVsRouteMap.get(r.reference_tt_route_id).name, r.moe_critical_density, r.moe_lane_capacity, r.moe_congestion_threshold_speed, r.start_time, r.end_time, r.update_time, r.status});
 
                 }
         }
@@ -237,7 +237,7 @@ public class PanelCategorizationParameter extends javax.swing.JPanel {
         moeLabelLC3 = new javax.swing.JLabel();
         moeLabelCTS3 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
-        selectRoute = new javax.swing.JComboBox<>();
+        selectRoute = new javax.swing.JComboBox<String>();
         jLabel3 = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
         startDate = new org.jdesktop.swingx.JXDatePicker();
@@ -615,7 +615,7 @@ public class PanelCategorizationParameter extends javax.swing.JPanel {
 
         jLabel2.setText("Route");
 
-        selectRoute.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Select One" }));
+        selectRoute.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Select One" }));
         selectRoute.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 selectRouteActionPerformed(evt);
@@ -705,11 +705,11 @@ public class PanelCategorizationParameter extends javax.swing.JPanel {
 
             },
             new String [] {
-                "Route", "Critical Density", "Lane Capacity", "Congestion Threshold Speed", "Start Date", "End Date", "Update Time"
+                "Route", "Critical Density", "Lane Capacity", "Congestion Threshold Speed", "Start Date", "End Date", "Update Time", "Status"
             }
         ) {
             boolean[] canEdit = new boolean [] {
-                false, false, false, false, false, false, false
+                false, false, false, false, false, false, false, false
             };
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {

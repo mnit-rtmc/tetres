@@ -12,6 +12,8 @@
 
     Existing data for the given time period will be deleted before adding data.
 """
+from pyticas_tetres.da.route_wise_moe_parameters import RouteWiseMOEParametersDataAccess
+
 __author__ = 'Chongmyung Park (chongmyung.park@gmail.com)'
 
 import datetime
@@ -77,7 +79,6 @@ def update_moe_values(rw_moe_param_json, db_info=None, *args, **kwargs):
     rw_moe_param_json['rw_moe_end_date'] = datetime.datetime.strptime(rw_moe_param_json['rw_moe_end_date'],
                                                                       '%Y-%m-%d %H:%M:%S').date()
 
-    # _create_yearly_db_tables(rw_moe_param_json['rw_moe_start_date'], rw_moe_param_json['rw_moe_end_date'])
     _update_moe_values(rw_moe_param_json, db_info=db_info, *args, **kwargs)
 
 
@@ -408,15 +409,16 @@ def _worker_process_to_update_moe_values(start_date, end_date, db_info, **kwargs
             da_route.close_session()
             exit(1)
         try:
+
             da_route.close_session()
-            traveltime.update_moe_values_a_route(prd, ttri.id, dbsession=da_route.get_session(),
-                                                 rw_moe_param_json=rw_moe_param_json)
+            traveltime.calculate_tt_moe_a_route(prd, ttri, dbsession=da_route.get_session(),
+                                                create_or_update=True,
+                                                rw_moe_param_json=rw_moe_param_json)
             gc.collect()
 
         except Exception as ex:
             tb.traceback(ex)
             continue
-
 
 def _worker_process_to_create_or_update_tt_and_moe(idx, queue, lck, data_path, db_info):
     from pyticas_tetres.db.tetres import conn
@@ -444,7 +446,8 @@ def _worker_process_to_create_or_update_tt_and_moe(idx, queue, lck, data_path, d
                 continue
             logger.debug('[TT-Categorization Worker %d] (%d/%d) %s (id=%s) at %s' % (
                 idx, num, total, ttri.name, ttri.id, prd.get_date_string()))
-            traveltime.calculate_tt_moe_a_route(prd, ttri, dbsession=da_route.get_session(), lock=lck, create_or_update=True)
+            traveltime.calculate_tt_moe_a_route(prd, ttri, dbsession=da_route.get_session(), lock=lck,
+                                                create_or_update=True)
             gc.collect()
 
         except Exception as ex:

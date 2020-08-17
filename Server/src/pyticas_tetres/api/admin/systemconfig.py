@@ -78,8 +78,25 @@ def handle_route_wise_moe_parameters(config_json_string):
                                                        rw_moe_congestion_threshold_speed, rw_moe_start_date,
                                                        rw_moe_end_date)
 
-        save_rw_param_object(rw_moe_param_info)
-        update_moe_values(config_json)
+        rw_moe_object_id = save_rw_param_object(rw_moe_param_info)
+
+        try:
+            update_moe_values(config_json)
+        except Exception as e:
+            print(e)
+            update_rw_moe_status(rw_moe_object_id, status="Failed")
+        finally:
+            update_rw_moe_status(rw_moe_object_id, status="Completed")
+
+
+def update_rw_moe_status(rw_moe_object_id, status="Completed"):
+    rw_da = RouteWiseMOEParametersDataAccess()
+    rw_da.update(rw_moe_object_id, {
+        "status": status,
+        "update_time": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    })
+    rw_da.commit()
+    rw_da.close_session()
 
 
 def create_rw_moe_param_object(route_id, rw_moe_critical_density, rw_moe_lane_capacity,
@@ -91,15 +108,18 @@ def create_rw_moe_param_object(route_id, rw_moe_critical_density, rw_moe_lane_ca
     rw_moe_param_info.moe_congestion_threshold_speed = rw_moe_congestion_threshold_speed
     rw_moe_param_info.start_time = rw_moe_start_date if rw_moe_start_date else None
     rw_moe_param_info.end_time = rw_moe_end_date if rw_moe_end_date else None
+    rw_moe_param_info.status = 'Running'
     return rw_moe_param_info
 
 
 def save_rw_param_object(rw_moe_param_info):
     rw_moe_param_info.update_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     rw_da = RouteWiseMOEParametersDataAccess()
-    rw_da.insert(rw_moe_param_info)
+    rw_moe_object = rw_da.insert(rw_moe_param_info)
     rw_da.commit()
+    _id = rw_moe_object.id
     rw_da.close_session()
+    return _id
 
 
 def put_task_to_actionlog(prev_syscfg):

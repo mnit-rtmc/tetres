@@ -24,6 +24,7 @@ from pyticas_tetres.da.route import TTRouteDataAccess
 from pyticas_tetres.da.route_wise_moe_parameters import RouteWiseMOEParametersDataAccess
 from pyticas_tetres.da.tt import TravelTimeDataAccess
 from pyticas_tetres.logger import getLogger
+from pyticas_tetres.ttypes import RouteWiseMOEParametersInfo
 from pyticas_tetres.util.noop_context import nonop_with
 from pyticas_tetres.util.systemconfig import get_system_config_info
 
@@ -357,8 +358,14 @@ def calculate_tt_moe_a_route(prd, ttri, **kwargs):
     logger = getLogger(__name__)
     dbsession = kwargs.get('dbsession', None)
     create_or_update = kwargs.get("create_or_update", True)
-
-    cur_config = get_system_config_info()
+    rw_moe_param_json = kwargs.get("rw_moe_param_json")
+    if rw_moe_param_json:
+        moe_param_config = RouteWiseMOEParametersInfo()
+        moe_param_config.moe_lane_capacity = rw_moe_param_json.get('rw_moe_lane_capacity')
+        moe_param_config.moe_critical_density = rw_moe_param_json.get('rw_moe_critical_density')
+        moe_param_config.moe_congestion_threshold_speed = rw_moe_param_json.get('rw_moe_congestion_threshold_speed')
+    else:
+        moe_param_config = get_system_config_info()
 
     if dbsession:
         da_tt = TravelTimeDataAccess(prd.start_date.year, session=dbsession)
@@ -382,14 +389,14 @@ def calculate_tt_moe_a_route(prd, ttri, **kwargs):
                     da_tt.close_session()
                 return False
 
-    latest_moe_parameter_object = None
-    try:
-        rw_moe_da = RouteWiseMOEParametersDataAccess()
-        latest_moe_parameter_object = rw_moe_da.get_latest_moe_param_for_a_route(ttri.id)
-        rw_moe_da.close_session()
-    except Exception as e:
-        logger = getLogger(__name__)
-        logger.warning('fail to fetch the latest MOE parameter for this route. Error: {}'.format(e))
+    # latest_moe_parameter_object = None
+    # try:
+    #     rw_moe_da = RouteWiseMOEParametersDataAccess()
+    #     latest_moe_parameter_object = rw_moe_da.get_latest_moe_param_for_a_route(ttri.id)
+    #     rw_moe_da.close_session()
+    # except Exception as e:
+    #     logger = getLogger(__name__)
+    #     logger.warning('fail to fetch the latest MOE parameter for this route. Error: {}'.format(e))
 
     print(f"{Fore.GREEN}CALCULATING TRAVEL-TIME FOR ROUTE[{ttri.name}]")
     res_dict = _calculate_tt_moe(ttri.route, prd)
@@ -409,11 +416,6 @@ def calculate_tt_moe_a_route(prd, ttri, **kwargs):
     timeline = prd.get_timeline(as_datetime=False, with_date=True)
     print(f"{Fore.CYAN}Start[{timeline[0]}] End[{timeline[-1]}] TimelineLength[{len(timeline)}]")
     for index, dateTimeStamp in enumerate(timeline):
-        if latest_moe_parameter_object:
-            moe_param_config = latest_moe_parameter_object
-        else:
-            moe_param_config = cur_config
-
         meta_data = generate_meta_data(raw_flow_data, raw_speed_data, raw_density_data,
                                        flow_data, speed_data, density_data, speed_data_without_virtual_node, res_mrf,
                                        moe_param_config,

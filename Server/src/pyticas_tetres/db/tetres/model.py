@@ -66,6 +66,7 @@ class RouteWiseMOEParameters(Base):
     start_time = Column(DateTime, nullable=True)
     end_time = Column(DateTime, nullable=True)
     update_time = Column(DateTime, nullable=False)
+    status = Column(VARCHAR(255), nullable=True)
 
     def __repr__(self):
         return '<Route Wise MOE Parameters id="%s" route_id="%s">' % (self.id, self.route_id)
