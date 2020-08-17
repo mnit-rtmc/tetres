@@ -444,7 +444,7 @@ def _worker_process_to_create_or_update_tt_and_moe(idx, queue, lck, data_path, d
                 continue
             logger.debug('[TT-Categorization Worker %d] (%d/%d) %s (id=%s) at %s' % (
                 idx, num, total, ttri.name, ttri.id, prd.get_date_string()))
-            traveltime.create_or_update_tt_and_moe(prd, ttri, dbsession=da_route.get_session(), lock=lck, create_or_update=True)
+            traveltime.calculate_tt_moe_a_route(prd, ttri, dbsession=da_route.get_session(), lock=lck, create_or_update=True)
             gc.collect()
 
         except Exception as ex:
