@@ -40,7 +40,12 @@ if __name__ == '__main__':
 
     edt_str = input('# Enter end date to load data (e.g. 2017-12-31) : ')
     edate = datetime.datetime.strptime(edt_str, '%Y-%m-%d').date()
-
+    from pyticas_tetres.util.traffic_file_checker import has_traffic_files
+    if not has_traffic_files(sdt_str, edt_str):
+        print("Missing traffic files for the given time range.")
+        print("Please check if you have put the traffic files in the proper directory structure.")
+        print("Failed to calculate moe for the given time range.")
+        exit(1)
     print('')
     print('!! Data during the given time period will be deleted.')
     res = input('!! Do you want to proceed data loading process ? [N/y] : ')
