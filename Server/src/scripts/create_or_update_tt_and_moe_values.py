@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from pyticas_tetres.api.admin.systemconfig import create_rw_moe_param_object, save_rw_param_object
 
 __author__ = 'Chongmyung Park (chongmyung.park@gmail.com)'
 
@@ -15,6 +14,7 @@ if __name__ == '__main__':
     from pyticas import ticas
     from pyticas.infra import Infra
     from pyticas_tetres.db.tetres import conn
+    from pyticas_tetres.api.admin.systemconfig import create_rw_moe_param_object, save_rw_param_object
 
     ticas.initialize(global_settings.DATA_PATH)
     infra = Infra.get_infra()
@@ -41,9 +41,9 @@ if __name__ == '__main__':
     moe_critical_density = input("Enter moe_critical_density: ")
     moe_congestion_threshold_speed = input("Enter moe_congestion_threshold_speed: ")
     rw_moe_param_json = {
-        "rw_moe_lane_capacity": moe_lane_capacity,
-        "rw_moe_critical_density": moe_critical_density,
-        "rw_moe_congestion_threshold_speed": moe_congestion_threshold_speed,
+        "rw_moe_lane_capacity": float(moe_lane_capacity),
+        "rw_moe_critical_density": float(moe_critical_density),
+        "rw_moe_congestion_threshold_speed": float(moe_congestion_threshold_speed),
     }
     print('')
     print('!! Data during the given time period will be updated if exists or created if does not exist.')
