@@ -304,6 +304,8 @@ class RouteWiseMOEParametersInfo(InfoBase):
         """:type: str """
         self.status = None
         """:type: str """
+        self.reason = None
+        """:type: str """
 
     def __str__(self):
         return '<Route Wise MOE Parameters id="%s" route_id="%s">' % (self.id, self.reference_tt_route_id)

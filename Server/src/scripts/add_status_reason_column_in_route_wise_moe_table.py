@@ -14,3 +14,9 @@ if __name__ == '__main__':
         print("Successfully added status column!")
     except Exception as e:
         print("Failed adding status column! Error: {}".format(e))
+    try:
+        reason = Column("reason", VARCHAR(255), nullable=True)
+        op.add_column("route_wise_moe_parameters", reason)
+        print("Successfully added reason column!")
+    except Exception as e:
+        print("Failed adding reason column! Error: {}".format(e))

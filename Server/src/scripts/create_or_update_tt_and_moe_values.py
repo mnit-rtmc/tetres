@@ -15,6 +15,7 @@ if __name__ == '__main__':
     from pyticas.infra import Infra
     from pyticas_tetres.db.tetres import conn
     from pyticas_tetres.api.admin.systemconfig import create_rw_moe_param_object, save_rw_param_object
+    from pyticas_tetres.util.traffic_file_checker import has_traffic_files
 
     ticas.initialize(global_settings.DATA_PATH)
     infra = Infra.get_infra()
@@ -37,6 +38,11 @@ if __name__ == '__main__':
 
     edt_str = input('# Enter end date to load data (e.g. 2017-12-31) : ')
     edate = datetime.datetime.strptime(edt_str, '%Y-%m-%d').date()
+    if not has_traffic_files(sdt_str, edt_str):
+        print("Missing traffic files for the given time range.")
+        print("Please check if you have put the traffic files in the proper directory structure.")
+        print("Failed to calculate moe for the given time range.")
+        exit(1)
     moe_lane_capacity = input("Enter moe_lane_capacity: ")
     moe_critical_density = input("Enter moe_critical_density: ")
     moe_congestion_threshold_speed = input("Enter moe_congestion_threshold_speed: ")

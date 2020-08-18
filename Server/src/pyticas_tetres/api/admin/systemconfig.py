@@ -8,6 +8,7 @@ this module handles the request from `system configuration tab` of `admin client
 """
 from pyticas_tetres.da.route_wise_moe_parameters import RouteWiseMOEParametersDataAccess
 from pyticas_tetres.systasks.initial_data_maker import update_moe_values
+from pyticas_tetres.util.traffic_file_checker import has_traffic_files
 
 __author__ = 'Chongmyung Park (chongmyung.park@gmail.com)'
 
@@ -79,21 +80,23 @@ def handle_route_wise_moe_parameters(config_json_string):
                                                        rw_moe_end_date)
 
         rw_moe_object_id = save_rw_param_object(rw_moe_param_info)
+        if has_traffic_files(rw_moe_start_date, rw_moe_end_date):
+            try:
+                update_moe_values(config_json)
+                update_rw_moe_status(rw_moe_object_id, status="Completed")
+            except Exception as e:
+                print(e)
+                update_rw_moe_status(rw_moe_object_id, status="Failed", reason=str(e))
+        else:
+            update_rw_moe_status(rw_moe_object_id, status="Failed", reason="Missing traffic files for the given time range.")
 
-        try:
-            update_moe_values(config_json)
-        except Exception as e:
-            print(e)
-            update_rw_moe_status(rw_moe_object_id, status="Failed")
-        finally:
-            update_rw_moe_status(rw_moe_object_id, status="Completed")
 
-
-def update_rw_moe_status(rw_moe_object_id, status="Completed"):
+def update_rw_moe_status(rw_moe_object_id, status="Completed", reason=None):
     rw_da = RouteWiseMOEParametersDataAccess()
     rw_da.update(rw_moe_object_id, {
         "status": status,
-        "update_time": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        "reason": reason,
+        "update_time": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
     })
     rw_da.commit()
     rw_da.close_session()
