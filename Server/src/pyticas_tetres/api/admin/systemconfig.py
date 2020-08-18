@@ -100,7 +100,7 @@ def update_rw_moe_status(rw_moe_object_id, status="Completed"):
 
 
 def create_rw_moe_param_object(route_id, rw_moe_critical_density, rw_moe_lane_capacity,
-                               rw_moe_congestion_threshold_speed, rw_moe_start_date, rw_moe_end_date):
+                               rw_moe_congestion_threshold_speed, rw_moe_start_date, rw_moe_end_date, status='Running'):
     rw_moe_param_info = RouteWiseMOEParametersInfo()
     rw_moe_param_info.reference_tt_route_id = route_id
     rw_moe_param_info.moe_critical_density = rw_moe_critical_density
@@ -108,7 +108,7 @@ def create_rw_moe_param_object(route_id, rw_moe_critical_density, rw_moe_lane_ca
     rw_moe_param_info.moe_congestion_threshold_speed = rw_moe_congestion_threshold_speed
     rw_moe_param_info.start_time = rw_moe_start_date if rw_moe_start_date else None
     rw_moe_param_info.end_time = rw_moe_end_date if rw_moe_end_date else None
-    rw_moe_param_info.status = 'Running'
+    rw_moe_param_info.status = status
     return rw_moe_param_info
 
 
