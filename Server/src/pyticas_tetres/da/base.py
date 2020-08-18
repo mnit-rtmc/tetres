@@ -14,6 +14,7 @@ from pyticas_tetres.db.tetres import conn
 
 DEFAULT_PRINT_EXCEPTION = True
 
+
 class DataAccessBase(object):
     def __init__(self, dbModel, dataInfoType, **kwargs):
         """
@@ -131,6 +132,14 @@ class DataAccessBase(object):
             # e.g. order_by = ('id', 'desc')
             # e.g. order_by = ('name', 'asc')
             qry = qry.order_by(getattr(getattr(self.dbModel, order_by[0]), order_by[1])())
+        # apply 'order by'
+        if order_by and isinstance(order_by, list):
+            # e.g. order_by = ('id', 'desc')
+            # e.g. order_by = ('name', 'asc')
+            order_by_args = list()
+            for each_order_by in order_by:
+                order_by_args.append(getattr(getattr(self.dbModel, each_order_by[0]), each_order_by[1])())
+            qry = qry.order_by(*order_by_args)
 
         if group_by:
             if isinstance(group_by, str):

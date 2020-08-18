@@ -97,6 +97,7 @@ public class PanelCategorizationParameter extends javax.swing.JPanel {
         this.modelMOE = new RouteWiseMOEParameterClient();
         this.modelMOE.list();
         DefaultTableModel model = (DefaultTableModel) this.RWMOETable.getModel();
+        model.setRowCount(0);
         for (RouteWiseMOEParameterInfo r: this.modelMOE.dataList){
                 if (idVsRouteMap.get(r.reference_tt_route_id) != null){
                     model.addRow(new Object[]{ idVsRouteMap.get(r.reference_tt_route_id).name, r.moe_critical_density, r.moe_lane_capacity, r.moe_congestion_threshold_speed, r.start_time, r.end_time, r.update_time, r.status});
