@@ -16,7 +16,8 @@ class RouteWiseMOEParametersDataAccess(DataAccess):
         """
         :rtype: list[pyticas_tetres.ttypes.WorkZoneGroupInfo]
         """
-        data_list = self.da_base.list()
+        data_list = self.da_base.list(
+            order_by=[('reference_tt_route_id', 'asc'), ('start_time', 'asc'), ('end_time', 'asc'), ('status', 'asc')])
         for data in data_list:
             data.start_time = str(data.start_time) if data.start_time else ""
             data.end_time = str(data.end_time) if data.end_time else ""

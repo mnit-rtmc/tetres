@@ -57,7 +57,7 @@ def create_year_table(year):
         "cm": Column(Float, nullable=True),
         "cmh": Column(Float, nullable=True),
         "acceleration": Column(Float, nullable=True),
-        "meta_data": Column(UnicodeText, nullable=False),
+        "meta_data": Column(UnicodeText, nullable=True),
 
         # 'sv': Column(Float, nullable=True),
         '_tt_weathers': relationship('TTWeather%d' % year, lazy='joined'),

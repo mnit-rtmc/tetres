@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2018 NATSRL @ UMD (University Minnesota Duluth)
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -18,11 +18,14 @@ package admin.api;
 
 import com.google.gson.reflect.TypeToken;
 import common.config.Config;
+
+import java.util.Collections;
 import java.util.Comparator;
+
 import admin.types.RouteWiseMOEParameterInfo;
+import common.pyticas.*;
 
 /**
- *
  * @author Chongmyung Park <chongmyung.park@gmail.com>
  */
 public class RouteWiseMOEParameterClient extends APIClient<RouteWiseMOEParameterInfo> {
@@ -46,4 +49,40 @@ public class RouteWiseMOEParameterClient extends APIClient<RouteWiseMOEParameter
                 return o1.update_time.compareTo(o2.update_time);
             }
         };
-    }}
+    }
+
+    protected IHttpResultCallback getListCallback() {
+        return new IHttpResultCallback() {
+            @Override
+            public void ready(HttpResult res) {
+                if (res.isSuccess()) {
+                    isLoadingList = false;
+                    try {
+                        ListResponse<RouteWiseMOEParameterInfo> obj = gsonBuilder.fromJson(res.contents, RESPONSE_LIST_TYPE);
+                        if (obj.isSuccess()) {
+                            dataList.clear();
+                            for (RouteWiseMOEParameterInfo sne : obj.obj.list) {
+                                dataList.add(sne);
+                            }
+                            fireListSuccess();
+                        } else {
+                            fireListFailed(res);
+                        }
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                        fireListFailed(res);
+                    }
+                } else {
+                    fireListFailed(res);
+                }
+            }
+
+            @Override
+            public void fail(HttpResult res) {
+                isLoadingList = false;
+                fireListFailed(res);
+            }
+        };
+    }
+
+}

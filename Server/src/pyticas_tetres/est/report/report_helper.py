@@ -146,7 +146,11 @@ def write_moe_data_sheet(eparam, ext_filter_groups, wb):
         for idx, extdata in enumerate(ef.whole_data):
             x = extdata.tti
             dts = x.time.strftime('%Y-%m-%d %H:%M')
-            meta_data = json.loads(x.meta_data)
+            try:
+                meta_data = json.loads(x.meta_data)
+            except Exception as e:
+                print(e)
+                meta_data = {}
             # interval = TT_DATA_INTERVAL
             moe_lane_capacity = cleanMOE(meta_data.get("moe_lane_capacity", 0))
             moe_critical_density = cleanMOE(meta_data.get("moe_critical_density", 0))

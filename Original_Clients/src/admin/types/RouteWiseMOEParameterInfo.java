@@ -33,6 +33,8 @@ public class RouteWiseMOEParameterInfo extends InfoBase {
     public String start_time;
     public String end_time;
     public String update_time;
+    public String status;
+    public String reason;
 
     public RouteWiseMOEParameterInfo() {
         this.setTypeInfo(TeTRESConfig.INFO_TYPE_ROUTE_WISE_MOE_PARAMETER);

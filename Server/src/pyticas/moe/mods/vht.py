@@ -65,3 +65,33 @@ def _calculate_vht(vmt_data, speed_data, interval, **kwargs):
                 vht = missing_data
             vht_data[ridx][tidx] = vht
     return vht_data
+
+
+def calculate_vht_dynamically(meta_data, interval, **kwargs):
+    """
+    Vehicle Miles Traveled (Trips per vehicle X miles per trip)
+    Equation : VMT = total flow of station(v/h) * interval(hour) * 0.1(distance in mile);
+
+    :param data: list of speed data list for each rnode.
+                 e.g. data = [ [ u(i,t), u(i,t+1), u(i,t+2) .. ], [ u(i+1,t), u(i+1,t+1), u(i+1,t+2) .. ], [ u(i+2,t), u(i+2,t+1), u(i+2,t+2) .. ],,,]
+    :type data: list[list[float]]
+    :param interval: data interval in second
+    :type interval: int
+    :type kwargs: dict
+    :return:
+    """
+    flow_data = meta_data.get('flow')
+    speed_data = meta_data.get('speed')
+    missing_data = kwargs.get('missing_data', cfg.MISSING_VALUE)
+    vd = moe_helper.VIRTUAL_RNODE_DISTANCE
+    seconds_per_hour = 3600
+    vht_data = []
+    for flow, speed in zip(flow_data, speed_data):
+        if flow == missing_data or speed == missing_data:
+            vht = missing_data
+        elif flow and speed:
+            vht = flow / speed * interval / seconds_per_hour * vd
+        else:
+            vht = missing_data
+        vht_data.append(vht)
+    return sum(vht_data)

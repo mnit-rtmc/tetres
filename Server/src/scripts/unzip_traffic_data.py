@@ -1,9 +1,11 @@
 import os
 import shutil
 from zipfile import ZipFile
+import sys
+sys.path.append("Server/src")
+import global_settings
 
-PROJECT_DIR = os.path.join("..", "..")
-DATA_DIRECTORY = os.path.join(PROJECT_DIR, "data")
+DATA_DIRECTORY = global_settings.DATA_PATH
 CACHE_DIRECTORY = os.path.join(DATA_DIRECTORY, "cache")
 DET_DIRECTORY = os.path.join(CACHE_DIRECTORY, "det")
 

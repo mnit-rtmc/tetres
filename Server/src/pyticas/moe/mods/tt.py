@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
 
+import datetime
 import math
 
-import datetime
-
 from pyticas.moe import moe_helper
-from pyticas.ttypes import TrafficType
 from pyticas.moe.imputation import spatial_avg
+from pyticas.ttypes import TrafficType
 
 __author__ = 'Chongmyung Park (chongmyung.park@gmail.com)'
 
@@ -128,3 +127,32 @@ def _calculate_tt(data, interval, **kwargs):
     tts[-1] = p[0] / 60.0 if p[1] >= goal_distance else -1
 
     return tts
+
+
+def calculate_tt_dynamically(us_results, us_data, prd, **kwargs):
+    """
+
+    :type route: pyticas.ttypes.Route
+    :type prd: pyticas.ttypes.Period
+    :return:
+    """
+
+    n_origin_data = len(prd.get_timeline())
+
+    # make empty whole_data for travel time by copying speed whole_data and reseting data
+    tt_results = [res.clone() for res in us_results]
+    for idx, res in enumerate(tt_results):
+        tt_results[idx].traffic_type = TrafficType.travel_time
+
+    for ridx, res in enumerate(tt_results):
+        tt_results[ridx].data = [-1] * n_origin_data
+        tt_results[ridx].prd = prd
+
+    # calculate travel time by increasing time index
+    for tidx in range(n_origin_data):
+        partial_data = [pd[tidx:] for pd in us_data]
+        tts = _calculate_tt(partial_data, prd.interval, **kwargs)
+        for ridx, tt_data in enumerate(tt_results):
+            tt_results[ridx].data[tidx] = tts[ridx]
+
+    return tt_results
