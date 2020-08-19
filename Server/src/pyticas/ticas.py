@@ -23,7 +23,7 @@ class TICASObj(object):
         if not os.path.exists(self.data_path):
             os.makedirs(self.data_path)
 
-        default_dirs = ['db', 'metro', 'route', 'cache', 'log', 'map']
+        default_dirs = ['db', 'metro', 'route', 'cache', 'log', 'map', 'tetres']
         for dn in default_dirs:
             dir_path = os.path.join(self.data_path, dn)
             if not os.path.exists(dir_path):
@@ -34,6 +34,12 @@ class TICASObj(object):
         det_directory = os.path.join(cache_dir, "det")
         if not os.path.exists(det_directory):
             os.makedirs(det_directory)
+        tetres_filters_directory = os.path.join(self.data_path, "tetres", "filters")
+        if not os.path.exists(tetres_filters_directory):
+            os.makedirs(tetres_filters_directory)
+        tetres_route_groups_directory = os.path.join(self.data_path, "tetres", "route-groups")
+        if not os.path.exists(tetres_route_groups_directory):
+            os.makedirs(tetres_route_groups_directory)
         if cfg_profile:
             if not hasattr(cfg_profile, 'setup') or not callable(getattr(cfg_profile, 'setup')):
                 raise Exception('cfg_profile must have callable "setup()" function')
