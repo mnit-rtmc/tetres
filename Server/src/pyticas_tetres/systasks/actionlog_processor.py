@@ -138,9 +138,11 @@ def run():
 
             logger.debug('    : skip : handler is not found')
             continue
-
         try:
+            reason = ''
             is_handled = handler(da, item, action_log)
+            if isinstance(is_handled, tuple):
+                is_handled, reason = is_handled[0], is_handled[1]
         except Exception as ex:
             tb.traceback(ex)
             da_actionlog.update(action_log.id, {'status': ActionLogDataAccess.STATUS_FAIL,
@@ -164,7 +166,7 @@ def run():
                 handled.append(key)
         else:
             da_actionlog.update(action_log.id, {'status': ActionLogDataAccess.STATUS_FAIL,
-                                                'reason': 'target data is not handled',
+                                                'reason': reason if reason else 'target data is not handled',
                                                 'status_updated_date': datetime.datetime.now()
                                                 })
             da_actionlog.commit()
@@ -195,6 +197,17 @@ def _handler_ttroute(da, item, action_log):
     """
     # 1. calculate travel time
     # 2. categorize (all)
+    try:
+        from pyticas_tetres.util.traffic_file_checker import has_traffic_files
+        start = datetime.date(cfg.DATA_ARCHIVE_START_YEAR, 1, 1)
+        last_day = datetime.date.today() - datetime.timedelta(days=cfg.DAILY_JOB_OFFSET_DAYS)
+        start_date_str, end_date_str = start.strftime('%Y-%m-%d'), last_day.strftime('%Y-%m-%d')
+        if not has_traffic_files(start_date_str, end_date_str):
+            return False, "Missing traffic files for the given time range from {} to {}.".format(start_date_str, end_date_str)
+    except Exception as e:
+        getLogger(__name__).warning(
+            'Exception occured while checking if traffic files exist during handling travel time routes. Error: {}'.format(
+                e))
     daily_periods = _get_all_daily_periods()
     cnt = 0
     for prd in daily_periods:
@@ -350,7 +363,12 @@ def _handler_systemconfig(da, item, action_log):
         try:
             # faverolles 1/16/2020 NOTE: Why is there no parameter db_info passed
             #  I'm guessing its expected to fail because try-catch maybe?
-            initial_data_maker.run(start_date.date(), prev_end_date)
+            from pyticas_tetres.util.traffic_file_checker import has_traffic_files
+            start_date_str, end_date_str = start_date.strftime('%Y-%m-%d'), prev_end_date.strftime('%Y-%m-%d')
+            if not has_traffic_files(start_date_str, end_date_str):
+                return False, "Missing traffic files for the given time range from {} to {}.".format(start_date_str, end_date_str)
+            import dbinfo
+            initial_data_maker.run(start_date.date(), prev_end_date, db_info=dbinfo.tetres_db_info())
             return True
         except Exception as ex:
             getLogger(__name__).warning(
