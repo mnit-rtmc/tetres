@@ -51,6 +51,13 @@ if __name__ == '__main__':
         "rw_moe_critical_density": float(moe_critical_density),
         "rw_moe_congestion_threshold_speed": float(moe_congestion_threshold_speed),
     }
+    choice = input("Do you want to specify some specific routes?[y/n]: ")
+    route_ids = None
+    if choice.lower() == "y":
+        route_ids = input("Enter the space separated database ids for the routes. Example: 1 2 3 4 5\n")
+        route_ids = route_ids.split()
+        route_ids = [int(route_id) for route_id in route_ids]
+
     print('')
     print('!! Data during the given time period will be updated if exists or created if does not exist.')
     res = input('!! Do you want to proceed data loading process ? [N/y] : ')
@@ -66,11 +73,15 @@ if __name__ == '__main__':
     from pyticas_tetres.da.route import TTRouteDataAccess
 
     try:
-        ttr_route_da = TTRouteDataAccess()
-        ttr_ids = [ttri.id for ttri in ttr_route_da.list()]
-        ttr_route_da.close_session()
+        if route_ids:
+            ttr_ids = route_ids
+        else:
+            ttr_route_da = TTRouteDataAccess()
+            ttr_ids = [ttri.id for ttri in ttr_route_da.list()]
+            ttr_route_da.close_session()
+
         initial_data_maker.create_or_update_tt_and_moe(sdate, edate, db_info=dbinfo.tetres_db_info(),
-                                                       rw_moe_param_json=rw_moe_param_json)
+                                                       rw_moe_param_json=rw_moe_param_json, route_ids=route_ids)
         for route_id in ttr_ids:
             rw_moe_param_info = create_rw_moe_param_object(route_id, moe_critical_density, moe_lane_capacity,
                                                            moe_congestion_threshold_speed,
