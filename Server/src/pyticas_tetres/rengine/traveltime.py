@@ -233,6 +233,10 @@ def generate_meta_data(raw_flow_data, raw_speed_data, raw_density_data,
         raw_meta_data["speed_min_u"] = min_u
     except Exception as e:
         logger.warning('fail to calculate speed min. Error: {}'.format(e))
+    try:
+        raw_meta_data["speed_difference"] = max_u - min_u
+    except Exception:
+        pass
     return raw_meta_data
 
 

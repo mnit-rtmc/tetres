@@ -63,9 +63,9 @@ def calculate_tt_only(start_date, end_date, db_info, **kwargs):
     _calculate_tt_only(start_date, end_date, db_info, **kwargs)
 
 
-def create_or_update_tt_and_moe(start_date, end_date, db_info, rw_moe_param_json):
+def create_or_update_tt_and_moe(start_date, end_date, db_info, rw_moe_param_json, route_ids):
     _create_yearly_db_tables(start_date, end_date)
-    _create_or_update_tt_and_moe(start_date, end_date, db_info, rw_moe_param_json)
+    _create_or_update_tt_and_moe(start_date, end_date, db_info, rw_moe_param_json, route_ids)
 
 
 def categorize_tt_only(start_date, end_date, db_info):
@@ -165,10 +165,7 @@ def _run_multi_process(target_function, start_date, end_date, db_info, **kwargs)
                     args=(idx, queue, lck, data_path, db_info), kwargs=kwargs)
         p.start()
         procs.append(p)
-    rw_moe_param_json = kwargs.get("rw_moe_param_json")
-    if rw_moe_param_json and rw_moe_param_json.get("reference_tt_route_id"):
-        ttr_ids = [int(rw_moe_param_json.get("reference_tt_route_id"))]
-    elif kwargs.get("route_ids"):
+    if kwargs.get("route_ids"):
         ttr_ids = kwargs.get("route_ids")
     else:
         ttr_route_da = TTRouteDataAccess()
@@ -224,7 +221,7 @@ def _calculate_tt_only(start_date, end_date, db_info, **kwargs):
     logger.debug('<< End of categorizing travel time data')
 
 
-def _create_or_update_tt_and_moe(start_date, end_date, db_info, rw_moe_param_json):
+def _create_or_update_tt_and_moe(start_date, end_date, db_info, rw_moe_param_json, route_ids):
     """
 
     :type start_date: datetime.date
@@ -234,7 +231,7 @@ def _create_or_update_tt_and_moe(start_date, end_date, db_info, rw_moe_param_jso
     logger = getLogger(__name__)
     logger.debug('>> Categorizing travel time data')
     _run_multi_process(_worker_process_to_create_or_update_tt_and_moe, start_date, end_date, db_info,
-                       rw_moe_param_json=rw_moe_param_json)
+                       rw_moe_param_json=rw_moe_param_json, route_ids=route_ids)
     logger.debug('<< End of categorizing travel time data')
 
 
