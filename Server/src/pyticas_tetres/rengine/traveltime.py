@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import json
 import statistics
+from pyticas.cfg import MISSING_VALUE
 from typing import List
 
 import numpy as np
@@ -195,7 +196,7 @@ def generate_meta_data(raw_flow_data, raw_speed_data, raw_density_data,
     for speed_rnode_data in speed_data_without_virtual_node:
         if speed_rnode_data and speed_rnode_data.data:
             speed_data = speed_rnode_data.data
-            if speed_data[time_index]:
+            if speed_data[time_index] and speed_data[time_index] != MISSING_VALUE:
                 speed_meta_data.append(speed_data[time_index])
     if mrf_data:
         try:
