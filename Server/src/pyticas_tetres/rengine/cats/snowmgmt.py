@@ -25,7 +25,7 @@ def categorize(ttri, prd, ttdata, **kwargs):
     ttsnmDA = TTSnowManagementDataAccess(prd.start_date.year, session=snmDA.get_session())
 
     given_snowmgmts = kwargs.get('snowmgmts', None)
-    snowmgmts = given_snowmgmts or snmDA.list_by_period(prd.start_date, prd.end_date)
+    snowmgmts = given_snowmgmts or snmDA.list_by_period(prd.start_date, prd.end_date, set_related_model_info=True)
     snmis = _decide_location(ttri, snowmgmts)
 
     with lock:

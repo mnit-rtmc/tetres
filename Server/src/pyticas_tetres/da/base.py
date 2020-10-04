@@ -349,7 +349,9 @@ class DataAccessBase(object):
             setattr(info, key, valueToSet)
 
         for attr_name, rel_info in rel_attrs.items():
-            if model_data and not attr_name.startswith('_'):
+            if kwargs.get("set_related_model_info", False):
+                valueToSet = self.to_info(getattr(model_data, attr_name), data_info_type=rel_info['info_cls'], **kwargs)
+            elif model_data and not attr_name.startswith('_'):
                 valueToSet = self.to_info(getattr(model_data, attr_name), data_info_type=rel_info['info_cls'], **kwargs)
             else:
                 valueToSet = None
