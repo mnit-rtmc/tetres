@@ -18,7 +18,7 @@ LOG_MAX_FILE_SIZE = 10000000  # 10 MB
 LOG_BACKUP_COUNT = 10
 
 NAME = 'MN TMC'
-TRAFFIC_DATA_URL = 'http://data.dot.state.mn.us:8080/trafdat'
+TRAFFIC_DATA_URL = 'http://data.dot.state.mn.us:80/trafdat'
 CONFIG_XML_URL = 'http://data.dot.state.mn.us/iris_xml/metro_config.xml.gz'
 SCANWEB_URL = 'http://rwis.dot.state.mn.us/scanweb/'
 
