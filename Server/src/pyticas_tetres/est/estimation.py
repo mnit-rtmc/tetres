@@ -44,7 +44,7 @@ def estimate(eparam, uid=None):
 
     logger.debug('>> Number of Data for Each Operation Condition')
     for gidx, oc in enumerate(operating_conditions):
-        logger.debug('  - %s : %d' % (eparam.operating_conditions[gidx].name, len(oc.whole_data)))
+        logger.debug('  - %s : %d' % (eparam.operating_conditions[gidx].name, len(oc.whole_data) if oc.whole_data else 0))
     logger.debug('>> End of Number of Data for Each Operation Condition')
 
     sdate = eparam.get_start_date()
@@ -99,7 +99,7 @@ def estimate(eparam, uid=None):
             res = _calculate_reliabilities_whole(eparam, oc)
             whole.append(res)
             logger.debug('<<<< end of calculation of whole time period reliabilities (elapsed time=%s, n=%d)' % (
-            timeutil.human_time(seconds=(time.time() - proc_start_time3)), len(res)))
+            timeutil.human_time(seconds=(time.time() - proc_start_time3)), len(res) if res else 0))
 
             if mode_yearly:
                 proc_start_time3 = time.time()
@@ -107,7 +107,7 @@ def estimate(eparam, uid=None):
                 res_yearly, res_years = _calculate_reliabilities_by_ymd(eparam, oc.yearly_data)
                 yearly.append((res_yearly, res_years))
                 logger.debug('<<<< end of calculation of yearly reliabilities (elapsed time=%s, n=%d)' % (
-                timeutil.human_time(seconds=(time.time() - proc_start_time3)), len(res_yearly)))
+                timeutil.human_time(seconds=(time.time() - proc_start_time3)), len(res_yearly) if res_yearly else 0))
 
             if mode_monthly:
                 proc_start_time3 = time.time()
@@ -115,14 +115,14 @@ def estimate(eparam, uid=None):
                 res_monthly, res_months = _calculate_reliabilities_by_ymd(eparam, oc.monthly_data)
                 monthly.append((res_monthly, res_months))
                 logger.debug('<<<< end of calculation of monthly reliabilities (elapsed time=%s, n=%d)' % (
-                timeutil.human_time(seconds=(time.time() - proc_start_time3)), len(res_monthly)))
+                timeutil.human_time(seconds=(time.time() - proc_start_time3)), len(res_monthly) if res_monthly else 0))
 
             proc_start_time3 = time.time()
             logger.debug('>>>> calculate daily reliabilities')
             res_daily, res_dates = _calculate_reliabilities_by_ymd(eparam, oc.daily_data)
             daily.append((res_daily, res_dates))
             logger.debug('<<<< end of calculation of daily reliabilities (elapsed time=%s, n=%d)' % (
-            timeutil.human_time(seconds=(time.time() - proc_start_time3)), len(res_daily)))
+            timeutil.human_time(seconds=(time.time() - proc_start_time3)), len(res_daily) if res_daily else 0))
 
         # Estimation Mode = 'Time of Day Reliability'
         if mode_TOD:
@@ -131,7 +131,7 @@ def estimate(eparam, uid=None):
             res_tod = _calculate_reliabilities_tod_whole(eparam, oc)
             TOD_whole.append(res_tod)
             logger.debug('<<<< end of calculation of TOD reliabilities (elapsed time=%s, n=%d)' % (
-            timeutil.human_time(seconds=(time.time() - proc_start_time3)), len(res_tod)))
+            timeutil.human_time(seconds=(time.time() - proc_start_time3)), len(res_tod) if res_tod else 0))
 
             if mode_yearly:
                 proc_start_time3 = time.time()
@@ -139,7 +139,7 @@ def estimate(eparam, uid=None):
                 res_tod_yearly = _calculate_reliabilities_tod_by_ymd(eparam, oc.all_years, oc.yearly_data)
                 TOD_yearly.append(res_tod_yearly)
                 logger.debug('<<<< end of calculation of yearly TOD reliabilities (elapsed time=%s, n=%d)' % (
-                timeutil.human_time(seconds=(time.time() - proc_start_time3)), len(res_tod_yearly)))
+                timeutil.human_time(seconds=(time.time() - proc_start_time3)), len(res_tod_yearly) if res_tod_yearly else 0))
 
             if mode_monthly:
                 proc_start_time3 = time.time()
@@ -147,7 +147,7 @@ def estimate(eparam, uid=None):
                 res_tod_monthly = _calculate_reliabilities_tod_by_ymd(eparam, oc.all_months, oc.monthly_data)
                 TOD_monthly.append(res_tod_monthly)
                 logger.debug('<<<< end of calculation of monthly TOD reliabilities (elapsed time=%s, n=%d)' % (
-                timeutil.human_time(seconds=(time.time() - proc_start_time3)), len(res_tod_monthly)))
+                timeutil.human_time(seconds=(time.time() - proc_start_time3)), len(res_tod_monthly) if res_tod_monthly else 0))
 
         logger.debug('<<< end of operating condition (elapsed time=%s)' % (
         timeutil.human_time(seconds=(time.time() - proc_start_time2))))

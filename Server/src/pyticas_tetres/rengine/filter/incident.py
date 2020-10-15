@@ -19,12 +19,15 @@ item
         - 0 : incident is inside the route
 """
 
+
 def _distance_checker(**kwargs):
     dn_distance_limit, up_distance_limit = _get_distance_limit(**kwargs)
+
     def _f(item):
         return (item.off_distance == 0
                 or (item.off_distance < 0 and up_distance_limit > abs(item.off_distance))
                 or (item.off_distance > 0 and dn_distance_limit > item.off_distance))
+
     return _f
 
 
@@ -34,7 +37,7 @@ def no_incident(**kwargs):
     dn_distance_limit, up_distance_limit = _get_distance_limit(**kwargs)
     return ExtFilter(SLOT_INCIDENT, [
         lambda item: ((item.off_distance < 0 and -up_distance_limit > item.off_distance)
-                            or (item.off_distance > 0 and dn_distance_limit < item.off_distance))
+                      or (item.off_distance > 0 and dn_distance_limit < item.off_distance))
     ], **kwargs)
 
 
@@ -267,7 +270,6 @@ def iris_impact_blocked(n, op='eq', **kwargs):
     :param str op: operator
     """
     symbols = kwargs.get('symbols', '!?')
-    distance_limit = _get_distance_limit(**kwargs)
 
     def _check_impact(item):
         """
@@ -293,7 +295,7 @@ def iris_impact_blocked(n, op='eq', **kwargs):
             raise Exception('Not supported operator')
 
     return ExtFilter(SLOT_INCIDENT, [
-        lambda item: 0 <= item.off_distance <= distance_limit,
+        _distance_checker(**kwargs),
         _check_impact
     ], **kwargs)
 
@@ -332,6 +334,7 @@ def _flag(flag_names, target_value, **kwargs):
     :type target_value: bool
     :rtype: callable
     """
+
     def _check(item):
         """
 
@@ -355,6 +358,7 @@ def _has_attr(attr_name, target_strings, **kwargs):
     :type target_strings: list[str]
     :rtype:
     """
+
     def _check_etype(item):
         """
 
@@ -382,4 +386,3 @@ def _get_distance_limit(**kwargs):
     dn_distance_limit = kwargs.get('downstream_distance_limit', cfg.INCIDENT_DOWNSTREAM_DISTANCE_LIMIT)
     up_distance_limit = kwargs.get('upstream_distance_limit', cfg.INCIDENT_UPSTREAM_DISTANCE_LIMIT)
     return dn_distance_limit, up_distance_limit
-

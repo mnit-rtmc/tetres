@@ -303,6 +303,12 @@ public final class TeTRESMain extends JFrame {
       Config.pythonServerURL = args[1];
       System.out.println("> ServerURL: " + args[1]);
     }
+    if (Config.zipURL == null || Config.zipURL == ""){
+        Config.zipURL = "http://0.0.0.0:5000/tetres/downloaddata";
+    }
+    if (Config.pythonServerURL == null || Config.pythonServerURL == "") {
+        Config.pythonServerURL = "http://0.0.0.0";
+    }
 
     /* Set the Nimbus look and feel */
     //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">

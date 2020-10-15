@@ -22,22 +22,22 @@ def write(uid, eparam, operating_conditions):
 
     # data file
     output_file = os.path.join(output_dir, 'traveltime-moe-data.xlsx')
-    per_route_moe_file = os.path.join(output_dir, "per-route-moe-data.xlsx")
+    # per_route_moe_file = os.path.join(output_dir, "per-route-moe-data.xlsx")
     wb = xlsxwriter.Workbook(output_file)
     report_helper.write_operating_condition_info_sheet(eparam, wb)
     report_helper.write_moe_data_sheet(eparam, operating_conditions, wb)
     wb.close()
 
-    cm_work_book = xlsxwriter.Workbook(os.path.join(output_dir, "travel-time-moe-cm.xlsx"))
-    cmh_work_book = xlsxwriter.Workbook(os.path.join(output_dir, "travel-time-moe-cmh.xlsx"))
-    sv_work_book = xlsxwriter.Workbook(os.path.join(output_dir, "travel-time-moe-sv.xlsx"))
-    report_helper.write_moe_per_route_sheets(eparam, operating_conditions,
-                                             cm_work_book=cm_work_book,
-                                             cmh_work_book=cmh_work_book,
-                                             sv_work_book=sv_work_book)
-    cm_work_book.close()
-    cmh_work_book.close()
-    sv_work_book.close()
+    # cm_work_book = xlsxwriter.Workbook(os.path.join(output_dir, "travel-time-moe-cm.xlsx"))
+    # cmh_work_book = xlsxwriter.Workbook(os.path.join(output_dir, "travel-time-moe-cmh.xlsx"))
+    # sv_work_book = xlsxwriter.Workbook(os.path.join(output_dir, "travel-time-moe-sv.xlsx"))
+    # report_helper.write_moe_per_route_sheets(eparam, operating_conditions,
+    #                                          cm_work_book=cm_work_book,
+    #                                          cmh_work_book=cmh_work_book,
+    #                                          sv_work_book=sv_work_book)
+    # cm_work_book.close()
+    # cmh_work_book.close()
+    # sv_work_book.close()
 
 
 def write_daily(uid, eparam, operating_conditions, daily):

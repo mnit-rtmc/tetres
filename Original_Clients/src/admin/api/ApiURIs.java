@@ -98,4 +98,9 @@ public class ApiURIs {
     // system config
     public String SYSCFG_GET;
     public String SYSCFG_UPDATE;
+
+
+    public String RW_MOE_PARAM_LIST;
+    public String RW_MOE_PARAM_INSERT;
+
 }

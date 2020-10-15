@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 __author__ = 'Chongmyung Park (chongmyung.park@gmail.com)'
 
-import tmc as tmc
 
 from pyticas import cfg
 from pyticas.infra import Infra
@@ -60,7 +59,7 @@ def cumulative_input_output(ent, prd, **kwargs):
         # if occupancy is high
         if occ[idx] > QUEUE_OCC_THRESHOLD:
             queue_full_count += 1
-            max_storage = met.storage * ent.lanes * K_JAM_RAMP / tmc.feet_per_mile
+            max_storage = met.storage * ent.lanes * K_JAM_RAMP / cfg.FEET_PER_MILE
             under = max_storage - queue_length
             queue_overflow_ratio = min(2 * queue_full_count * 30.0 / max(met.max_wait, 1), 1)
             min_demand_adjustment = int(round(queue_full_count * 30 / 60)) * 30 / 60.0

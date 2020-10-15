@@ -12,11 +12,11 @@ LOG_LEVEL = pyticas_cfg.ROOT_LOGGER_LEVEL
 LOG_TO_CONSOLE = pyticas_cfg.ROOT_LOGGER_TO_CONSOLE
 
 # Admin Client is Acceptable from this IP
-USE_WHITELIST  = tetresconf.get_property('ticas.use_whitelist')
+USE_WHITELIST = tetresconf.get_property('ticas.use_whitelist')
 if USE_WHITELIST.upper() == "FALSE":
-	USE_WHITELIST = False
+    USE_WHITELIST = False
 else:
-	USE_WHITELIST = True
+    USE_WHITELIST = True
 
 ip_addresses = tetresconf.get_property('ticas.admin_ip_addresses')
 ip_list = [s.strip() for s in ip_addresses.split(',')]
@@ -75,5 +75,9 @@ SE_DEPARTURE_WINDOW2 = 150  # in minutes (2.5 hour period from DEPARTURE_WINDOW_
 MOE_CRITICAL_DENSITY = 40  # vehs/mile/lane
 MOE_LANE_CAPACITY = 2200  # vehs/hr/lane
 MOE_CONGESTION_THRESHOLD_SPEED = 45  # miles/hr
+
+DEFAULT_MOE_CRITICAL_DENSITY = 40  # vehs/mile/lane
+DEFAULT_MOE_LANE_CAPACITY = 2200  # vehs/hr/lane
+DEFAULT_MOE_CONGESTION_THRESHOLD_SPEED = 45  # miles/hr
 
 ###########################################################################################################

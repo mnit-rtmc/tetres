@@ -14,6 +14,6 @@ if not os.path.exists(CONFIG_FILE_PATH):
 # add path
 sys.path.append(LIB_PATH)
 
-DOWNLOAD_TRAFFIC_DATA_FILES = True
+DOWNLOAD_TRAFFIC_DATA_FILES = False
 
 

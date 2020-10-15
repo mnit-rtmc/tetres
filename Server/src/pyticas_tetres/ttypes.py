@@ -281,6 +281,36 @@ class WorkZoneGroupInfo(InfoBase):
         return '<WorkZoneGroupInfo id="%s" name="%s">' % (self.id, self.name)
 
 
+class RouteWiseMOEParametersInfo(InfoBase):
+    _info_type_ = 'route wise moe parameters'
+    _db_model_ = model.RouteWiseMOEParameters
+
+    def __init__(self):
+        self.id = None
+        """:type: int """
+        self.reference_tt_route_id = None
+        """:type: int """
+        self.moe_lane_capacity = None
+        """:type: float """
+        self.moe_critical_density = None
+        """:type: float """
+        self.moe_congestion_threshold_speed = None
+        """:type: float """
+        self.start_time = None
+        """:type: str """
+        self.end_time = None
+        """:type: str """
+        self.update_time = None
+        """:type: str """
+        self.status = None
+        """:type: str """
+        self.reason = None
+        """:type: str """
+
+    def __str__(self):
+        return '<Route Wise MOE Parameters id="%s" route_id="%s">' % (self.id, self.reference_tt_route_id)
+
+
 class WorkZoneInfo(InfoBase):
     _info_type_ = 'work zone'
     _route_attrs_ = ['route1', 'route2']
@@ -828,7 +858,6 @@ class TravelTimeInfo(InfoBase):
         #        f'acceleration="{self.acceleration:s}" uvmt="{self.uvmt:s}">'
 
 
-
 class TODReliabilityInfo(InfoBase):
     _info_type_ = 'tod reliability'
     _dt_attrs_ = ['time']
@@ -1130,7 +1159,10 @@ class EstimationRequestInfo(InfoBase):
         self._dbsession = None
         """:type: sqlalchemy.orm.Session """
 
-
+    def add_start_time_offset(self, offset=0):
+        start_time_object_with_offset = datetime.datetime.strptime(self.start_time, '%H:%M:%S') + datetime.timedelta(
+            minutes=offset)
+        self.start_time = start_time_object_with_offset.strftime('%H:%M:%S')
 
     def get_start_date(self):
         return self._get_date(self.start_date)
@@ -1138,8 +1170,8 @@ class EstimationRequestInfo(InfoBase):
     def get_end_date(self):
         return self._get_date(self.end_date)
 
-    def get_start_time(self):
-        return self._get_time(self.start_time)
+    def get_start_time(self, offset=None):
+        return self._get_time(self.start_time, offset=offset)
 
     def get_end_time(self):
         return self._get_time(self.end_time)
@@ -1154,7 +1186,7 @@ class EstimationRequestInfo(InfoBase):
             return None
         return datetime.datetime.strptime(dts, '%Y-%m-%d').date()
 
-    def _get_time(self, dts):
+    def _get_time(self, dts, offset=None):
         """
 
         :type dts: str
@@ -1162,7 +1194,10 @@ class EstimationRequestInfo(InfoBase):
         """
         if not dts:
             return None
-        return datetime.datetime.strptime(dts, '%H:%M:%S').time()
+        if not offset:
+            return datetime.datetime.strptime(dts, '%H:%M:%S').time()
+        else:
+            return (datetime.datetime.strptime(dts, '%H:%M:%S') + datetime.timedelta(minutes=offset)).time()
 
     def __str__(self):
         return '<EstimationRequestInfo route_id="%s" start_date="%s" end_date="%s" start_time="%s" end_time="%s">' % (

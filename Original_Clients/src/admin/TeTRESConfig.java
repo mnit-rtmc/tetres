@@ -36,6 +36,7 @@ public class TeTRESConfig {
     static public String INFO_TYPE_TTROUTE = "route";
     static public String INFO_TYPE_WORKZONE = "work zone";
     static public String INFO_TYPE_WORKZONE_GROUP = "work zone group";
+    static public String INFO_TYPE_ROUTE_WISE_MOE_PARAMETER = "route wise moe parameters";
     static public String INFO_TYPE_SPECIAL_EVNET = "special event";
     static public String INFO_TYPE_SNOWMGMT = "snow management";
     static public String INFO_TYPE_SNOWROUTE = "snow route";

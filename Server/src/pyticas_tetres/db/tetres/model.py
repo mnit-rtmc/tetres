@@ -55,6 +55,24 @@ class WorkZoneGroup(Base):
         return '<WorkZoneGroup id="%s" name="%s">' % (self.id, self.name)
 
 
+class RouteWiseMOEParameters(Base):
+    __tablename__ = 'route_wise_moe_parameters'
+    id = Column(Integer, primary_key=True, unique=True, autoincrement=True)
+    reference_tt_route_id = Column(Integer, ForeignKey('route.id', ondelete='CASCADE'), nullable=False, index=True)
+    reference_tt_route = relationship(TTRoute)
+    moe_lane_capacity = Column(Float, nullable=False)
+    moe_critical_density = Column(Float, nullable=False)
+    moe_congestion_threshold_speed = Column(Float, nullable=False)
+    start_time = Column(DateTime, nullable=True)
+    end_time = Column(DateTime, nullable=True)
+    update_time = Column(DateTime, nullable=False)
+    status = Column(VARCHAR(255), nullable=True)
+    reason = Column(VARCHAR(255), nullable=True)
+
+    def __repr__(self):
+        return '<Route Wise MOE Parameters id="%s" route_id="%s">' % (self.id, self.route_id)
+
+
 class WorkZone(Base):
     __tablename__ = 'workzone'
     id = Column(Integer, primary_key=True, unique=True, autoincrement=True)
@@ -266,6 +284,8 @@ class ActionLog(Base):
     reason = Column(VARCHAR(255), nullable=True)
     user_ip = Column(VARCHAR(15), nullable=True)
     reg_date = Column(DateTime, nullable=False, default=datetime.datetime.now)
+    processed_start_date = Column(DateTime, nullable=True)
+    processed_end_date = Column(DateTime, nullable=True)
 
     def __repr__(self):
         return ('<ActionLog id="%s" action_type="%s" target_datatype="%s" target_table="%s" target_id="%s" '
@@ -299,7 +319,10 @@ class TravelTime(object):
     dvh = Column(Float, nullable=True)
     lvmt = Column(Float, nullable=True)
     uvmt = Column(Float, nullable=True)
-    # sv = Column(Float, nullable=True)
+    cm = Column(Float, nullable=True)
+    cmh = Column(Float, nullable=True)
+    acceleration = Column(Float, nullable=True)
+    meta_data = Column(UnicodeText, nullable=True)
 
     inc_severity = Column(Integer, nullable=True)
     inc_impact = Column(Integer, nullable=True)

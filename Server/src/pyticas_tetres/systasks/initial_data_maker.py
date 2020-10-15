@@ -12,17 +12,19 @@
 
     Existing data for the given time period will be deleted before adding data.
 """
+from pyticas_tetres.da.route_wise_moe_parameters import RouteWiseMOEParametersDataAccess
+
 __author__ = 'Chongmyung Park (chongmyung.park@gmail.com)'
 
-import gc
 import datetime
+import gc
 from multiprocessing import Process, Manager, Lock
 
 from pyticas import period, ticas
 from pyticas_tetres import cfg
+from pyticas_tetres.da import actionlog
 from pyticas_tetres.da.route import TTRouteDataAccess
 from pyticas_tetres.da.tt import TravelTimeDataAccess
-from pyticas_tetres.da import actionlog
 from pyticas_tetres.db.tetres.model_yearly import create_year_table
 from pyticas_tetres.logger import getLogger
 from pyticas_tetres.rengine import traveltime
@@ -46,14 +48,52 @@ def run(start_date, end_date, db_info):
     _update_actionlogs()
 
 
-def calculate_tt_only(start_date, end_date, db_info):
+def calculate_tt_and_categorize(start_date, end_date, db_info, **kwargs):
     _create_yearly_db_tables(start_date, end_date)
-    _calculate_tt_only(start_date, end_date, db_info)
+    _calculate_tt_and_categorize(start_date, end_date, db_info)
 
 
-def categorize_tt_only(start_date, end_date, db_info):
+def load_incident_data(start_date, end_date):
     _create_yearly_db_tables(start_date, end_date)
-    _categorize_tt_only(start_date, end_date, db_info)
+    _load_incident_data(start_date, end_date)
+
+
+def load_weather_data(start_date, end_date):
+    _create_yearly_db_tables(start_date, end_date)
+    _load_weather_data(start_date, end_date)
+
+
+def calculate_tt_only(start_date, end_date, db_info, **kwargs):
+    _create_yearly_db_tables(start_date, end_date)
+    _calculate_tt_only(start_date, end_date, db_info, **kwargs)
+
+
+def create_or_update_tt_and_moe(start_date, end_date, db_info, rw_moe_param_json, route_ids):
+    _create_yearly_db_tables(start_date, end_date)
+    _create_or_update_tt_and_moe(start_date, end_date, db_info, rw_moe_param_json, route_ids)
+
+
+def categorize_tt_only(start_date, end_date, db_info, **kwargs):
+    _create_yearly_db_tables(start_date, end_date)
+    _categorize_tt_only(start_date, end_date, db_info, **kwargs)
+
+
+def update_moe_values(rw_moe_param_json, db_info=None, *args, **kwargs):
+    rw_moe_param_json['rw_moe_start_date'] = datetime.datetime.strptime(rw_moe_param_json['rw_moe_start_date'],
+                                                                        '%Y-%m-%d %H:%M:%S').date()
+    rw_moe_param_json['rw_moe_end_date'] = datetime.datetime.strptime(rw_moe_param_json['rw_moe_end_date'],
+                                                                      '%Y-%m-%d %H:%M:%S').date()
+
+    _update_moe_values(rw_moe_param_json, db_info=db_info, *args, **kwargs)
+
+
+def _update_moe_values(rw_moe_param_json,
+                       db_info=None, *args, **kwargs):
+    logger = getLogger(__name__)
+    logger.debug('>> Updating MOE Values')
+    _worker_process_to_update_moe_values(rw_moe_param_json['rw_moe_start_date'], rw_moe_param_json['rw_moe_end_date'],
+                                         db_info, rw_moe_param_json=rw_moe_param_json)
+    logger.debug('<< End of Updating MOE Values')
 
 
 def _create_yearly_db_tables(start_date, end_date):
@@ -130,10 +170,12 @@ def _run_multi_process(target_function, start_date, end_date, db_info, **kwargs)
                     args=(idx, queue, lck, data_path, db_info), kwargs=kwargs)
         p.start()
         procs.append(p)
-
-    ttr_route_da = TTRouteDataAccess()
-    ttr_ids = [ttri.id for ttri in ttr_route_da.list()]
-    ttr_route_da.close_session()
+    if kwargs.get("route_ids"):
+        ttr_ids = kwargs.get("route_ids")
+    else:
+        ttr_route_da = TTRouteDataAccess()
+        ttr_ids = [ttri.id for ttri in ttr_route_da.list()]
+        ttr_route_da.close_session()
 
     total = len(daily_periods) * len(ttr_ids)
     cnt = 1
@@ -158,7 +200,7 @@ def _run_multi_process(target_function, start_date, end_date, db_info, **kwargs)
     logger.debug('<<< End of Multi Processing (duration= %s to %s)' % (start_date, end_date))
 
 
-def _calculate_tt_and_categorize(start_date, end_date, db_info):
+def _calculate_tt_and_categorize(start_date, end_date, db_info, **kwargs):
     """
 
     :type start_date: datetime.date
@@ -167,11 +209,11 @@ def _calculate_tt_and_categorize(start_date, end_date, db_info):
     """
     logger = getLogger(__name__)
     logger.debug('>> Categorizing travel time data')
-    _run_multi_process(_worker_process_to_calculate_tt_and_categorize, start_date, end_date, db_info)
+    _run_multi_process(_worker_process_to_calculate_tt_and_categorize, start_date, end_date, db_info, **kwargs)
     logger.debug('<< End of categorizing travel time data')
 
 
-def _calculate_tt_only(start_date, end_date, db_info):
+def _calculate_tt_only(start_date, end_date, db_info, **kwargs):
     """
 
     :type start_date: datetime.date
@@ -180,11 +222,11 @@ def _calculate_tt_only(start_date, end_date, db_info):
     """
     logger = getLogger(__name__)
     logger.debug('>> Categorizing travel time data')
-    _run_multi_process(_worker_process_to_calculate_tt_only, start_date, end_date, db_info)
+    _run_multi_process(_worker_process_to_calculate_tt_only, start_date, end_date, db_info, **kwargs)
     logger.debug('<< End of categorizing travel time data')
 
 
-def _categorize_tt_only(start_date, end_date, db_info):
+def _create_or_update_tt_and_moe(start_date, end_date, db_info, rw_moe_param_json, route_ids):
     """
 
     :type start_date: datetime.date
@@ -193,7 +235,21 @@ def _categorize_tt_only(start_date, end_date, db_info):
     """
     logger = getLogger(__name__)
     logger.debug('>> Categorizing travel time data')
-    _run_multi_process(_worker_process_to_categorize_tt_only, start_date, end_date, db_info)
+    _run_multi_process(_worker_process_to_create_or_update_tt_and_moe, start_date, end_date, db_info,
+                       rw_moe_param_json=rw_moe_param_json, route_ids=route_ids)
+    logger.debug('<< End of categorizing travel time data')
+
+
+def _categorize_tt_only(start_date, end_date, db_info, **kwargs):
+    """
+
+    :type start_date: datetime.date
+    :type end_date: datetime.date
+    :type db_info: dict
+    """
+    logger = getLogger(__name__)
+    logger.debug('>> Categorizing travel time data')
+    _run_multi_process(_worker_process_to_categorize_tt_only, start_date, end_date, db_info, **kwargs)
     logger.debug('<< End of categorizing travel time data')
 
 
@@ -289,7 +345,7 @@ def _worker_process_to_specific_categorization(idx, queue, lck, data_path, db_in
             continue
 
 
-def _worker_process_to_calculate_tt_only(idx, queue, lck, data_path, db_info):
+def _worker_process_to_calculate_tt_only(idx, queue, lck, data_path, db_info, **kwargs):
     from pyticas_tetres.db.tetres import conn
     from pyticas.infra import Infra
     from pyticas.tool import tb
@@ -326,7 +382,84 @@ def _worker_process_to_calculate_tt_only(idx, queue, lck, data_path, db_info):
             continue
 
 
-def _worker_process_to_categorize_tt_only(idx, queue, lck, data_path, db_info):
+def _worker_process_to_update_moe_values(start_date, end_date, db_info, **kwargs):
+    from pyticas_tetres.db.tetres import conn
+    from pyticas.tool import tb
+    logger = getLogger(__name__)
+
+    stime = datetime.time(0, 0, 0, 0)
+    etime = datetime.time(23, 55, 0, 0)
+
+    daily_periods = period.create_periods(start_date, end_date,
+                                          stime, etime,
+                                          cfg.TT_DATA_INTERVAL,
+                                          target_days=[0, 1, 2, 3, 4, 5, 6],
+                                          remove_holiday=False)
+
+    logger.debug('>>> Starting Multi Processing (duration= %s to %s)' % (start_date, end_date))
+    rw_moe_param_json = kwargs.get("rw_moe_param_json")
+    reference_tt_route_id = rw_moe_param_json.get('reference_tt_route_id')
+    if db_info:
+        conn.connect(db_info)
+    da_route = TTRouteDataAccess()
+    ttri = da_route.get_by_id(reference_tt_route_id)
+    if not ttri:
+        logger.debug('route is not found (%s)' % (reference_tt_route_id))
+        return
+    for pidx, prd in enumerate(daily_periods):
+        if prd is None:
+            da_route.close_session()
+            exit(1)
+        try:
+
+            da_route.close_session()
+            traveltime.calculate_tt_moe_a_route(prd, ttri, dbsession=da_route.get_session(),
+                                                create_or_update=True,
+                                                rw_moe_param_json=rw_moe_param_json)
+            gc.collect()
+
+        except Exception as ex:
+            tb.traceback(ex)
+            continue
+
+
+def _worker_process_to_create_or_update_tt_and_moe(idx, queue, lck, data_path, db_info, **kwargs):
+    from pyticas_tetres.db.tetres import conn
+    from pyticas.infra import Infra
+    from pyticas.tool import tb
+
+    logger = getLogger(__name__)
+    # initialize
+    logger.debug('[TT-Categorization Worker %d] starting...' % (idx))
+    ticas.initialize(data_path)
+    infra = Infra.get_infra()
+    conn.connect(db_info)
+    rw_moe_param_json = kwargs.get("rw_moe_param_json")
+    da_route = TTRouteDataAccess()
+    logger.debug('[TT-Categorization Worker %d] is ready' % (idx))
+    while True:
+        ttr_id, prd, num, total = queue.get()
+        if prd is None:
+            da_route.close_session()
+            exit(1)
+        try:
+            ttri = da_route.get_by_id(ttr_id)
+            if not ttri:
+                logger.debug('[TT-Categorization Worker %d] route is not found (%s)' % (idx, ttr_id))
+                continue
+            logger.debug('[TT-Categorization Worker %d] (%d/%d) %s (id=%s) at %s' % (
+                idx, num, total, ttri.name, ttri.id, prd.get_date_string()))
+            traveltime.calculate_tt_moe_a_route(prd, ttri, dbsession=da_route.get_session(), lock=lck,
+                                                create_or_update=True, rw_moe_param_json=rw_moe_param_json)
+            gc.collect()
+
+        except Exception as ex:
+            logger.warning('[TT-Categorization Worker %d]  - fail to add travel time data' % idx)
+            tb.traceback(ex)
+            continue
+
+
+def _worker_process_to_categorize_tt_only(idx, queue, lck, data_path, db_info, **kwargs):
     from pyticas_tetres.db.tetres import conn
     from pyticas.infra import Infra
     from pyticas.tool import tb
@@ -369,7 +502,7 @@ def _worker_process_to_categorize_tt_only(idx, queue, lck, data_path, db_info):
             continue
 
 
-def _worker_process_to_calculate_tt_and_categorize(idx, queue, lck, data_path, db_info):
+def _worker_process_to_calculate_tt_and_categorize(idx, queue, lck, data_path, db_info, **kwargs):
     from pyticas_tetres.db.tetres import conn
     from pyticas.infra import Infra
     from pyticas.tool import tb

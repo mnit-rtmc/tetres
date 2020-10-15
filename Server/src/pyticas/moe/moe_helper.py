@@ -20,13 +20,21 @@ THREAD_LIMIT_PER_CALL = 5
 VIRTUAL_RNODE_DISTANCE = 0.1  # add virtual rnode every 0.1 mile
 
 
+def replace_zero_with_missing_value(speed_data):
+    for ridx, rnode_object in enumerate(speed_data):
+        for tidx, speed in enumerate(rnode_object.data):
+            if speed == 0:
+                speed_data[ridx].data[tidx] = cfg.MISSING_VALUE
+    return speed_data
+
+
 def get_speed(rnode_list, prd, **kwargs):
     """
     :type rnode_list: list[RNodeObject]
     :type prd: Period
     :rtype: list[RNodeData]
     """
-    return get_traffic_data(rnode_list, prd, 'u', **kwargs)
+    return replace_zero_with_missing_value(get_traffic_data(rnode_list, prd, 'u', **kwargs))
 
 
 def get_total_flow(rnode_list, prd, **kwargs):
@@ -215,6 +223,7 @@ def remove_virtual_rnodes(results):
     """
     return [rnd for rnd in results if rnd.rnode_name]
 
+
 def used_lanes(results, r, **kwargs):
     """
     :type results: list[RNodeData]
@@ -245,6 +254,7 @@ def used_lanes(results, r, **kwargs):
         laneinfos.append('\n'.join(lane_info))
 
     return laneinfos
+
 
 def accumulated_distances(results, r, **kwargs):
     """
