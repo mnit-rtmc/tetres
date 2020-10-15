@@ -43,7 +43,7 @@ class SnowMgmtDataAccess(DataAccess):
 
         data_list = []
         for model_data in qry:
-            data_list.append(self.da_base.to_info(model_data))
+            data_list.append(self.da_base.to_info(model_data, **kwargs))
         return data_list
 
     def get_by_id(self, route_id):

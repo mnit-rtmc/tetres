@@ -58,6 +58,6 @@ def write(uid, eparam, operating_conditions, results):
         proc_start_time = time.time()
         logger.debug('>> Writing MOE spread sheet')
         tt_moe_data_writer.write(uid, eparam, operating_conditions)
-        tt_moe_data_writer.write_daily(uid, eparam, operating_conditions, daily)
+        # tt_moe_data_writer.write_daily(uid, eparam, operating_conditions, daily)
         logger.debug('<< End of writing MOE spread sheet (elapsed time=%s)' % (
             timeutil.human_time(seconds=(time.time() - proc_start_time))))

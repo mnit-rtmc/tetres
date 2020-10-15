@@ -62,5 +62,5 @@ if __name__ == '__main__':
     try:
         ticasServer.start(host="0.0.0.0", port=5000, debug=True, use_reloader=False)
     # ticasServer.start(host=read_host_ip(), port=port, debug=True, use_reloader=False)
-    except Exception:
-        traceback.print_exc()
+    except Exception as e:
+        print(e)

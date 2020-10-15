@@ -8,7 +8,7 @@ from pyticas.moe.imputation import spatial_avg
 
 __author__ = 'Chongmyung Park (chongmyung.park@gmail.com)'
 
-CONGESTED_SPEED = 45
+from pyticas_tetres.util.systemconfig import get_system_config_info
 
 
 def run(route, prd, **kwargs):
@@ -19,6 +19,8 @@ def run(route, prd, **kwargs):
     :return:
     """
     # load_data speed data
+    moe_congestion_threshold_speed = kwargs.pop("moe_congestion_threshold_speed",
+                                                get_system_config_info().moe_congestion_threshold_speed)
     us = moe_helper.get_speed(route.get_stations(), prd, **kwargs)
     us_results = moe_helper.add_virtual_rnodes(us, route)
 
@@ -32,14 +34,32 @@ def run(route, prd, **kwargs):
         cmh_results[ridx].prd = prd
 
     # calculate CMH
-    cm_data = _calculate_cmh(us_data, prd.interval, **kwargs)
+    cm_data = _calculate_cmh(us_data, prd.interval, moe_congestion_threshold_speed, **kwargs)
     for ridx, res in enumerate(cmh_results):
         res.data = cm_data[ridx]
 
     return cmh_results
 
 
-def _calculate_cmh(data, interval, **kwargs):
+def calculate_cmh_dynamically(data, interval, moe_congestion_threshold_speed, **kwargs):
+    try:
+        vd = moe_helper.VIRTUAL_RNODE_DISTANCE
+        cmh_unit = (interval / 3600.0) * vd
+        cmh_data = []
+        for index, each_station_speed_data in enumerate(data['speed']):
+            value = 0 if each_station_speed_data >= moe_congestion_threshold_speed or each_station_speed_data < 0 else cmh_unit
+            cmh_data.append(value)
+        cmh_data[-1] = 0
+
+        return sum(cmh_data)
+    except Exception as e:
+        from pyticas_tetres.logger import getLogger
+        logger = getLogger(__name__)
+        logger.warning('fail to calculate calculate cmh dynamically. Error: {}'.format(e))
+        return 0
+
+
+def _calculate_cmh(data, interval, moe_congestion_threshold_speed, **kwargs):
     """
      Congested Miles*Hours (Miles, %)
      => CM(j): Sum of freeway segments whose speed values are less than or equal to 'User specified threshold'
@@ -65,7 +85,7 @@ def _calculate_cmh(data, interval, **kwargs):
     cmh_data = copy.deepcopy(data)
     for ridx, rnode_data in enumerate(data):
         for tidx, value in enumerate(rnode_data):
-            cmh_data[ridx][tidx] = 0 if value >= CONGESTED_SPEED or value < 0 else cmh_unit
+            cmh_data[ridx][tidx] = 0 if value >= moe_congestion_threshold_speed or value < 0 else cmh_unit
     cmh_data[-1] = ['-'] * len(cmh_data[-1])
 
     return cmh_data

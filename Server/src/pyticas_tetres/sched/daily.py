@@ -46,6 +46,15 @@ def run():
         getLogger(__name__).warning(
             'too many days to process. please use data loader program to process the long-time periods')
         return
+    try:
+        from pyticas_tetres.util.traffic_file_checker import has_traffic_files
+        for prd in periods:
+            start_date_str, end_date_str = prd.start_date.strftime('%Y-%m-%d'), prd.end_date.strftime('%Y-%m-%d')
+            if not has_traffic_files(start_date_str, end_date_str):
+                getLogger(__name__).warning('Missing traffic files for performing daily task for the time range starting from {} to {}'.format(start_date_str, end_date_str))
+                return
+    except Exception as e:
+        getLogger(__name__).warning('Exception occured while checking if traffic files exist during performing daily task. Error: {}'.format(e))
 
     for prd in periods:
         getLogger(__name__).info('>> running daily task for %s' % prd.get_date_string())

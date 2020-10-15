@@ -79,6 +79,17 @@ def _checkup_tt_for_a_route(ttri):
                 if rate >= R_TH:
                     continue
                 logger.debug('     -> it needs to be re-calculated')
+                try:
+                    from pyticas_tetres.util.traffic_file_checker import has_traffic_files
+                    start_date_str, end_date_str = prd.start_date.strftime('%Y-%m-%d'), prd.end_date.strftime('%Y-%m-%d')
+                    if not has_traffic_files(start_date_str, end_date_str):
+                        logger.warning(
+                            'Missing traffic files for performing monthly check up for the time range starting from {} to {}'.format(
+                                start_date_str, end_date_str))
+                        return
+                except Exception as e:
+                    logger.warning(
+                        'Exception occured while checking if traffic files exist during performing monthly task. Error: {}'.format(e))
 
                 _perform_calculation_of_tt(ttri, prd)
 

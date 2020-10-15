@@ -64,6 +64,9 @@ SNE_INSERT = '/tetres/adm/snowevent/add'
 SNE_GET = '/tetres/adm/snowevent/get'
 SNE_YEARS = '/tetres/adm/snowevent/years'
 
+RW_MOE_PARAM_LIST = '/tetres/adm/rw_moe_param/list'
+RW_MOE_PARAM_INSERT = '/tetres/adm/rw_moe_param/add'
+
 # public travel time information
 PI_ROUTE_LIST = '/tetres/public/route_list'
 PI_REGIME_LIST = '/tetres/public/regime_list'

@@ -27,6 +27,7 @@ class ActionLogDataAccess(DataAccess):
     DT_SNOWROUTE = 'snow_route'
     DT_SNOWMGMT = 'snow_management'
     DT_SYSTEMCONFIG = 'sysconfig'
+    DT_ROUTE_WISE_MOE_PARAMETERS = 'route_wise_moe_parameters'
 
     STATUS_WAIT = 'wait'
     STATUS_RUNNING = 'running'
