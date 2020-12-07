@@ -87,16 +87,20 @@ def get_day_data(isd_station, year, month, day):
     :type day: int or str
     :rtype: Generator: pyticas_noaa.isd.isdtypes.ISDData
     """
+    current_year = datetime.datetime.now().year
     YEAR_COL = 15
     filepath1, filepath2, filepath3 = None, None, None
 
     if month == 1 and day == 1:
         filepath1 = _download_data(isd_station.usaf, isd_station.wban, year - 1)
     filepath2 = _download_data(isd_station.usaf, isd_station.wban, year)
-    if month == 12 and day == 31:
+    # Next year's data not available. Say, current date is 11/24/2020. How will we get 2021's data?
+    if month == 12 and day == 31 and year + 1 <= current_year:
         filepath3 = _download_data(isd_station.usaf, isd_station.wban, year + 1)
+        if not filepath3:
+            return iter([])
 
-    if not filepath1 and not filepath2 and not filepath3:
+    if not filepath2:
         return iter([])
 
     filepaths = [filepath1, filepath2, filepath3]
@@ -129,13 +133,18 @@ def get_year_data(isd_station, year):
     :type year: int or str
     :rtype: Generator: pyticas_noaa.isd.isdtypes.ISDData
     """
+    current_year = datetime.datetime.now().year
     YEAR_COL = 15
-
     filepath1 = _download_data(isd_station.usaf, isd_station.wban, year - 1)
     filepath2 = _download_data(isd_station.usaf, isd_station.wban, year)
-    filepath3 = _download_data(isd_station.usaf, isd_station.wban, year + 1)
+    filepath3 = None
+    # Next year's data not available. Say, current date is 11/24/2020. How will we get 2021's data?
+    if year + 1 <= current_year:
+        filepath3 = _download_data(isd_station.usaf, isd_station.wban, year + 1)
+        if not filepath3:
+            return iter([])
 
-    if not filepath1 and not filepath2 and not filepath3:
+    if not filepath2:
         return iter([])
 
     filepaths = [filepath1, filepath2, filepath3]

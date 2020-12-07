@@ -26,7 +26,7 @@ TMC = namedtuple('TMCObject', [
 ])
 
 TMC.NAME = 'MN TMC'
-TMC.TRAFFIC_DATA_URL = 'http://data.dot.state.mn.us:8080/trafdat'
+TMC.TRAFFIC_DATA_URL = 'http://data.dot.state.mn.us:80/trafdat'
 TMC.CONFIG_XML_URL = 'http://data.dot.state.mn.us/iris_xml/metro_config.xml.gz'
 TMC.SCANWEB_URL = 'http://rwis.dot.state.mn.us/scanweb/'
 TMC.MISSING_DATA = -1

@@ -1,4 +1,7 @@
 from datetime import datetime, timedelta
+import sys
+
+sys.path.append("Server/src")
 
 from pyticas.dr.det_reader_raw import _save_file_to_cache
 from pyticas.tool import http
@@ -26,9 +29,7 @@ class TrafficType:
 
 
 if __name__ == "__main__":
-    import sys
-    sys.path.append("server")
-    import common
+    import global_settings
     from pyticas import ticas, cfg
     from pyticas.infra import Infra
 
@@ -38,9 +39,11 @@ if __name__ == "__main__":
             self.extension = extension
 
 
-    ticas.initialize(common.DATA_PATH)
+    ticas.initialize(global_settings.DATA_PATH)
     infra = Infra.get_infra()
-    days = gen_days('2019-10-13')
+    sdt_str = input('# Enter start date to load data (e.g. 2015-01-01) : ')
+    edt_str = input('# Enter end date to load data (e.g. 2017-12-31) : ')
+    days = gen_days(start_date_string=sdt_str, end_date_string=edt_str)
     formats = ("v30", "c30")
     success_count = 0
     fail_count = 0
