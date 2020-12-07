@@ -28,7 +28,7 @@ def download(usaf, wban, year):
     output_file = os.path.join(output_dir, _filename(usaf, wban, year))
 
     if os.path.exists(output_file):
-        return output_file
+        os.remove(output_file)
 
     # if os.path.exists(output_file):
     #     ctime = _created_time(output_file)

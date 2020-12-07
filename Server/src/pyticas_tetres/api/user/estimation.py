@@ -25,6 +25,7 @@ def register_api(app):
     def tetres_user_estimation():
         routes = request.form.get('routeIDs')
         param = request.form.get('param')
+        param = fix_operating_condition_info(param)
         route_ids = json.loads(routes)
         eparam = json.loads(param)
         """:type: pyticas_tetres.ttypes.EstimationRequestInfo """
@@ -72,3 +73,40 @@ def register_api(app):
             return 'not found', 404
 
         return send_from_directory(directory=output_dir_path, filename='%s.zip' % uid)
+
+
+def fix_operating_condition_info(params):
+    import json
+    json_params = json.loads(params)
+    default_module = "pyticas_tetres.ttypes"
+    operating_conditions = json_params.get("operating_conditions", [])
+    condition_vs_type_class_map = {
+        "weather_conditions": {
+            "__module__": default_module,
+            "__class__": "WeatherConditionInfo"
+        },
+        "incident_conditions": {
+            "__module__": default_module,
+            "__class__": "IncidentConditionInfo"
+        },
+        "workzone_conditions": {
+            "__module__": default_module,
+            "__class__": "WorkzoneConditionInfo"
+        },
+        "specialevent_conditions": {
+            "__module__": default_module,
+            "__class__": "SpecialeventConditionInfo"
+        },
+        "snowmanagement_conditions": {
+            "__module__": default_module,
+            "__class__": "SnowmanagementConditionInfo"
+        }
+    }
+    for operating_condition in operating_conditions:
+        for condition in condition_vs_type_class_map:
+            current_condition = operating_condition.get(condition, [])
+            for each_filter in current_condition:
+                for key, value in condition_vs_type_class_map[condition].items():
+                    if key not in each_filter:
+                        each_filter[key] = value
+    return json.dumps(json_params)
