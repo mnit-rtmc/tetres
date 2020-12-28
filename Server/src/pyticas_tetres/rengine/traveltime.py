@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import sys
 import json
 import statistics
 from pyticas.cfg import MISSING_VALUE
@@ -281,64 +282,9 @@ def _route_total(res_list):
     total_values = []
     for didx in range(n_data):
         total_values.append(
-            sum([data_list[sidx][didx] for sidx in range(n_stations) if str(data_list[sidx][didx]) != '-']))
+            sum([data_list[sidx][didx] for sidx in range(n_stations) if
+                 str(data_list[sidx][didx]) != '-' and data_list[sidx][didx] >= 0]))
     return total_values
-
-
-def update_moe_values_a_route(prd, ttri_id, **kwargs):
-    """
-
-    :type prd: pyticas.ttypes.Period
-    :type ttri: pyticas_tetres.ttypes.TTRouteInfo
-    """
-    import json
-    dbsession = kwargs.get('dbsession', None)
-
-    if dbsession:
-        da_tt = TravelTimeDataAccess(prd.start_date.year, session=dbsession)
-    else:
-        da_tt = TravelTimeDataAccess(prd.start_date.year)
-    rw_moe_param_json = kwargs.get("rw_moe_param_json")
-    updatable_dict = {}
-    existing_data_list = da_tt.list_by_period(ttri_id, prd)
-    for existing_data in existing_data_list:
-        meta_data = json.loads(existing_data.meta_data)
-        updatable_data = dict()
-        if meta_data.get('moe_congestion_threshold_speed') != rw_moe_param_json.get(
-                'rw_moe_congestion_threshold_speed'):
-            cm = (calculate_cm_dynamically(meta_data, rw_moe_param_json.get('rw_moe_congestion_threshold_speed')))
-            cmh = (calculate_cmh_dynamically(meta_data, TT_DATA_INTERVAL,
-                                             rw_moe_param_json.get('rw_moe_congestion_threshold_speed')))
-            if existing_data.cm != cm:
-                updatable_data['cm'] = cm
-            if existing_data.cmh != cmh:
-                updatable_data['cmh'] = cmh
-            meta_data['moe_congestion_threshold_speed'] = rw_moe_param_json.get('rw_moe_congestion_threshold_speed')
-            updatable_data['meta_data'] = json.dumps(meta_data)
-        if meta_data.get('moe_lane_capacity') != rw_moe_param_json.get('rw_moe_lane_capacity') or meta_data.get(
-                'moe_critical_density') != rw_moe_param_json.get('rw_moe_critical_density'):
-            lvmt = calculate_lvmt_dynamically(meta_data, TT_DATA_INTERVAL,
-                                              rw_moe_param_json.get('rw_moe_critical_density'),
-                                              rw_moe_param_json.get('rw_moe_lane_capacity'))
-            uvmt = calculate_uvmt_dynamically(meta_data, TT_DATA_INTERVAL,
-                                              rw_moe_param_json.get('rw_moe_critical_density'),
-                                              rw_moe_param_json.get('rw_moe_lane_capacity'))
-            if existing_data.lvmt != lvmt:
-                updatable_data['lvmt'] = lvmt
-            if existing_data.uvmt != uvmt:
-                updatable_data['uvmt'] = uvmt
-            meta_data['moe_lane_capacity'] = rw_moe_param_json.get('rw_moe_lane_capacity')
-            meta_data['moe_critical_density'] = rw_moe_param_json.get('rw_moe_critical_density')
-            updatable_data['meta_data'] = json.dumps(meta_data)
-        if updatable_data:
-            updatable_dict[existing_data.id] = updatable_data
-    lock = kwargs.get('lock', nonop_with())
-    if updatable_dict:
-        with lock:
-            for id, updatable_data in updatable_dict.items():
-                da_tt.update(id, updatable_data)
-            da_tt.commit()
-    da_tt.close_session()
 
 
 def generate_updatable_moe_dict(tt_data):
@@ -519,3 +465,55 @@ def _calculate_tt_moe(r, prd, **kwargs):
 
     except Exception as ex:
         getLogger(__name__).warning(tb.traceback(ex))
+
+
+def recalculate_moe_values_from_meta_data_a_route(prd, ttri_id, **kwargs):
+    """
+
+    :type prd: pyticas.ttypes.Period
+    :type ttri: pyticas_tetres.ttypes.TTRouteInfo
+    """
+    import json
+    dbsession = kwargs.get('dbsession', None)
+
+    if dbsession:
+        da_tt = TravelTimeDataAccess(prd.start_date.year, session=dbsession)
+    else:
+        da_tt = TravelTimeDataAccess(prd.start_date.year)
+    updatable_dict = {}
+    existing_data_list = da_tt.list_by_period(ttri_id, prd)
+    updatable_moe_values = kwargs.get("updatable_moe_values")
+    for existing_data in existing_data_list:
+        meta_data = json.loads(existing_data.meta_data)
+        if not meta_data:
+            getLogger(__name__).warning(
+                "Can't find meta data for the route: {} and for time period: {}".format(ttri_id, prd))
+            continue
+        updatable_data = dict()
+        interval = TT_DATA_INTERVAL
+        moe_critical_density = meta_data["moe_critical_density"]
+        moe_lane_capacity = meta_data["moe_lane_capacity"]
+        moe_congestion_threshold_speed = meta_data["moe_congestion_threshold_speed"]
+        for key in updatable_moe_values:
+            function_name = "calculate_{}_dynamically".format(key)
+            if key in ["lvmt", "uvmt"]:
+                updatable_data[key] = getattr(sys.modules[__name__], function_name)(meta_data, interval,
+                                                                                    moe_critical_density,
+                                                                                    moe_lane_capacity)
+            elif key in ["cm"]:
+                updatable_data[key] = getattr(sys.modules[__name__], function_name)(meta_data,
+                                                                                    moe_congestion_threshold_speed)
+            elif key in ["cmh"]:
+                updatable_data[key] = getattr(sys.modules[__name__], function_name)(meta_data, interval,
+                                                                                    moe_congestion_threshold_speed)
+            else:
+                updatable_data[key] = getattr(sys.modules[__name__], function_name)(meta_data, interval)
+        if updatable_data:
+            updatable_dict[existing_data.id] = updatable_data
+    lock = kwargs.get('lock', nonop_with())
+    if updatable_dict:
+        with lock:
+            for id, updatable_data in updatable_dict.items():
+                da_tt.update(id, updatable_data)
+            da_tt.commit()
+    da_tt.close_session()

@@ -88,10 +88,12 @@ def calculate_vht_dynamically(meta_data, interval, **kwargs):
     vht_data = []
     for flow, speed in zip(flow_data, speed_data):
         if flow == missing_data or speed == missing_data:
-            vht = missing_data
+            vht = 0
         elif flow and speed:
             vht = flow / speed * interval / seconds_per_hour * vd
         else:
-            vht = missing_data
+            vht = 0
+        if vht < 0:
+            vht = 0
         vht_data.append(vht)
     return sum(vht_data)

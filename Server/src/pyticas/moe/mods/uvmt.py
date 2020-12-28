@@ -109,7 +109,8 @@ def calculate_uvmt_dynamically(data, interval, critical_denisty, lane_capacity):
                 uvmt = (uvmt * interval / seconds_per_hour * vd)
             else:
                 uvmt = 0
-
+            if uvmt < 0:
+                uvmt = 0
             uvmt_data.append(uvmt)
         return sum(uvmt_data)
     except Exception as e:

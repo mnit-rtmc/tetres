@@ -89,7 +89,7 @@ def calculate_dvh_dynamically(meta_data, interval, **kwargs):
     for flow, speed, speed_limit in zip(flow_data, speed_data, speed_limit_data):
         try:
             dvh = ((vd / speed) - (vd / speed_limit)) * flow * interval / seconds_per_hour
-            if dvh < 0 or missing_data in [flow, speed_data]:
+            if dvh < 0 or missing_data in [flow, speed]:
                 dvh = 0
         except Exception as e:
             print(e)

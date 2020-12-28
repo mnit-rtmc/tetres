@@ -12,7 +12,6 @@
 
     Existing data for the given time period will be deleted before adding data.
 """
-from pyticas_tetres.da.route_wise_moe_parameters import RouteWiseMOEParametersDataAccess
 
 __author__ = 'Chongmyung Park (chongmyung.park@gmail.com)'
 
@@ -71,6 +70,10 @@ def calculate_tt_only(start_date, end_date, db_info, **kwargs):
 def create_or_update_tt_and_moe(start_date, end_date, db_info, rw_moe_param_json, route_ids):
     _create_yearly_db_tables(start_date, end_date)
     _create_or_update_tt_and_moe(start_date, end_date, db_info, rw_moe_param_json, route_ids)
+
+
+def recalculate_moe_values(start_date, end_date, db_info, updatable_moe_values, route_ids):
+    _recalculate_moe_values(start_date, end_date, db_info, updatable_moe_values, route_ids)
 
 
 def categorize_tt_only(start_date, end_date, db_info, **kwargs):
@@ -237,6 +240,20 @@ def _create_or_update_tt_and_moe(start_date, end_date, db_info, rw_moe_param_jso
     logger.debug('>> Categorizing travel time data')
     _run_multi_process(_worker_process_to_create_or_update_tt_and_moe, start_date, end_date, db_info,
                        rw_moe_param_json=rw_moe_param_json, route_ids=route_ids)
+    logger.debug('<< End of categorizing travel time data')
+
+
+def _recalculate_moe_values(start_date, end_date, db_info, updatable_moe_values, route_ids):
+    """
+
+    :type start_date: datetime.date
+    :type end_date: datetime.date
+    :type db_info: dict
+    """
+    logger = getLogger(__name__)
+    logger.debug('>> Recalculating MOE values: {}'.format(updatable_moe_values))
+    _run_multi_process(_worker_process_to_recalculate_moe_values, start_date, end_date, db_info,
+                       updatable_moe_values=updatable_moe_values, route_ids=route_ids)
     logger.debug('<< End of categorizing travel time data')
 
 
@@ -451,6 +468,43 @@ def _worker_process_to_create_or_update_tt_and_moe(idx, queue, lck, data_path, d
                 idx, num, total, ttri.name, ttri.id, prd.get_date_string()))
             traveltime.calculate_tt_moe_a_route(prd, ttri, dbsession=da_route.get_session(), lock=lck,
                                                 create_or_update=True, rw_moe_param_json=rw_moe_param_json)
+            gc.collect()
+
+        except Exception as ex:
+            logger.warning('[TT-Categorization Worker %d]  - fail to add travel time data' % idx)
+            tb.traceback(ex)
+            continue
+
+
+def _worker_process_to_recalculate_moe_values(idx, queue, lck, data_path, db_info, **kwargs):
+    from pyticas_tetres.db.tetres import conn
+    from pyticas.infra import Infra
+    from pyticas.tool import tb
+
+    logger = getLogger(__name__)
+    # initialize
+    logger.debug('[MOE-Recalculation Worker %d] starting...' % (idx))
+    ticas.initialize(data_path)
+    infra = Infra.get_infra()
+    conn.connect(db_info)
+    da_route = TTRouteDataAccess()
+    logger.debug('[MOE-Recalculation Worker %d] is ready' % (idx))
+    updatable_moe_values = kwargs.get("updatable_moe_values")
+    while True:
+        ttr_id, prd, num, total = queue.get()
+        if prd is None:
+            da_route.close_session()
+            exit(1)
+        try:
+            ttri = da_route.get_by_id(ttr_id)
+            if not ttri:
+                logger.debug('[MOE-Recalculation Worker %d] route is not found (%s)' % (idx, ttr_id))
+                continue
+            logger.debug('[MOE-Recalculation Worker %d] (%d/%d) %s (id=%s) at %s' % (
+                idx, num, total, ttri.name, ttri.id, prd.get_date_string()))
+            traveltime.recalculate_moe_values_from_meta_data_a_route(prd, ttr_id, dbsession=da_route.get_session(),
+                                                                     lock=lck,
+                                                                     updatable_moe_values=updatable_moe_values)
             gc.collect()
 
         except Exception as ex:
