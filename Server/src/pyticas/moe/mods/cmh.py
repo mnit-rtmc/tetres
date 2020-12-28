@@ -48,6 +48,8 @@ def calculate_cmh_dynamically(data, interval, moe_congestion_threshold_speed, **
         cmh_data = []
         for index, each_station_speed_data in enumerate(data['speed']):
             value = 0 if each_station_speed_data >= moe_congestion_threshold_speed or each_station_speed_data < 0 else cmh_unit
+            if value < 0:
+                value = 0
             cmh_data.append(value)
         cmh_data[-1] = 0
 

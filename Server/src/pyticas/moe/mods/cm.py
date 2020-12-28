@@ -48,6 +48,8 @@ def calculate_cm_dynamically(data, moe_congestion_threshold_speed, **kwargs):
         cm_data = []
         for index, each_station_speed_data in enumerate(data['speed']):
             value = 0 if each_station_speed_data >= moe_congestion_threshold_speed or each_station_speed_data < 0 else vd
+            if value < 0:
+                value = 0
             cm_data.append(value)
         cm_data[-1] = 0
 
