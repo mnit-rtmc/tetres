@@ -68,7 +68,6 @@ def calculate_tt_only(start_date, end_date, db_info, **kwargs):
 
 
 def create_or_update_tt_and_moe(start_date, end_date, db_info, rw_moe_param_json, route_ids):
-    _create_yearly_db_tables(start_date, end_date)
     _create_or_update_tt_and_moe(start_date, end_date, db_info, rw_moe_param_json, route_ids)
 
 

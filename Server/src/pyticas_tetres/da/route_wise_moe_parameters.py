@@ -41,6 +41,14 @@ class RouteWiseMOEParametersDataAccess(DataAccess):
     def search_by_route_id(self, route_id, *args, **kwargs):
         return self.da_base.search([('reference_tt_route_id', route_id)])
 
+    def search_by_completed_status(self, *args, **kwargs):
+        data_list = self.da_base.search([('status', "Completed")])
+        for data in data_list:
+            data.start_time = str(data.start_time) if data.start_time else ""
+            data.end_time = str(data.end_time) if data.end_time else ""
+            data.update_time = str(data.update_time) if data.update_time else ""
+        return data_list
+
     def get_latest_moe_param_for_a_route(self, route_id, *args, **kwargs):
         latest_object = None
         data_list = self.search_by_route_id(route_id, *args, **kwargs)

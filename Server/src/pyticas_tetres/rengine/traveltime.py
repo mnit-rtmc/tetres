@@ -168,16 +168,16 @@ def _calculate_tt(r, prd, **kwargs):
 def generate_meta_data(flow_with_virtual_nodes_data, speed_with_virtual_nodes_data, density_with_virtual_nodes_data,
                        flow_objects_with_virtual_nodes, flow_data_without_virtual_nodes,
                        speed_data_without_virtual_nodes, density_data_without_virtual_nodes,
-                       speed_without_virtual_nodes, acceleration_data, mrf_data, moe_param_config, time_index):
+                       speed_without_virtual_nodes, mrf_data, acceleration_data, moe_param_config, time_index):
     logger = getLogger(__name__)
     raw_meta_data = {
         "flow": [],
         "speed": [],
         "density": [],
-        "flow_without_virtual_nodes": flow_data_without_virtual_nodes,
-        "speed_without_virtual_nodes": speed_data_without_virtual_nodes,
-        "density_without_virtual_nodes": density_data_without_virtual_nodes,
-        "accelerations": [acceleration_data[i][time_index] for i in acceleration_data],
+        "flow_without_virtual_nodes": [each_station_data[time_index] for each_station_data in flow_data_without_virtual_nodes],
+        "speed_without_virtual_nodes": [each_station_data[time_index] for each_station_data in speed_data_without_virtual_nodes],
+        "density_without_virtual_nodes": [each_station_data[time_index] for each_station_data in density_data_without_virtual_nodes],
+        "accelerations": [each_station_data[time_index] for each_station_data in acceleration_data],
         "lanes": [],
         "speed_limit": [],
         "speed_average": 0,
@@ -293,6 +293,7 @@ def _route_total(res_list):
 
 def generate_updatable_moe_dict(tt_data):
     return {
+        'vmt': tt_data['vmt'],
         'vht': tt_data['vht'],
         'dvh': tt_data['dvh'],
         'lvmt': tt_data['lvmt'],
