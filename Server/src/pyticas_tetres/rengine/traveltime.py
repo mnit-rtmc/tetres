@@ -293,6 +293,8 @@ def _route_total(res_list):
 
 def generate_updatable_moe_dict(tt_data):
     return {
+        'tt': tt_data['tt'],
+        'speed': tt_data['speed'],
         'vmt': tt_data['vmt'],
         'vht': tt_data['vht'],
         'dvh': tt_data['dvh'],
