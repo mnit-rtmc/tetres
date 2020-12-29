@@ -15,8 +15,10 @@ def run(route, prd, **kwargs):
     """
 
     # load_data total flow data
-    ks_results = density.run(route, prd)
-    ks_results = moe_helper.add_virtual_rnodes(ks_results, route)
-    ks_data = [res.data for res in ks_results]
+    ks = density.run(route, prd)
+    ks_data = [res.data for res in ks]
 
-    return ks_results, ks_data
+    ks_with_virtual_nodes = moe_helper.add_virtual_rnodes(ks, route)
+    ks_with_virtual_nodes_data = [res.data for res in ks_with_virtual_nodes]
+
+    return ks, ks_data, ks_with_virtual_nodes, ks_with_virtual_nodes_data
