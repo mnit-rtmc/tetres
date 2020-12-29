@@ -68,7 +68,6 @@ def calculate_tt_only(start_date, end_date, db_info, **kwargs):
 
 
 def create_or_update_tt_and_moe(start_date, end_date, db_info, rw_moe_param_json, route_ids):
-    _create_yearly_db_tables(start_date, end_date)
     _create_or_update_tt_and_moe(start_date, end_date, db_info, rw_moe_param_json, route_ids)
 
 
@@ -254,7 +253,7 @@ def _recalculate_moe_values(start_date, end_date, db_info, updatable_moe_values,
     logger.debug('>> Recalculating MOE values: {}'.format(updatable_moe_values))
     _run_multi_process(_worker_process_to_recalculate_moe_values, start_date, end_date, db_info,
                        updatable_moe_values=updatable_moe_values, route_ids=route_ids)
-    logger.debug('<< End of categorizing travel time data')
+    logger.debug('<< End of Recalculating MOE values')
 
 
 def _categorize_tt_only(start_date, end_date, db_info, **kwargs):
@@ -500,8 +499,6 @@ def _worker_process_to_recalculate_moe_values(idx, queue, lck, data_path, db_inf
             if not ttri:
                 logger.debug('[MOE-Recalculation Worker %d] route is not found (%s)' % (idx, ttr_id))
                 continue
-            logger.debug('[MOE-Recalculation Worker %d] (%d/%d) %s (id=%s) at %s' % (
-                idx, num, total, ttri.name, ttri.id, prd.get_date_string()))
             traveltime.recalculate_moe_values_from_meta_data_a_route(prd, ttr_id, dbsession=da_route.get_session(),
                                                                      lock=lck,
                                                                      updatable_moe_values=updatable_moe_values)

@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
-import sys
 import json
 import statistics
-from pyticas.cfg import MISSING_VALUE
+import sys
 from typing import List
 
 import numpy as np
 from colorama import Fore
+from pyticas.cfg import MISSING_VALUE
 from pyticas.moe import moe
 from pyticas.moe.imputation import spatial_avg
 from pyticas.moe.mods import total_flow_with_virtual_nodes, speed_with_virtual_nodes, density_with_virtual_nodes
@@ -23,7 +23,6 @@ from pyticas.tool import tb
 from pyticas.ttypes import RNodeData
 from pyticas_tetres.cfg import TT_DATA_INTERVAL
 from pyticas_tetres.da.route import TTRouteDataAccess
-from pyticas_tetres.da.route_wise_moe_parameters import RouteWiseMOEParametersDataAccess
 from pyticas_tetres.da.tt import TravelTimeDataAccess
 from pyticas_tetres.logger import getLogger
 from pyticas_tetres.ttypes import RouteWiseMOEParametersInfo
@@ -166,15 +165,19 @@ def _calculate_tt(r, prd, **kwargs):
         getLogger(__name__).warning(tb.traceback(ex))
 
 
-def generate_meta_data(raw_flow_data, raw_speed_data, raw_density_data,
-                       flow_data, speed_data, density_data, speed_data_without_virtual_node, mrf_data,
-                       moe_param_config,
-                       time_index):
+def generate_meta_data(flow_with_virtual_nodes_data, speed_with_virtual_nodes_data, density_with_virtual_nodes_data,
+                       flow_objects_with_virtual_nodes, flow_data_without_virtual_nodes,
+                       speed_data_without_virtual_nodes, density_data_without_virtual_nodes,
+                       speed_without_virtual_nodes, mrf_data, acceleration_data, moe_param_config, time_index):
     logger = getLogger(__name__)
     raw_meta_data = {
         "flow": [],
         "speed": [],
         "density": [],
+        "flow_without_virtual_nodes": [each_station_data[time_index] for each_station_data in flow_data_without_virtual_nodes],
+        "speed_without_virtual_nodes": [each_station_data[time_index] for each_station_data in speed_data_without_virtual_nodes],
+        "density_without_virtual_nodes": [each_station_data[time_index] for each_station_data in density_data_without_virtual_nodes],
+        "accelerations": [each_station_data[time_index] for each_station_data in acceleration_data],
         "lanes": [],
         "speed_limit": [],
         "speed_average": 0,
@@ -187,14 +190,15 @@ def generate_meta_data(raw_flow_data, raw_speed_data, raw_density_data,
         "moe_lane_capacity": moe_param_config.moe_lane_capacity,
         "moe_critical_density": moe_param_config.moe_critical_density,
         "moe_congestion_threshold_speed": moe_param_config.moe_congestion_threshold_speed}
-    for flow, speed, flow_object, density in zip(raw_flow_data, raw_speed_data, flow_data, raw_density_data):
+    for flow, speed, flow_object, density in zip(flow_with_virtual_nodes_data, speed_with_virtual_nodes_data,
+                                                 flow_objects_with_virtual_nodes, density_with_virtual_nodes_data):
         raw_meta_data['flow'].append(flow[time_index])
         raw_meta_data['speed'].append(speed[time_index])
         raw_meta_data['density'].append(density[time_index])
         raw_meta_data['lanes'].append(flow_object.lanes)
         raw_meta_data['speed_limit'].append(flow_object.speed_limit)
     speed_meta_data = list()
-    for speed_rnode_data in speed_data_without_virtual_node:
+    for speed_rnode_data in speed_without_virtual_nodes:
         if speed_rnode_data and speed_rnode_data.data:
             speed_data = speed_rnode_data.data
             if speed_data[time_index] and speed_data[time_index] != MISSING_VALUE:
@@ -289,6 +293,9 @@ def _route_total(res_list):
 
 def generate_updatable_moe_dict(tt_data):
     return {
+        'tt': tt_data['tt'],
+        'speed': tt_data['speed'],
+        'vmt': tt_data['vmt'],
         'vht': tt_data['vht'],
         'dvh': tt_data['dvh'],
         'lvmt': tt_data['lvmt'],
@@ -340,15 +347,6 @@ def calculate_tt_moe_a_route(prd, ttri, **kwargs):
                     da_tt.close_session()
                 return False
 
-    # latest_moe_parameter_object = None
-    # try:
-    #     rw_moe_da = RouteWiseMOEParametersDataAccess()
-    #     latest_moe_parameter_object = rw_moe_da.get_latest_moe_param_for_a_route(ttri.id)
-    #     rw_moe_da.close_session()
-    # except Exception as e:
-    #     logger = getLogger(__name__)
-    #     logger.warning('fail to fetch the latest MOE parameter for this route. Error: {}'.format(e))
-
     print(f"{Fore.GREEN}CALCULATING TRAVEL-TIME FOR ROUTE[{ttri.name}]")
     res_dict = _calculate_tt_moe(ttri.route, prd)
 
@@ -356,21 +354,26 @@ def calculate_tt_moe_a_route(prd, ttri, **kwargs):
         logger.warning('fail to calculate travel time')
         return False
 
-    flow_data, raw_flow_data = res_dict["flow_data"]
-    density_data, raw_density_data = res_dict['density_data']
-    speed_data_without_virtual_node, speed_data, raw_speed_data = res_dict["speed_data"]
+    flow_without_virtual_nodes, flow_without_virtual_nodes_data, flow_with_virtual_nodes, flow_with_virtual_nodes_data = \
+        res_dict["flow_data"]
+    speed_without_virtual_nodes, speed_without_virtual_nodes_data, speed_with_virtual_nodes, speed_with_virtual_nodes_data = \
+        res_dict["speed_data"]
+    density_without_virtual_nodes, density_without_virtual_nodes_data, density_with_virtual_nodes, density_with_virtual_nodes_data = \
+        res_dict["density_data"]
     travel_time_results = res_dict['tt']
     res_mrf = res_dict["mrf"]
     travel_time = travel_time_results[-1].data
-    avg_speeds = _route_avgs(speed_data_without_virtual_node)
-    accelerator_data = _raw_route_avgs(_calculate_accel(speed_data_without_virtual_node, prd.interval, **kwargs), prd)
+    avg_speeds = _route_avgs(speed_without_virtual_nodes)
+    acceleration_data = _calculate_accel(speed_without_virtual_nodes, prd.interval, **kwargs)
+    accelerator_avgs = _raw_route_avgs(acceleration_data, prd)
     timeline = prd.get_timeline(as_datetime=False, with_date=True)
     print(f"{Fore.CYAN}Start[{timeline[0]}] End[{timeline[-1]}] TimelineLength[{len(timeline)}]")
     for index, dateTimeStamp in enumerate(timeline):
-        meta_data = generate_meta_data(raw_flow_data, raw_speed_data, raw_density_data,
-                                       flow_data, speed_data, density_data, speed_data_without_virtual_node, res_mrf,
-                                       moe_param_config,
-                                       index)
+        meta_data = generate_meta_data(flow_with_virtual_nodes_data, speed_with_virtual_nodes_data,
+                                       density_with_virtual_nodes_data, flow_with_virtual_nodes,
+                                       flow_without_virtual_nodes_data, speed_without_virtual_nodes_data,
+                                       density_without_virtual_nodes_data, speed_without_virtual_nodes, res_mrf,
+                                       acceleration_data, moe_param_config, index)
         meta_data_string = json.dumps(meta_data)
         interval = TT_DATA_INTERVAL
         moe_critical_density = moe_param_config.moe_critical_density
@@ -395,7 +398,7 @@ def calculate_tt_moe_a_route(prd, ttri, **kwargs):
             'uvmt': uvmt,
             'cm': cm,
             'cmh': cmh,
-            'acceleration': accelerator_data[index],
+            'acceleration': accelerator_avgs[index],
             'meta_data': meta_data_string,
 
         }

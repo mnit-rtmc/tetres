@@ -166,10 +166,14 @@ def write_moe_data_sheet(eparam, ext_filter_groups, wb):
             speed_difference = cleanMOE(meta_data.get("speed_difference", 0))
             number_of_vehicles_entered = cleanMOE(meta_data.get("number_of_vehicles_entered", 0))
             number_of_vehicles_exited = cleanMOE(meta_data.get("number_of_vehicles_exited", 0))
+            try:
+                acceleration = "->".join([str(i) for i in meta_data.get("accelerations")])
+            except:
+                acceleration = ""
             ws.write_row(idx + 3, 0, [
                 dts, clean(x.tt), clean(x.speed), clean(x.vmt),
                 cleanMOE(x.vht), cleanMOE(x.dvh), cleanMOE(x.lvmt), cleanMOE(x.uvmt),
-                cleanMOE(x.cm), cleanMOE(x.cmh), cleanMOE(x.acceleration), number_of_vehicles_entered, number_of_vehicles_exited,
+                cleanMOE(x.cm), cleanMOE(x.cmh), acceleration, number_of_vehicles_entered, number_of_vehicles_exited,
                 speed_average, speed_variance, speed_max_u, speed_min_u, speed_difference,
                 moe_lane_capacity, moe_critical_density, moe_congestion_threshold_speed,
             ]
