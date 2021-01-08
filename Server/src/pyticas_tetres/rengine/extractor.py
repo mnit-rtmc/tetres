@@ -80,9 +80,9 @@ def _retrieve_data_from_db(route_id, operating_conditions, sdate, edate, start_t
 
         if not _tt_weathers:
             getLogger(__name__).warning('No weather data for route(%d) at %s' % (route_id, dt.strftime('%Y-%m-%d %H:%M')))
-            continue
 
-        extdata = ExtData(ttm, _tt_weathers[0], _tt_incidents, _tt_workzones, _tt_specialevents, _tt_snowmanagements)
+
+        extdata = ExtData(ttm, _tt_weathers[0] if _tt_weathers else [], _tt_incidents, _tt_workzones, _tt_specialevents, _tt_snowmanagements)
 
         for fidx, ef in enumerate(operating_conditions):
             try:
