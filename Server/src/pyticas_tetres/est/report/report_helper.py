@@ -307,9 +307,7 @@ def get_weather_values(extdata):
                                          '') if extdata.weather._weather.precip_intensity else '',
         ]
     except Exception as ex:
-        print('error occured: ', ex)
-        print('precip_type:', extdata.weather._weather.precip_type)
-        return []
+        return ["", "", "", "", ""]
 
 
 def _get_precip_type(extdata):
