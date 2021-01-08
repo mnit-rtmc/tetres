@@ -149,7 +149,8 @@ def write_moe_data_sheet(eparam, ext_filter_groups, wb):
             try:
                 meta_data = json.loads(x.meta_data)
             except Exception as e:
-                print(e)
+                print("Meta data not found, MOE value is not pre-calculated for the route: {}, for "
+                      "the time period: {}. Error: {}".format(x, dts, e))
                 meta_data = {}
             # interval = TT_DATA_INTERVAL
             moe_lane_capacity = cleanMOE(meta_data.get("moe_lane_capacity", 0))
