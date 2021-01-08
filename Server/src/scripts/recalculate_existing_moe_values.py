@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from pyticas_tetres.da.route_wise_moe_parameters import RouteWiseMOEParametersDataAccess
 
 __author__ = 'Chongmyung Park (chongmyung.park@gmail.com)'
 
@@ -38,6 +37,7 @@ if __name__ == '__main__':
     from pyticas_tetres.db.tetres import conn
 
     conn.connect(dbinfo.tetres_db_info())
+    from pyticas_tetres.da.route_wise_moe_parameters import RouteWiseMOEParametersDataAccess
 
     moe_calculation_data_access = RouteWiseMOEParametersDataAccess()
     moe_calculation_data = moe_calculation_data_access.search_by_completed_status()
