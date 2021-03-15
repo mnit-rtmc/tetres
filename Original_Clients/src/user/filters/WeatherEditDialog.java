@@ -71,14 +71,8 @@ public final class WeatherEditDialog extends FilterEditDialog {
         DefaultTableModel model = (DefaultTableModel) this.table.getModel();
         
         List<String> targetIntensities = new ArrayList<String>();      
-        if(INTENSITY_ANY.equals(intensity)) {           
-            for(String _intensity : this.intensities) {
-                targetIntensities.add(_intensity);
-            }
-        } else {
-            targetIntensities.add(intensity);
-        }
-       
+        targetIntensities.add(intensity);
+
         int nAdded = 0;
         for(String _intensity : targetIntensities) {
             if(this.hasValueInTable(type, _intensity)) {
