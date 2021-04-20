@@ -21,7 +21,7 @@ matplotlib==2.1.2
 numpy==1.15.4
 pg8000==1.11.0
 pluggy==0.6.0
-py==1.5.2
+py==1.10.0
 pycparser==2.18
 PyDispatcher==2.0.5
 pyOpenSSL==17.5.0
