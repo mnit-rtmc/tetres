@@ -258,7 +258,7 @@ public class PanelEstimation extends javax.swing.JPanel implements IInitializabl
             return;
         }
 
-        if (eri.estmation_mode.isNotSet()) {
+        if (eri.estmation_mode.isNotSet() && !this.chkWriteMoeSpreadsheet.isSelected()) {
             JOptionPane.showMessageDialog(this, "Select a reliability type to estimate at least one");
             return;
         }
