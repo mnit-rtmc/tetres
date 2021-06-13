@@ -35,9 +35,9 @@ def write(uid, eparam, operating_conditions, results):
             tod_reliabilities_writer.write(uid, eparam, operating_conditions, TOD_whole, TOD_yearly, TOD_monthly)
         logger.debug('<< End of writing spread sheets (elapsed time=%s)' % (
             timeutil.human_time(seconds=(time.time() - proc_start_time))))
-
-        # write data sheet
-        tt_data_writer.write(uid, eparam, operating_conditions)
+        if whole or TOD_whole:
+            # write data sheet
+            tt_data_writer.write(uid, eparam, operating_conditions)
 
     if eparam.write_graph_images:
         # write graphs
