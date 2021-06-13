@@ -38,6 +38,7 @@ def calculate(ttri, extdata_list):
 
     # Calculating reference travel times
     avg_tt = statistics.mean(tts)
+    median_tt = statistics.median(tts)
     #tt_rate = avg_tt / ttri.route.length()
     tt_rate = avg_tt / milepoint_routeLength(ttri)
     ffs_tt = _tt_by_freeflowspeed(ttri) 
@@ -54,6 +55,7 @@ def calculate(ttri, extdata_list):
     percentiles = [0.5, 0.8, 0.85, 0.9, 0.95]
     ipercentiles = [ int(p*100) for p in percentiles ]
     buffer_indice = {}
+    buffer_indice_median = {}
     planning_indice = {}
     percentile_tts = {}
     traveltime_Rate={}
@@ -67,7 +69,11 @@ def calculate(ttri, extdata_list):
         bi = (pct_tt - avg_tt) / avg_tt
         if bi < 0:
             bi = 0
+        bim = (pct_tt - median_tt) / median_tt
+        if bim < 0:
+            bim = 0
         buffer_indice[ipct] = bi
+        buffer_indice_median[ipct] = bim
         planning_indice[ipct] = (pct_tt / ffs_tt)
         traveltime_Rate[ipct]= pct_tt/milepoint_routeLength(ttri)
         
@@ -98,6 +104,7 @@ def calculate(ttri, extdata_list):
         'congested_count': len(congested_tts),
         'travel_time_index': traveltime_index,
         'buffer_index': buffer_indice,
+        'buffer_index_median': buffer_indice_median,
         'travel_time_rate': traveltime_Rate,
         'misery_index': misery_index,
         'on_time_arrival': on_time_arrival,
