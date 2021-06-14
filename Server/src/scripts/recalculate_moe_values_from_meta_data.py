@@ -11,26 +11,6 @@ import global_settings
 import dbinfo
 
 if __name__ == '__main__':
-    from pyticas import ticas
-    from pyticas.infra import Infra
-    from pyticas_tetres.db.tetres import conn
-
-    ticas.initialize(global_settings.DATA_PATH)
-    infra = Infra.get_infra()
-
-    conn.connect(dbinfo.tetres_db_info())
-
-    time.sleep(1)
-
-    print('')
-    print(
-        '!! Do not run multiple instances of this program. (DB sync problem can be caused in bulk-insertion and deletion)')
-    print('!! Stop TeTRES Server if it is running.')
-    print('')
-    print('# Have you defined the travel time reliability route in administrator client?')
-    print('# calculates travel times and moe values during the given time period')
-    print('')
-
     sdt_str = input('# Enter start date to load data (e.g. 2015-01-01) : ')
     sdate = datetime.datetime.strptime(sdt_str, '%Y-%m-%d').date()
 
@@ -56,6 +36,26 @@ if __name__ == '__main__':
     if res.lower() not in ['y', 'ye', 'yes']:
         print('\nAborted!')
         exit(1)
+
+    from pyticas import ticas
+    from pyticas.infra import Infra
+    from pyticas_tetres.db.tetres import conn
+
+    ticas.initialize(global_settings.DATA_PATH)
+    infra = Infra.get_infra()
+
+    conn.connect(dbinfo.tetres_db_info())
+
+    time.sleep(1)
+
+    print('')
+    print(
+        '!! Do not run multiple instances of this program. (DB sync problem can be caused in bulk-insertion and deletion)')
+    print('!! Stop TeTRES Server if it is running.')
+    print('')
+    print('# Have you defined the travel time reliability route in administrator client?')
+    print('# calculates travel times and moe values during the given time period')
+    print('')
 
     filename = '_initial_data_maker.log'
     with open(filename, 'w') as f:

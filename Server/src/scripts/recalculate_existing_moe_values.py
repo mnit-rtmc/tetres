@@ -11,16 +11,6 @@ import global_settings
 import dbinfo
 
 if __name__ == '__main__':
-    from pyticas import ticas
-    from pyticas.infra import Infra
-    from pyticas_tetres.util.traffic_file_checker import has_traffic_files
-    from pyticas_tetres.systasks import initial_data_maker
-
-    ticas.initialize(global_settings.DATA_PATH)
-    infra = Infra.get_infra()
-
-    time.sleep(1)
-
     print('')
     print(
         '!! Do not run multiple instances of this program. (DB sync problem can be caused in bulk-insertion and deletion)')
@@ -34,6 +24,17 @@ if __name__ == '__main__':
     if res.lower() not in ['y', 'ye', 'yes']:
         print('\nAborted!')
         exit(1)
+
+    from pyticas import ticas
+    from pyticas.infra import Infra
+    from pyticas_tetres.util.traffic_file_checker import has_traffic_files
+    from pyticas_tetres.systasks import initial_data_maker
+
+    ticas.initialize(global_settings.DATA_PATH)
+    infra = Infra.get_infra()
+
+    time.sleep(1)
+
     from pyticas_tetres.db.tetres import conn
 
     conn.connect(dbinfo.tetres_db_info())
