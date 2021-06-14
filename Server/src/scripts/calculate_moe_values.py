@@ -11,19 +11,6 @@ import global_settings
 import dbinfo
 
 if __name__ == '__main__':
-    from pyticas import ticas
-    from pyticas.infra import Infra
-    from pyticas_tetres.db.tetres import conn
-    from pyticas_tetres.api.admin.systemconfig import create_rw_moe_param_object, save_rw_param_object
-    from pyticas_tetres.util.traffic_file_checker import has_traffic_files
-
-    ticas.initialize(global_settings.DATA_PATH)
-    infra = Infra.get_infra()
-
-    conn.connect(dbinfo.tetres_db_info())
-
-    time.sleep(1)
-
     print('')
     print(
         '!! Do not run multiple instances of this program. (DB sync problem can be caused in bulk-insertion and deletion)')
@@ -38,11 +25,7 @@ if __name__ == '__main__':
 
     edt_str = input('# Enter end date to load data (e.g. 2017-12-31) : ')
     edate = datetime.datetime.strptime(edt_str, '%Y-%m-%d').date()
-    if not has_traffic_files(sdt_str, edt_str):
-        print("Missing traffic files for the given time range.")
-        print("Please check if you have put the traffic files in the proper directory structure.")
-        print("Failed to calculate moe for the given time range.")
-        exit(1)
+
     moe_lane_capacity = input("Enter moe_lane_capacity: ")
     moe_critical_density = input("Enter moe_critical_density: ")
     moe_congestion_threshold_speed = input("Enter moe_congestion_threshold_speed: ")
@@ -51,6 +34,7 @@ if __name__ == '__main__':
         "rw_moe_critical_density": float(moe_critical_density),
         "rw_moe_congestion_threshold_speed": float(moe_congestion_threshold_speed),
     }
+
     choice = input("Do you want to specify some specific routes?[y/n]: ")
     route_ids = None
     if choice.lower() == "y":
@@ -63,6 +47,25 @@ if __name__ == '__main__':
     res = input('!! Do you want to proceed data loading process ? [N/y] : ')
     if res.lower() not in ['y', 'ye', 'yes']:
         print('\nAborted!')
+        exit(1)
+
+    from pyticas import ticas
+    from pyticas.infra import Infra
+    from pyticas_tetres.db.tetres import conn
+    from pyticas_tetres.api.admin.systemconfig import create_rw_moe_param_object, save_rw_param_object
+    from pyticas_tetres.util.traffic_file_checker import has_traffic_files
+
+    ticas.initialize(global_settings.DATA_PATH)
+    infra = Infra.get_infra()
+
+    conn.connect(dbinfo.tetres_db_info())
+
+    time.sleep(1)
+
+    if not has_traffic_files(sdt_str, edt_str):
+        print("Missing traffic files for the given time range.")
+        print("Please check if you have put the traffic files in the proper directory structure.")
+        print("Failed to calculate moe for the given time range.")
         exit(1)
 
     filename = '_initial_data_maker.log'
