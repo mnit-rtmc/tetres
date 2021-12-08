@@ -96,7 +96,8 @@ def calculate_lvmt_dynamically(data, interval, critical_denisty, lane_capacity):
                 lvmt = (lvmt * interval / seconds_per_hour * vd)
             else:
                 lvmt = 0
-
+            if lvmt < 0:
+                lvmt = 0
             lvmt_data.append(lvmt)
         return sum(lvmt_data)
     except Exception as e:

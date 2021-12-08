@@ -79,8 +79,9 @@ def calculate_vmt_dynamically(meta_data, interval, **kwargs):
     seconds_per_hour = 3600
     vmt_data = []
     for value in data:
-        vmt = value * interval / seconds_per_hour * vd
         if value == missing_data:
-            vmt = missing_data
+            vmt = 0
+        else:
+            vmt = value * interval / seconds_per_hour * vd
         vmt_data.append(vmt)
     return sum(vmt_data)

@@ -149,7 +149,8 @@ def write_moe_data_sheet(eparam, ext_filter_groups, wb):
             try:
                 meta_data = json.loads(x.meta_data)
             except Exception as e:
-                print(e)
+                print("Meta data not found, MOE value is not pre-calculated for the route: {}, for "
+                      "the time period: {}. Error: {}".format(x, dts, e))
                 meta_data = {}
             # interval = TT_DATA_INTERVAL
             moe_lane_capacity = cleanMOE(meta_data.get("moe_lane_capacity", 0))
@@ -166,10 +167,14 @@ def write_moe_data_sheet(eparam, ext_filter_groups, wb):
             speed_difference = cleanMOE(meta_data.get("speed_difference", 0))
             number_of_vehicles_entered = cleanMOE(meta_data.get("number_of_vehicles_entered", 0))
             number_of_vehicles_exited = cleanMOE(meta_data.get("number_of_vehicles_exited", 0))
+            try:
+                acceleration = "->".join([str(i) for i in meta_data.get("accelerations")])
+            except:
+                acceleration = ""
             ws.write_row(idx + 3, 0, [
                 dts, clean(x.tt), clean(x.speed), clean(x.vmt),
                 cleanMOE(x.vht), cleanMOE(x.dvh), cleanMOE(x.lvmt), cleanMOE(x.uvmt),
-                cleanMOE(x.cm), cleanMOE(x.cmh), cleanMOE(x.acceleration), number_of_vehicles_entered, number_of_vehicles_exited,
+                cleanMOE(x.cm), cleanMOE(x.cmh), acceleration, number_of_vehicles_entered, number_of_vehicles_exited,
                 speed_average, speed_variance, speed_max_u, speed_min_u, speed_difference,
                 moe_lane_capacity, moe_critical_density, moe_congestion_threshold_speed,
             ]
@@ -303,9 +308,7 @@ def get_weather_values(extdata):
                                          '') if extdata.weather._weather.precip_intensity else '',
         ]
     except Exception as ex:
-        print('error occured: ', ex)
-        print('precip_type:', extdata.weather._weather.precip_type)
-        return []
+        return ["", "", "", "", ""]
 
 
 def _get_precip_type(extdata):
@@ -488,6 +491,10 @@ def get_indice_names():
         'buffer_index:85',
         'buffer_index:90',
         'buffer_index:95',
+        'buffer_index_median:80',
+        'buffer_index_median:85',
+        'buffer_index_median:90',
+        'buffer_index_median:95',
         'planning_time_index:80',
         'planning_time_index:85',
         'planning_time_index:90',
@@ -519,6 +526,10 @@ def get_indice_names():
         'Buffer Index (85th %-ile)',
         'Buffer Index (90th %-ile)',
         'Buffer Index (95th %-ile)',
+        'Buffer Index Median (80th %-ile)',
+        'Buffer Index Median (85th %-ile)',
+        'Buffer Index Median (90th %-ile)',
+        'Buffer Index Median (95th %-ile)',
         'Planning Time Index (80th %-ile)',
         'Planning Time Index (85th %-ile)',
         'Planning Time Index (90th %-ile)',
@@ -551,6 +562,10 @@ def get_indice_names_for_byindices():
         'buffer_index:85',
         'buffer_index:90',
         'buffer_index:95',
+        'buffer_index_median:80',
+        'buffer_index_median:85',
+        'buffer_index_median:90',
+        'buffer_index_median:95',
         'planning_time_index:80',
         'planning_time_index:85',
         'planning_time_index:90',
@@ -577,6 +592,10 @@ def get_indice_names_for_byindices():
         'Buffer Index (85th %-ile)',
         'Buffer Index (90th %-ile)',
         'Buffer Index (95th %-ile)',
+        'Buffer Index Median (80th %-ile)',
+        'Buffer Index Median (85th %-ile)',
+        'Buffer Index Median (90th %-ile)',
+        'Buffer Index Median (95th %-ile)',
         'Planning Time Index (80th %-ile)',
         'Planning Time Index (85th %-ile)',
         'Planning Time Index (90th %-ile)',
@@ -603,6 +622,10 @@ def get_indice_names_for_byindices():
         'BufferIndex(85%)',
         'BufferIndex(90%)',
         'BufferIndex(95%)',
+        'BufferIndexMedian(80%)',
+        'BufferIndexMedian(85%)',
+        'BufferIndexMedian(90%)',
+        'BufferIndexMedian(95%)',
         'PlanningTimeIndex(80%)',
         'PlanningTimeIndex(85%)',
         'PlanningTimeIndex(90%)',

@@ -15,8 +15,10 @@ def run(route, prd, **kwargs):
     """
 
     # load_data total flow data
-    tq_results = total_flow.run(route, prd)
-    tq_results = moe_helper.add_virtual_rnodes(tq_results, route)
-    tq_data = [res.data for res in tq_results]
+    tq = total_flow.run(route, prd)
+    tq_data = [res.data for res in tq]
 
-    return tq_results, tq_data
+    tq_with_virtual_nodes = moe_helper.add_virtual_rnodes(tq, route)
+    tq_with_virtual_nodes_data = [res.data for res in tq_with_virtual_nodes]
+
+    return tq, tq_data, tq_with_virtual_nodes, tq_with_virtual_nodes_data

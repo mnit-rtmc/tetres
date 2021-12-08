@@ -2,30 +2,14 @@
 __author__ = 'Chongmyung Park (chongmyung.park@gmail.com)'
 
 import datetime
+import sys
 import time
-import sys
 
-import sys
 sys.path.append("Server/src")
 import global_settings
 import dbinfo
 
 if __name__ == '__main__':
-    from pyticas import ticas
-    from pyticas.infra import Infra
-    from pyticas_tetres.db.cad import conn as conn_cad
-    from pyticas_tetres.db.iris import conn as conn_iris
-    from pyticas_tetres.db.tetres import conn
-
-    ticas.initialize(global_settings.DATA_PATH)
-    infra = Infra.get_infra()
-
-    conn.connect(dbinfo.tetres_db_info())
-    conn_cad.connect(dbinfo.cad_db_info())
-    conn_iris.connect(dbinfo.iris_incident_db_info())
-
-    time.sleep(1)
-
     print('')
     print(
         '!! Do not run multiple instances of this program. (DB sync problem can be caused in bulk-insertion and deletion)')
@@ -45,8 +29,23 @@ if __name__ == '__main__':
     print('!! Data during the given time period will be deleted.')
     res = input('!! Do you want to proceed data loading process ? [N/y] : ')
     if res.lower() not in ['y', 'ye', 'yes']:
-        print('\nAported!')
+        print('\nAborted!')
         exit(1)
+
+    from pyticas import ticas
+    from pyticas.infra import Infra
+    from pyticas_tetres.db.cad import conn as conn_cad
+    from pyticas_tetres.db.iris import conn as conn_iris
+    from pyticas_tetres.db.tetres import conn
+
+    ticas.initialize(global_settings.DATA_PATH)
+    infra = Infra.get_infra()
+
+    conn.connect(dbinfo.tetres_db_info())
+    conn_cad.connect(dbinfo.cad_db_info())
+    conn_iris.connect(dbinfo.iris_incident_db_info())
+
+    time.sleep(1)
 
     filename = '_initial_data_maker.log'
     with open(filename, 'w') as f:
