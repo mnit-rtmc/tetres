@@ -18,7 +18,7 @@ Jinja2==2.10
 Mako==1.0.7
 MarkupSafe==1.0
 matplotlib==2.1.2
-numpy==1.15.4
+numpy==1.22.0
 pg8000==1.11.0
 pluggy==0.6.0
 py==1.5.2
